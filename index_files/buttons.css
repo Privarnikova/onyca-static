@@ -1,0 +1,159 @@
+/**
+ * Кнопки. Источник — «Кнопка ЦД - 1.svg», «Кнопка Второстепенная - 1.svg»,
+ * «Кнопка - Куки.svg», «Кнопка - Лид магнит.svg» (статика + hover) +
+ * точные значения padding из Figma (Auto Layout) для второстепенной
+ * кнопки: top 16 / right 22 / bottom 18 / left 22, gap 10, radius 100.
+ * Высоту (52/44/40px) не задаём напрямую — она получается из padding +
+ * line-height текста, так кнопка тянется под любую длину лейбла.
+ *
+ * .btn--cta делит те же 52px высоты (top/bottom 16/18), что и
+ * .btn--secondary, но точный горизонтальный padding под её текст пока не
+ * подтверждён Figma-значениями — если разъедется, поправить здесь же.
+ * .btn--cookie/.btn--lead-magnet ниже (44/40px) — их точный padding тоже
+ * не подтверждён, взят пропорционально.
+ *
+ * ТЗ п.02: тип 1 — магнитные кнопки ЦД (JS-часть притяжения к курсору —
+ * отдельно, здесь только заливка/цвет). Тип 2 — второстепенные/табы, для
+ * табов есть состояние .is-selected (п.05-01 — таб выбран, не переход).
+ */
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--btn-gap);
+	font-family: var(--font-family-base);
+	font-weight: var(--font-weight-button);
+	line-height: var(--line-height-button);
+	border: none;
+	border-radius: var(--radius-pill);
+	cursor: pointer;
+	text-decoration: none;
+	white-space: nowrap;
+	transition: background-color 0.3s ease, color 0.3s ease;
+	/* Рамка фокуса убрана глобально в main.css — здесь дублировать нельзя,
+	   иначе синий прямоугольник возвращается поверх скруглённой кнопки. */
+}
+
+/**
+ * Тип 1 — целевое действие (магнитная кнопка). Базовый вариант — чёрный
+ * (ЦД-3/ЦД-2), это обычный случай. Розовый (ЦД-1) — модификатор
+ * --primary, зарезервирован только под ГЛАВНУЮ кнопку «Обсудить проект»
+ * (подтверждено 2026-09-03), не ставить его на другие ЦД-кнопки.
+ */
+.btn--cta {
+	/* Тянется по трём реальным точкам: 16/32/18 на 1600+, 15/18/16 на 700
+	   (node-id 2610:8371), 16/22/18 на 360 (node-id 2568:1599). Ниже 700
+	   вертикальные значения разворачиваются обратно вверх — так в макете
+	   (не монотонно, как и шрифт 16→15→16). */
+	padding: clamp(15px, calc(14.22px + 0.1111vw), 16px) clamp(18px, calc(7.11px + 1.5556vw), 32px) clamp(16px, calc(14.44px + 0.2222vw), 18px);
+	font-size: var(--font-size-button);
+	background-color: var(--color-black);
+	color: var(--color-white);
+
+	&:hover {
+		background-color: var(--color-accent-blue);
+	}
+}
+
+/* ЦД-1: розовый — только для главной кнопки «Обсудить проект» */
+.btn--cta--primary {
+	background-color: var(--color-accent-pink);
+
+	&:hover {
+		background-color: var(--color-accent-blue);
+	}
+}
+
+/* ЦД-4: инверсия для тёмной/серой подложки — светлая кнопка, тёмный текст */
+.btn--cta--inverse {
+	background-color: var(--color-white);
+	color: var(--color-text);
+
+	&:hover {
+		background-color: var(--color-black);
+		color: var(--color-white);
+	}
+}
+
+/* ЦД-2: увеличенный размер (68px). Padding — пропорциональная оценка,
+   точных цифр из Figma для этого варианта нет */
+.btn--cta--large {
+	padding: 24px 40px 26px;
+}
+
+/* Тип 2 — второстепенная/таб. Padding подтверждён точными значениями Figma */
+.btn--secondary {
+	padding: clamp(15px, calc(14.22px + 0.1111vw), 16px) clamp(18px, calc(14.89px + 0.4444vw), 22px) clamp(16px, calc(14.44px + 0.2222vw), 18px);
+	font-size: var(--font-size-button);
+	background-color: var(--color-surface);
+	color: var(--color-text);
+
+	&:hover {
+		background-color: var(--color-accent-blue);
+		color: var(--color-white);
+	}
+
+	&.is-selected {
+		background-color: var(--color-accent-blue);
+		color: var(--color-white);
+	}
+}
+
+/* Уменьшенный второстепенный таб — форма «Обсудить проект», пилюли услуг.
+   Figma, две точки: 1600 (padding 12/14/14, шрифт 13) и 1920
+   (padding 13/16/16, шрифт 14) — clamp() между ними, см. project_breakpoints. */
+.btn--secondary--sm {
+	padding:
+		clamp(12px, calc(7px + 0.3125vw), 13px)
+		clamp(14px, calc(4px + 0.625vw), 16px)
+		clamp(14px, calc(4px + 0.625vw), 16px);
+	font-size: clamp(13px, calc(8px + 0.3125vw), 14px);
+}
+
+/* Кнопка cookie-баннера */
+.btn--cookie {
+	padding: 13px 20px 15px;
+	font-size: var(--font-size-button-sm);
+	background-color: var(--color-black);
+	color: var(--color-white);
+
+	&:hover {
+		background-color: var(--color-accent-blue);
+	}
+}
+
+/* Кнопка лид-магнита */
+.btn--lead-magnet {
+	padding: 11px 18px 13px;
+	font-size: var(--font-size-button-sm);
+	background-color: var(--color-dark-grey);
+	color: var(--color-white);
+
+	&:hover {
+		background-color: var(--color-text);
+		color: var(--color-text-dimmed);
+	}
+}
+
+/*
+ * Телефон (700 → 360). Продолжение той же непрерывной интерполяции: на 700
+ * значения совпадают с блоком выше (15/18/16 у ЦД, 15/18/16 у
+ * второстепенной), к 360 приходят к реальным 16/22/18 из макета
+ * «Форма. Телефон» (node-id 2568:1599). Разрыва на границе 700/699 нет.
+ */
+@media (max-width: 699px) {
+	.btn--cta {
+		padding:
+			clamp(15px, calc(17.06px - 0.2941vw), 16px)
+			clamp(18px, calc(26.24px - 1.1765vw), 22px)
+			clamp(16px, calc(20.12px - 0.5882vw), 18px);
+	}
+
+	.btn--secondary {
+		padding:
+			clamp(15px, calc(17.06px - 0.2941vw), 16px)
+			clamp(18px, calc(26.24px - 1.1765vw), 22px)
+			clamp(16px, calc(20.12px - 0.5882vw), 18px);
+	}
+}

@@ -1,0 +1,40 @@
+/**
+ * Переиспользуемая анимация подчёркивания при наведении — референс
+ * todaydigital.pro (::after, scaleX 0→1, transform-origin left, 300ms
+ * ease-out). Цвет линии — currentColor, подстраивается под цвет текста
+ * (в т.ч. приглушённый цвет активного пункта меню).
+ *
+ * Класс .link-underline вешается через разметку (header.php — Telegram)
+ * или через фильтр nav_menu_link_attributes (inc/setup.php — пункты меню).
+ */
+
+.link-underline {
+	position: relative;
+	display: inline-block;
+	/* Ширина по тексту, а не по колонке. Когда ссылки стали элементами
+	   сетки, они растянулись на всю колонку (510px при тексте 244px), и
+	   линия подчёркивания уезжала до края блока. justify-self держит их
+	   у левого края своей ячейки. */
+	width: fit-content;
+	max-width: 100%;
+	justify-self: start;
+}
+
+.link-underline::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	bottom: -4px;
+	width: 100%;
+	height: 1px;
+	background-color: currentColor;
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 0.3s ease-out;
+	pointer-events: none;
+}
+
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+	transform: scaleX(1);
+}

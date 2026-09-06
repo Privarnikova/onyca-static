@@ -1,0 +1,59 @@
+/**
+ * Пилюли-табы (выбор услуги в форме и др.) — переиспользуемый компонент,
+ * класс .tab-pill. Источник — Figma, две реальные точки: 1920 (node-id
+ * 1200:1581 и соседние в узле 1200:1607) и 1600 (node-id 2373:6505),
+ * fileKey 93JlTAOwjlBO4naQ7ReAFF. Все размеры — clamp(), интерполяция
+ * между этими двумя точками, не растяжка одной.
+ *
+ * Не путать с .btn--secondary (buttons.css) — визуально похожи, но разная
+ * семантика состояний: у .btn--secondary «выбрано» = тот же синий, что и
+ * hover; здесь «выбрано» — отдельный, чёрный цвет, hover — синий. Разные
+ * компоненты, поэтому не переиспользуем один класс на оба случая.
+ */
+
+.tab-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: clamp(12px, calc(7px + 0.3125vw), 13px) clamp(14px, calc(4px + 0.625vw), 16px) clamp(14px, calc(4px + 0.625vw), 16px);
+	border: none;
+	border-radius: var(--radius-pill);
+	background-color: var(--color-surface);
+	color: var(--color-text);
+	font-family: var(--font-family-base);
+	font-size: clamp(13px, calc(8px + 0.3125vw), 14px);
+	font-weight: var(--font-weight-button);
+	line-height: var(--line-height-button);
+	white-space: nowrap;
+	cursor: pointer;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.tab-pill:hover {
+	background-color: var(--color-accent-blue);
+	color: var(--color-white);
+}
+
+.tab-pill.is-selected {
+	background-color: var(--color-black);
+	color: var(--color-white);
+}
+
+/* Телефон (360, node-id 2491:9585) — не монотонно с 1200/1600: паддинг и
+   шрифт возвращаются к «десктопным» значениям (16/13/16, 14px), так в
+   макете, не опечатка. */
+/*
+ * 700 → 360: паддинги и шрифт тянутся, а не переключаются. Реальные точки:
+ * на 700 (node-id 2610:8371) — 12/14/14 и 13px, на 360 (node-id 2568:1599) —
+ * 13/16/16 и 14px. Раньше тут стояли плоские значения, и на 699 таб скачком
+ * менял размер (падинг 14 → 16, ширина 66 → 73).
+ */
+@media (max-width: 699px) {
+	.tab-pill {
+		padding:
+			clamp(12px, calc(14.06px - 0.2941vw), 13px)
+			clamp(14px, calc(18.12px - 0.5882vw), 16px)
+			clamp(14px, calc(18.12px - 0.5882vw), 16px);
+		font-size: clamp(13px, calc(15.06px - 0.2941vw), 14px);
+	}
+}

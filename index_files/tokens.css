@@ -1,0 +1,131 @@
+/**
+ * Дизайн-токены. Источник — экспорт из Figma (страница Контакты, десктоп
+ * 1920, + компоненты кнопок). Значения переносим сюда по мере разбора
+ * остальных страниц/брейкпоинтов — не выдумываем недостающее.
+ *
+ * Шрифт — локальные файлы из assets/font (вариативный TTF), не Google
+ * Fonts. Диапазон весов 100–900 покрывает оба используемых веса (500, 600)
+ * одним файлом.
+ */
+
+@font-face {
+	font-family: 'Wix Madefor Display';
+	src: url('../font/WixMadeforDisplay-VariableFont_wght.ttf') format('truetype-variations');
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+:root {
+	/* Шрифт */
+	--font-family-base: 'Wix Madefor Display', sans-serif;
+
+	/* Заголовки: H1–H6, вес 600, line-height 120% */
+	--font-size-h1: 54px;
+	--font-size-h2: 40px;
+	--font-size-h3: 32px;
+	--font-size-h4: 24px;
+	--font-size-h5: 20px;
+	--font-size-h6: 16px;
+	--font-weight-heading: 600;
+	--line-height-heading: 1.2;
+
+	/* Текст: два размера, вес 500, line-height 140% */
+	--font-size-body: 16px;
+	--font-size-body-sm: 15px;
+	--font-weight-body: 500;
+	--line-height-body: 1.4;
+
+	/* Кнопки: два размера, вес 600, line-height 110% */
+	--font-size-button: 16px;
+	--font-size-button-sm: 14px;
+	--font-weight-button: 600;
+	--line-height-button: 1.1;
+
+	/* Цвета — текст и служебные */
+	--color-text: #1a1a1a;
+	--color-text-muted: #999999;
+	--color-text-footer: #666666;
+	--color-text-disclaimer: #b3b3b3;
+	--color-text-dimmed: #e6e6e6;
+	--color-border: #cccccc;
+	--color-divider: #d8d8d8;
+	--color-surface: #f1f1f1;
+	--color-surface-alt: #f7f7f7;
+	--color-black: #000000;
+	--color-white: #ffffff;
+	--color-dark-grey: #333333;
+
+	/* Акценты — используются только в кнопках (см. components/buttons.css) */
+	--color-accent-blue: #0041e5;
+	--color-accent-pink: #ff3fac;
+
+	/* Ошибка/обязательное поле — components/radio.css */
+	--color-error: #ea0a20;
+
+	/* Форма */
+	--radius-pill: 100px;
+	--btn-gap: 10px;
+
+	/*
+	 * Сетка (десктоп, эталон 1920). Выше 1920 (до 2560 — «одна сетка» с
+	 * FHD/ноутбуком по ТЗ, см. project_breakpoints) макет не растягивается
+	 * дальше — отдельного 2560-макета нет, значения остаются как на 1920.
+	 * Для 1600 (ноутбук) шапка использует свои собственные fluid-значения
+	 * (components/header.css) — у неё асимметричные отступы, общий токен
+	 * контейнера под это не годится. Остальные компоненты пока не
+	 * разбирались на 1600 — когда дойдёт очередь, уточнять по факту, не по
+	 * этой же формуле вслепую.
+	 */
+	--container-max-width: 1920px;
+	--container-padding: 40px;
+}
+
+/*
+ * Адаптивная типографика и паддинг контейнера. Раньше это были флэт-токены,
+ * из-за чего любая страница на голых тегах h1..h6/.container (архивы CPT —
+ * Проекты и т.п. на заглушках archive.php/single.php) наследовала
+ * десктопные размеры на любой ширине, а потом скачком менялась на границе
+ * брейкпоинта. Скачков быть не должно — поэтому здесь не ступеньки, а
+ * непрерывная кусочно-линейная интерполяция по трём реальным Figma-точкам:
+ *
+ *   десктоп (1600+)   планшет (1200–700)   телефон (360)
+ *   H1 54             46                   32
+ *   H2 40             34                   27
+ *   H3 32             26                   24
+ *   H6 / текст 16     15                   16   (не монотонно — так в макете)
+ *   паддинг 40        25                   15
+ *
+ * Как это работает: первый media-блок тянет 1600→1200 и упирается в
+ * планшетное значение (clamp floor), поэтому на 1200–700 держится плато;
+ * второй блок продолжает 700→360. На границах значения совпадают, разрыва
+ * нет. Проверено: на 700 обе формулы дают одно и то же.
+ *
+ * H4/H5 — отдельной планшетной точки в макете нет, поэтому для них одна
+ * прямая 1600→360 без промежуточного плато (не выдумываем данные).
+ */
+@media (max-width: 1599px) {
+	:root {
+		--font-size-h1: clamp(46px, calc(22px + 2vw), 54px);
+		--font-size-h2: clamp(34px, calc(16px + 1.5vw), 40px);
+		--font-size-h3: clamp(26px, calc(8px + 1.5vw), 32px);
+		--font-size-h4: clamp(20px, calc(18.8387px + 0.3226vw), 24px);
+		--font-size-h5: clamp(18px, calc(17.4194px + 0.1613vw), 20px);
+		--font-size-h6: clamp(15px, calc(12px + 0.25vw), 16px);
+		--font-size-body: clamp(15px, calc(12px + 0.25vw), 16px);
+		--font-size-button: clamp(15px, calc(12px + 0.25vw), 16px);
+		--container-padding: clamp(25px, calc(-20px + 3.75vw), 40px);
+	}
+}
+
+@media (max-width: 699px) {
+	:root {
+		--font-size-h1: clamp(32px, calc(17.1765px + 4.1176vw), 46px);
+		--font-size-h2: clamp(27px, calc(19.5882px + 2.0588vw), 34px);
+		--font-size-h3: clamp(24px, calc(21.8824px + 0.5882vw), 26px);
+		--font-size-h6: clamp(15px, calc(17.0588px - 0.2941vw), 16px);
+		--font-size-body: clamp(15px, calc(17.0588px - 0.2941vw), 16px);
+		--font-size-button: clamp(15px, calc(17.0588px - 0.2941vw), 16px);
+		--container-padding: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
+	}
+}

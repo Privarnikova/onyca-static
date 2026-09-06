@@ -1,0 +1,535 @@
+/**
+ * Подвал сайта. Источник — Figma, две реальные точки: 1920 (node-id
+ * 975:2655) и 1600 (node-id 2411:4012), fileKey 93JlTAOwjlBO4naQ7ReAFF.
+ * Все размеры — clamp() с линейной интерполяцией между этими двумя
+ * точками (формула calc(intercept + slope*100vw), выведена из обеих
+ * точек), не растяжка одной. Выше 1920 — не растягивается дальше (см.
+ * project_breakpoints), ниже 1600 — отдельный проход позже.
+ *
+ * Паддинг подвала (35→40) — реальные симметричные данные из Figma на
+ * обеих точках, в отличие от шапки (там на 1600 была порча файла —
+ * см. header.css), поэтому здесь честная интерполяция, не флэт 40.
+ *
+ * Некоторые величины уменьшаются при росте ширины (шрифт Telegram/email
+ * 26→24, ширина дисклеймера 240→232) — так в макете на обеих точках,
+ * не опечатка.
+ */
+
+.site-footer {
+	background-color: var(--color-white);
+	padding-block: clamp(66px, calc(6px + 3.75vw), 78px);
+}
+
+/*
+ * Десктоп — сетка из ШЕСТИ РАВНЫХ колонок (макет 2411:4012):
+ *
+ *   кол1   кол2   кол3        кол4          кол5      кол6
+ *   лого   —      Telegram    почта         —         —
+ *   —      —      разделитель на колонки 3–6
+ *   —      —      Проекты     Студия        соцсети   политики
+ *                 Услуги      Карьера                 дисклеймер
+ *                 Блог        Контакты
+ *
+ * Бренд занимает колонку 1, контент — колонки 3–6 (внутри делит их на
+ * четыре равные части). Ни одной фиксированной ширины.
+ */
+.site-footer__inner {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	align-items: start;
+}
+
+.site-footer__brand {
+	grid-column: 1;
+}
+
+.site-footer__content {
+	grid-column: 3 / -1;
+}
+
+.site-footer__contacts,
+.site-footer__bottom {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	column-gap: 0;
+}
+
+.site-footer__contacts-link:first-child {
+	grid-column: 1;
+}
+
+.site-footer__contacts-link:last-child {
+	grid-column: 2;
+}
+
+.site-footer__nav {
+	grid-column: 1 / 3;
+}
+
+.site-footer__social {
+	grid-column: 3;
+}
+
+.site-footer__legal {
+	grid-column: 4;
+}
+
+.site-footer__inner.container {
+	padding-left: clamp(35px, calc(10px + 1.5625vw), 40px);
+	padding-right: clamp(35px, calc(10px + 1.5625vw), 40px);
+}
+
+.site-footer__brand {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(14px, calc(4px + 0.625vw), 16px);
+}
+
+.site-footer__logo {
+	display: block;
+	width: clamp(200.57px, calc(143.43px + 3.5716vw), 212px);
+	height: clamp(39px, calc(29px + 0.625vw), 41px);
+}
+
+.site-footer__copyright {
+	margin: 0;
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text-footer);
+}
+
+.site-footer__content {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(66px, calc(6px + 3.75vw), 78px);
+}
+
+
+.site-footer__contacts-link {
+	font-size: clamp(24px, calc(36px - 0.625vw), 26px);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+	text-decoration: none;
+}
+
+.site-footer__divider {
+	height: 0;
+	border-top: 1px solid var(--color-divider);
+}
+
+
+.site-footer__menu {
+	display: grid;
+	grid-auto-flow: column;
+	grid-template-rows: repeat(3, auto);
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: 0;
+	row-gap: clamp(7px, calc(2px + 0.3125vw), 8px);
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.site-footer__social {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(7px, calc(2px + 0.3125vw), 8px);
+}
+
+
+.site-footer__menu a,
+.site-footer__social a {
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text);
+	text-decoration: none;
+}
+
+.site-footer__policy {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(7px, calc(2px + 0.3125vw), 8px);
+	margin: 0;
+}
+
+.site-footer__policy a {
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text-disclaimer);
+	text-decoration: none;
+}
+
+.site-footer__disclaimer {
+	margin: clamp(11px, calc(1px + 0.625vw), 13px) 0 0;
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text-disclaimer);
+}
+
+/*
+ * Планшет (1200) — Figma «1200x517 - Подвал» (node-id 2587:11816).
+ * Не растяжка десктоп-тира: колонка бренда/паддинг/шрифты в основном
+ * совпадают с floor-значениями существующих clamp() (совпало само по
+ * себе), но нижний блок (nav+соцсети+легал) — другая раскладка: единая
+ * 3-колоночная сетка (292/292/1fr), легал в третьей строке той же сетки,
+ * а не отдельный блок сбоку.
+ */
+/*
+ * Подвал ниже десктопа — ОДНА сетка на все ряды, три трека:
+ *
+ *   [ колонка 1 ] [ подколонка 1 ] [ подколонка 2 ]
+ *   лого + год     —                —
+ *   Telegram       почта
+ *   Проекты        Студия           соцсети
+ *   Услуги         Карьера
+ *   Блог           Контакты
+ *   политики       дисклеймер
+ *
+ * То есть по структуре из макета 700 (node-id 2610:7064): две колонки,
+ * правая делится на две подколонки (x=25 / 359 / 528 внутри 650).
+ *
+ * Раньше ряды держались на flex-basis, и это дважды дало баги: место
+ * блока в строке и ширина его текста оказывались одним и тем же числом —
+ * почта не попадала в колонку меню, а у политик текст растягивался на
+ * всю колонку (334px) вместо 240px и не переносился на две строки.
+ * В сетке место задаётся треком, а ширина текста — своим свойством, и
+ * эти вещи больше не связаны.
+ *
+ * Ширины треков — реальные точки: 292/292 на 1200 и 334/169 на 700.
+ */
+/*
+ * Подвал ниже десктопа — сетка из ЧЕТЫРЁХ РАВНЫХ колонок. Никаких
+ * фиксированных ширин: колонки делят контейнер поровну (`1fr`), поэтому
+ * вся раскладка масштабируется пропорционально сама.
+ *
+ *   кол1        кол2                  кол3                       кол4
+ *   лого+год    Telegram              почта                      —
+ *   —           Проекты Услуги Блог   Студия Карьера Контакты    соцсети
+ *   —           политика обработки    политика cookie            дисклеймер
+ *
+ * Пока бренд помещается в строку — он занимает колонку 1, а контент
+ * (контакты, меню, легал) живёт в колонках 2–4. Когда места не хватает,
+ * бренд уходит наверх на всю ширину, и контент разворачивается на все
+ * четыре колонки — тогда Telegram встаёт в колонку 1, почта в 3,
+ * соцсети в 4, как в макете 700.
+ */
+/*
+ * Граница 1400: выше держится раскладка 1600 (шесть колонок), ниже —
+ * четыре колонки макета 1200.
+ */
+@media (max-width: 1400px) {
+	.site-footer__inner {
+		/*
+		 * Колонка бренда сжимается медленнее остальных: в ней логотип
+		 * (200.5px), и при равных четвертях к 900 колонка доходила до 210,
+		 * то есть логотип упирался в её край. Минимум 15.6em — логотип плюс
+		 * воздух; пока четверть шире (до ~1130), колонки равные и на 1200
+		 * совпадают с макетом, ниже колонка держит минимум, а место отдают
+		 * три правые — там короткие строки и запас есть.
+		 *
+		 * min-content тут не годится: логотип — картинка с max-width:100%,
+		 * её min-content равен нулю, и колонке было куда сжиматься.
+		 *
+		 * minmax(0, 1fr) у правых, а не просто 1fr: 1fr не даёт колонке
+		 * сжаться уже min-content, и длинный текст (почта, 244px)
+		 * растягивал свой трек — колонки переставали быть равными
+		 * (135/135/244/135).
+		 */
+		display: grid;
+		grid-template-columns: max(25%, 15.6em) repeat(3, minmax(0, 1fr));
+		row-gap: clamp(78px, calc(123.29px - 6.4706vw), 100px);
+	}
+
+	.site-footer__inner.container {
+		padding-left: clamp(25px, calc(11px + 2vw), 35px);
+		padding-right: clamp(25px, calc(11px + 2vw), 35px);
+	}
+
+	.site-footer__brand {
+		grid-column: 1;
+	}
+
+	.site-footer__content {
+		/* Контент занимает колонки 2–4 и делит их поровну между рядами */
+		grid-column: 2 / -1;
+		display: flex;
+		flex-direction: column;
+		gap: clamp(32px, calc(-4px + 10vw), 66px);
+	}
+
+	.site-footer__contacts,
+	.site-footer__bottom,
+	.site-footer__legal {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		column-gap: 0;
+	}
+
+	.site-footer__contacts {
+		row-gap: 24px;
+	}
+
+	.site-footer__contacts-link:first-child {
+		grid-column: 1;
+	}
+
+	.site-footer__contacts-link:last-child {
+		grid-column: 2;
+	}
+
+	.site-footer__bottom {
+		row-gap: 66px;
+	}
+
+	.site-footer__nav {
+		/* Меню занимает две колонки и делит их поровну на свои два столбца */
+		grid-column: 1 / 3;
+	}
+
+	.site-footer__menu {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		width: auto;
+		column-gap: 0;
+		row-gap: 10px;
+	}
+
+	.site-footer__social {
+		grid-column: 3;
+		margin-left: 0;
+		gap: clamp(8px, calc(12.8px - 0.4vw), 10px);
+	}
+
+	.site-footer__legal {
+		grid-column: 1 / -1;
+		margin-left: 0;
+		row-gap: 8px;
+	}
+
+	.site-footer__policy {
+		/* contents — политики ложатся прямо в колонки легала */
+		display: contents;
+	}
+
+	/*
+	 * Перенос строки в «Политика обработки / персональных данных» задан в
+	 * разметке (footer.php, <br>) — так же, как в макете. Раньше он
+	 * достигался шириной 240px, но тогда сам блок ссылки был шире текста, и
+	 * линия подчёркивания при наведении тянулась до края колонки.
+	 */
+
+	.site-footer__policy a:first-child {
+		grid-column: 1;
+	}
+
+	.site-footer__policy a:last-child {
+		grid-column: 2;
+	}
+
+	.site-footer__disclaimer {
+		grid-column: 3;
+		margin-top: 0;
+		width: auto;
+	}
+}
+
+/*
+ * Бренд перестаёт помещаться в строку — уходит наверх на всю ширину, а
+ * контент разворачивается на все четыре колонки. Тогда Telegram встаёт в
+ * колонку 1, почта в 3, соцсети в 4 — раскладка макета 700.
+ */
+@media (max-width: 900px) {
+	.site-footer__inner.container {
+		/* 25px до 700, дальше к 15px на 360. Раньше эта формула стояла в
+		   блоке 530 и отступ прыгал 25 → 20 ровно на границе. */
+		padding-left: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
+		padding-right: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
+	}
+
+	.site-footer__bottom {
+		/* 66px до 700, дальше к 48px на 360 */
+		row-gap: clamp(48px, calc(28.94px + 5.2941vw), 66px);
+	}
+
+	.site-footer__brand,
+	.site-footer__content {
+		grid-column: 1 / -1;
+	}
+
+	.site-footer__contacts,
+	.site-footer__bottom,
+	.site-footer__legal {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	.site-footer__contacts-link:last-child {
+		grid-column: 3;
+	}
+
+	/*
+	 * Меню занимает колонки 1–3: «Проекты Услуги Блог» в колонке 1,
+	 * «Студия Карьера Контакты» — в колонке 3 (не 2), чтобы правая половина
+	 * подвала делилась на две подколонки: пункты и соцсети.
+	 */
+	.site-footer__nav {
+		grid-column: 1 / 4;
+	}
+
+	.site-footer__menu {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.site-footer__menu > li:nth-child(1) {
+		grid-area: 1 / 1;
+	}
+
+	.site-footer__menu > li:nth-child(2) {
+		grid-area: 2 / 1;
+	}
+
+	.site-footer__menu > li:nth-child(3) {
+		grid-area: 3 / 1;
+	}
+
+	.site-footer__menu > li:nth-child(4) {
+		grid-area: 1 / 3;
+	}
+
+	.site-footer__menu > li:nth-child(5) {
+		grid-area: 2 / 3;
+	}
+
+	.site-footer__menu > li:nth-child(6) {
+		grid-area: 3 / 3;
+	}
+
+	.site-footer__social {
+		grid-column: 4;
+	}
+
+	.site-footer__policy a:last-child {
+		grid-column: 3;
+	}
+
+	.site-footer__disclaimer {
+		grid-column: 4;
+	}
+}
+
+/*
+ * Политики перестают помещаться в две соседние колонки — возвращаются в
+ * столбик в первую, дисклеймер остаётся в своей.
+ */
+@media (max-width: 780px) {
+	.site-footer__logo {
+		/* 200.571×39 на 700 → 160×31 на 360, обе точки реальные. Правило
+		   стояло в мобильном блоке, из-за чего от 700 до 531 логотип
+		   держал десктопный размер и на 530 менялся ступенькой. */
+		width: clamp(160px, calc(117.04px + 11.933vw), 200.571px);
+		height: clamp(31px, calc(22.53px + 2.3529vw), 39px);
+	}
+
+	.site-footer__policy {
+		display: flex;
+		flex-direction: column;
+		grid-column: 1 / 3;
+		gap: clamp(7px, calc(12.33px - 0.3333vw), 10px);
+	}
+
+	.site-footer__policy a:first-child,
+	.site-footer__policy a:last-child {
+		grid-column: auto;
+	}
+
+	.site-footer__disclaimer {
+		/* Колонки 3-4, как в макете 700: дисклеймер под «Студия Карьера
+		   Контакты» и занимает обе оставшиеся колонки. Пока политики стоят
+		   в ряд (выше 780), он в колонке 4, иначе наложился бы на
+		   «Политику cookie». */
+		grid-column: 3 / -1;
+	}
+}
+
+/*
+ * Раскладка 360. Порог 530, а не 699: выше него четыре колонки просто
+ * сжимаются и раскладка макета 700 держится — «пока есть место». Ниже
+ * колонка становится уже пунктов меню, и ряды переходят в один столбец.
+ */
+/*
+ * Ряд контактов уходит в столбик раньше остальных: email — 244px, а он
+ * стоит в двух колонках из четырёх, то есть перестаёт помещаться, когда
+ * контейнер становится уже 488 (это и есть 530). Нижний ряд к этому
+ * моменту помещается свободно, поэтому раньше он перестраивался зря —
+ * правило было одно на три ряда.
+ */
+@media (max-width: 530px) {
+	.site-footer__contacts {
+		grid-template-columns: 1fr;
+		row-gap: 24px;
+	}
+
+	.site-footer__contacts-link:first-child,
+	.site-footer__contacts-link:last-child {
+		grid-column: 1;
+	}
+}
+
+/*
+ * Нижний ряд переходит в столбик на 470: ниже колонки становятся теснее,
+ * чем читается — по месту он дотягивал бы и до 380, но это уже слишком
+ * узко.
+ */
+@media (max-width: 470px) {
+	.site-footer__bottom,
+	.site-footer__legal {
+		grid-template-columns: 1fr;
+	}
+
+	.site-footer__nav,
+	.site-footer__social,
+	.site-footer__policy,
+	.site-footer__disclaimer {
+		grid-column: 1;
+	}
+
+	.site-footer__nav {
+		/* Меню тоже в ДВЕ колонки, как соцсети: ниже вся раскладка
+		   двухколоночная, иначе меню шло на три колонки и не совпадало
+		   с соцсетями — макет 360 разъезжался. */
+		grid-column: 1;
+	}
+
+	.site-footer__menu {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.site-footer__menu > li:nth-child(4) {
+		grid-area: 1 / 2;
+	}
+
+	.site-footer__menu > li:nth-child(5) {
+		grid-area: 2 / 2;
+	}
+
+	.site-footer__menu > li:nth-child(6) {
+		grid-area: 3 / 2;
+	}
+
+	.site-footer__social {
+		/* Два столбца: Dprofile/Telegram | VK/Instagram* */
+		display: grid;
+		grid-auto-flow: column;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-rows: repeat(2, auto);
+		column-gap: 0;
+		row-gap: 10px;
+	}
+
+	.site-footer__disclaimer {
+		margin-top: 0;
+	}
+}

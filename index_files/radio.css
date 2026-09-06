@@ -1,0 +1,59 @@
+/**
+ * Круглый контрол (radio/checkbox) — переиспользуемый компонент, класс
+ * .radio-control на input[type=radio] или input[type=checkbox]. Источник —
+ * Figma: две реальные точки, 1920 (node-id 2362:5243) и 1600 (node-id
+ * 2362:5279 — там же добавлено 4-е состояние «Обязательное поле», см.
+ * ниже), fileKey 93JlTAOwjlBO4naQ7ReAFF. Размер 21↔25px — clamp() между
+ * этими точками, совпадает с готовыми Figma-экспортами на обеих (не
+ * растяжка одной).
+ *
+ * Внутренняя точка (выбрано/наведение) — inset 14.286% (= 3px от 21px
+ * рамки в макете), в процентах, а не в px, чтобы точка масштабировалась
+ * вместе с fluid-размером самого контрола, а не оставалась статичной.
+ *
+ * Состояние «Обязательное поле» (--color-error) — класс .radio-control.
+ * is-required-error, вешать будет JS-валидация формы позже («Формы и
+ * интеграции», см. роадмап) — сама валидация ещё не реализована, здесь
+ * только визуальное состояние.
+ */
+
+.radio-control {
+	appearance: none;
+	position: relative;
+	width: clamp(21px, calc(1px + 1.25vw), 25px);
+	height: clamp(21px, calc(1px + 1.25vw), 25px);
+	margin: 0;
+	flex-shrink: 0;
+	border: 1px solid var(--color-black);
+	border-radius: 50%;
+	background: none;
+	cursor: pointer;
+}
+
+.radio-control:hover {
+	border-color: var(--color-accent-blue);
+}
+
+.radio-control:hover::after {
+	content: '';
+	position: absolute;
+	inset: 14.286%;
+	border-radius: 50%;
+	background-color: var(--color-accent-blue);
+}
+
+.radio-control.is-required-error {
+	border-color: var(--color-error);
+}
+
+.radio-control:checked {
+	border-color: var(--color-black);
+}
+
+.radio-control:checked::after {
+	content: '';
+	position: absolute;
+	inset: 14.286%;
+	border-radius: 50%;
+	background-color: var(--color-black);
+}

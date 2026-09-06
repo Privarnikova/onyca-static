@@ -1,0 +1,129 @@
+/**
+ * Базовый reset и служебные классы. Токены — см. tokens.css, компоненты —
+ * см. components/. Значения сетки/отступов подтверждены по разбору
+ * страницы Контакты (десктоп 1920) — для остальных брейкпоинтов пока
+ * ориентируемся на них же, точные цифры уточним по мере разбора планшета
+ * и мобилки.
+ */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: var(--font-family-base);
+	font-size: var(--font-size-body);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text);
+}
+
+/*
+ * Синяя рамка фокуса полностью убрана — на ВСЕХ элементах и во всех
+ * состояниях (:focus и :focus-visible), включая кнопки, ссылки, инпуты,
+ * радиокнопки и чекбоксы. Раньше тут было «убрать на клик, оставить на
+ * Tab», но синяя рамка с прямыми углами всё равно вылезала поверх
+ * скруглённых кнопок и мешала показывать сайт.
+ *
+ * Отдельно -webkit-tap-highlight-color: подсветка тапа на мобильных/в
+ * режиме эмуляции устройств — это НЕ outline, отдельное свойство, без
+ * него серо-синий прямоугольник остаётся при клике даже с outline:none.
+ *
+ * Компромисс: индикации фокуса с клавиатуры теперь нет совсем. Если
+ * понадобится вернуть — делать в стиле макета (например, подчёркивание
+ * или смена фона), а не браузерным outline.
+ */
+*,
+*::before,
+*::after {
+	-webkit-tap-highlight-color: transparent;
+}
+
+*:focus,
+*:focus-visible,
+*:focus-within {
+	outline: none;
+	box-shadow: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0;
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+}
+
+h1 {
+	font-size: var(--font-size-h1);
+}
+
+h2 {
+	font-size: var(--font-size-h2);
+}
+
+h3 {
+	font-size: var(--font-size-h3);
+}
+
+h4 {
+	font-size: var(--font-size-h4);
+}
+
+h5 {
+	font-size: var(--font-size-h5);
+}
+
+h6 {
+	font-size: var(--font-size-h6);
+}
+
+img,
+video {
+	max-width: 100%;
+	display: block;
+}
+
+.container {
+	width: 100%;
+	max-width: var(--container-max-width);
+	margin-inline: auto;
+	padding-inline: var(--container-padding);
+}
+
+.screen-reader-text {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+}
+
+.skip-link:focus {
+	position: fixed;
+	top: 8px;
+	left: 8px;
+	width: auto;
+	height: auto;
+	clip: auto;
+	z-index: 1000;
+	background: #000;
+	color: #fff;
+	padding: 8px 16px;
+}
+
+[hidden] {
+	display: none !important;
+}

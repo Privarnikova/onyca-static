@@ -1,0 +1,575 @@
+/**
+ * Шапка сайта. Источник — Figma, узел «Меню», две реальные точки:
+ * 1920 (node-id 1440:5835) и 1600 (node-id 2362:5082 — актуальная версия
+ * компонента, подтверждена пользователем 2026-09-03; более старый узел
+ * 2317:10594 больше не используется), fileKey 93JlTAOwjlBO4naQ7ReAFF.
+ * Это НЕ одна и та же вёрстка, растянутая по пропорции — на 1600 другая
+ * высота (50 вместо 54), другой шрифт (14 вместо 15), другой логотип
+ * (105.42×22 вместо 115×24). Внешние отступы в актуальной версии —
+ * честные симметричные 35→40 (в старой версии Telegram был некорректно
+ * прибит к левому краю — тот баг был в самом файле Figma, тут уже
+ * исправлено). Поэтому между 1600 и 1920 — честная линейная интерполяция
+ * по двум точкам (clamp с формулой из обеих сторон), а не растяжка одной
+ * точки. Выше 1920 (до 2560, «десктоп на одной сетке» — см.
+ * project_breakpoints) — дизайн не растягивается дальше, макет для 2560
+ * отдельно не давали, значения остаются на уровне 1920. Ниже 1600
+ * (планшет/телефон) — отдельный проход позже.
+ *
+ * Панель выпадающего списка «Услуги» — макета открытого состояния на
+ * 1600 не было. Ширина/паддинг панели (168/12px) оставлены как на 1920
+ * (не фluidные). Вертикальный паддинг триггера (padding-top/bottom) —
+ * посчитан пропорционально из fluid высоты шапки и текста, сохраняя то
+ * же соотношение top:bottom, что и на 1920 (16:17) — это математическая
+ * оценка, не измеренное значение, точно как в макете подтвердить нечем.
+ *
+ * Между «Прайс-лист» и «Блог» — увеличенный отступ. На 1920 это
+ * gap(50)+доп.margin(109); на 1600 в макете отдельный flex-gap(163) между
+ * группами. Оба выражены здесь одинаково — доп. margin-left на 4-м
+ * пункте (nth-child), поверх обычного gap — в предположении, что порядок
+ * пунктов меню в админке не меняется: Проекты, Услуги, Прайс-лист, Блог,
+ * Студия, Карьера, Контакты. Если порядок сменится, поправить здесь же.
+ *
+ * Подменю «Услуги» (ТЗ п. 04) — узел «Выпадающий список - Услуги»
+ * (node-id 975:3074, эталон 1920). Панель 168×179, фон Grey-30 (#F7F7F7),
+ * паддинг 12px, между пунктами 6px, кроме отступа перед «Все услуги» — там
+ * 32px (в предположении, что «Все услуги» всегда последний пункт подменю).
+ * Раскрывается по наведению (без JS); клик по «Услуги» по-прежнему ведёт на
+ * её страницу — так и задумано для этого паттерна.
+ *
+ * Подчёркивание при наведении — переиспользуемый класс .link-underline
+ * (components/link-underline.css), вешается через nav_menu_link_attributes
+ * (inc/setup.php) на пункты меню и вручную в разметке на Telegram. Здесь его
+ * нет — это осознанно, чтобы не дублировать.
+ */
+
+.site-header {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	background-color: var(--color-white);
+	/* Показ/скрытие при скролле — референс celerart.com (smart-nav),
+	   400ms ease; класс .is-hidden ставит main.js (initHeaderScroll) */
+	transition: transform 0.4s ease;
+
+	/* Фluidные значения — линейная интерполяция между 1600 (первое число)
+	   и 1920 (второе), формула calc(intercept + slope*100vw) выведена из
+	   этих двух точек. clamp() держит границы вне диапазона: ниже 1600 —
+	   на уровне 1600, выше 1920 — на уровне 1920 (не тянется до 2560). */
+	--header-height: clamp(50px, calc(30px + 1.25vw), 54px);
+	--header-padding: clamp(35px, calc(10px + 1.5625vw), 40px);
+	--header-logo-w: clamp(105.42px, calc(57.5px + 2.995vw), 115.01px);
+	--header-logo-h: clamp(22px, calc(12px + 0.625vw), 24px);
+	/* Нижняя граница опущена до 120px: от 1600 к 1200 промежуток сжимается,
+	   чтобы ПОЛНОЕ меню держалось как можно дольше (ноутбучная раскладка),
+	   а не переключалось на бургер сразу под 1600. Значения на 1600/1920
+	   не изменились — формула та же, поменялся только floor. */
+	--header-logo-gap: clamp(120px, calc(-756.54px + 72.945vw), 644px);
+	--header-font-size: clamp(14px, calc(9px + 0.3125vw), 15px);
+	--header-item-gap: clamp(24px, calc(2px + 2.5vw), 50px);
+	--header-group-gap-extra: clamp(109px, calc(181px - 3.75vw), 121px);
+	--header-chevron-size: clamp(12px, calc(2px + 0.625vw), 14px);
+}
+
+.site-header__inner {
+	display: flex;
+	align-items: center;
+	height: var(--header-height);
+}
+
+.site-header__inner.container {
+	padding-left: var(--header-padding);
+	padding-right: var(--header-padding);
+}
+
+.site-header__logo {
+	display: block;
+	flex-shrink: 0;
+	width: var(--header-logo-w);
+	height: var(--header-logo-h);
+	margin-right: var(--header-logo-gap);
+}
+
+.site-header__logo img {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+img.site-header__logo-icon {
+	display: none;
+}
+
+.site-header__nav {
+	display: flex;
+}
+
+.site-header__menu {
+	display: flex;
+	/* Явная высота вместо align-items:center на родителе — все <li>
+	   центрируются ОДНИМ и тем же способом (flex + height:100% на самом
+	   li), а не смесью «центрирование по контенту» для обычных пунктов и
+	   «ручной padding» для «Услуги». Раньше это давало между ними ~0.5px
+	   расхождения от независимого субпиксельного округления браузера. */
+	height: var(--header-height);
+	gap: var(--header-item-gap);
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.site-header__menu > li {
+	display: flex;
+	align-items: center;
+	height: 100%;
+}
+
+.site-header__menu > li:nth-child(4) {
+	margin-left: var(--header-group-gap-extra);
+}
+
+.site-header__menu a {
+	font-size: var(--header-font-size);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text);
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.site-header__menu .current-menu-item > a,
+.site-header__menu .current_page_item > a {
+	color: var(--color-text-disclaimer);
+}
+
+.site-header__menu .menu-item-has-children {
+	position: relative;
+	/* height:100% уже растягивает li на всю высоту шапки (см. правило
+	   .site-header__menu > li выше), поэтому .sub-menu на top:100%
+	   стыкуется без разрыва в hover — отдельный padding-хак больше не
+	   нужен */
+}
+
+.site-header__menu .menu-item-has-children > a {
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	height: calc(var(--header-font-size) * var(--line-height-body));
+	gap: 4px; /* одинаково на обеих точках, не фluid */
+}
+
+.site-header__menu .menu-item-has-children > a::after {
+	content: '';
+	width: var(--header-chevron-size);
+	height: var(--header-chevron-size);
+	/* ?v=2 — вручную бампать при каждой правке самого SVG: в отличие от
+	   CSS/JS-файлов (версionируются по mtime через wp_enqueue), путь внутри
+	   url() тут статический текст, PHP его не трогает — без версии браузер
+	   может продолжать показывать старую закэшированную картинку */
+	background: url('../../img/icon-chevron-down.svg?v=2') center / contain no-repeat;
+	transition: transform 0.15s ease;
+}
+
+.site-header__menu .menu-item-has-children:hover > a::after {
+	transform: rotate(180deg);
+}
+
+.site-header__menu .sub-menu {
+	display: flex;
+	position: absolute;
+	/* 100%, не top:Npx — триггер сам растянут паддингами ровно до конца
+	   визуального зазора, так что панель просто стыкуется с его нижним
+	   краем без разрыва в hover. Ширина/паддинг панели — см. комментарий
+	   в шапке файла, не фluidные (нет макета открытого списка на 1600). */
+	top: 100%;
+	left: 0;
+	width: 168px;
+	padding: 12px;
+	flex-direction: column;
+	gap: 6px;
+	background-color: var(--color-surface-alt);
+	list-style: none;
+	margin: 0;
+	/* Плавное раскрытие — точь-в-точь celerart.com: translate3d(0, 3rem, 0)
+	   + opacity 0 → 1, 400ms ease. visibility выключается с задержкой
+	   0.4s, чтобы панель оставалась некликабельной уже сразу после ухода
+	   курсора, но не пропадала до конца затухания. */
+	opacity: 0;
+	visibility: hidden;
+	transform: translate3d(0, 3rem, 0);
+	transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0.4s;
+}
+
+.site-header__menu .menu-item-has-children:hover > .sub-menu {
+	opacity: 1;
+	visibility: visible;
+	transform: translate3d(0, 0, 0);
+	transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0s;
+}
+
+.site-header__menu .sub-menu li:last-child {
+	margin-top: 26px; /* Figma: отступ перед «Все услуги» — 32px вместо обычных 6px между пунктами */
+}
+
+.site-header.is-hidden {
+	transform: translateY(-100%);
+}
+
+/* Панель WP admin bar (32px, фиксирована, z-index 99999) иначе перекрывает
+   sticky-шапку сверху — она была прибита к top:0 и пряталась под чёрной
+   панелью вместо того, чтобы стоять ниже неё. body_class() добавляет
+   .admin-bar автоматически при логине.
+   min-width:783px — это собственный брейкпоинт самого WP (admin-bar.min.css):
+   ниже него панель становится position:absolute (не fixed) и уезжает при
+   скролле вместе с контентом. Если применять top:32px и там тоже, после
+   скролла над шапкой остаётся пустой зазор (панели там уже нет, а сдвиг
+   остался) — это и был замеченный «отрыв шапки от верха» на 360. */
+@media (min-width: 783px) {
+	body.admin-bar .site-header {
+		top: 32px;
+	}
+}
+
+.burger {
+	/* Бургер — только для планшета/мобилки; на десктопе кнопка скрыта.
+	   Иконка — 2 полосы 24×3, зазор 8px (Figma: node-id 2645:8776/2650:14444,
+	   одинаково на 1200 и 360), позиция x=4/y=12 и x=4/y=20 внутри 32×32. */
+	display: none;
+	position: relative;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: none;
+	background: none;
+	cursor: pointer;
+}
+
+.burger::before,
+.burger::after {
+	content: '';
+	position: absolute;
+	left: 4px;
+	width: 24px;
+	height: 3px;
+	background-color: var(--color-black);
+	transition: top 0.2s ease, transform 0.2s ease;
+}
+
+.burger::before {
+	top: 12px;
+}
+
+.burger::after {
+	top: 20px;
+}
+
+/* Открытое состояние (Figma: компонент «Menu», property1=«Выбрано») —
+   те же 2 полосы поворачиваются в крестик, отдельная SVG-иконка не
+   заводится: бургер и так CSS-иконка, а не asset, логично тем же путём
+   сделать и открытое состояние. */
+.burger[aria-expanded='true']::before {
+	top: 14.5px;
+	transform: rotate(45deg);
+}
+
+.burger[aria-expanded='true']::after {
+	top: 14.5px;
+	transform: rotate(-45deg);
+}
+
+/*
+ * Ноутбук, узкий конец (1201–1599). Здесь ещё ДЕСКТОПНАЯ раскладка —
+ * полное меню и Telegram, без бургера (бургер начинается с 1200, где для
+ * него есть реальный макет). Чтобы меню дожило до 1200, дополнительно
+ * сжимаем увеличенный отступ перед «Блог»: 121px на 1600 → 40px на 1200.
+ * Раньше весь планшетный блок включался уже на 1599, и на ноутбуке
+ * показывался бургер вместо меню — это и была ошибка.
+ */
+@media (min-width: 1201px) and (max-width: 1599px) {
+	.site-header {
+		--header-group-gap-extra: clamp(40px, calc(-203px + 20.25vw), 121px);
+	}
+}
+
+/*
+ * Планшет/телефон (ниже 1600 — вне десктоп-тира, см. project_breakpoints):
+ * шапка сворачивается до иконки-лого + бургера, полное меню/Telegram
+ * уходят в панель бургер-меню. Источник — Figma «Меню. Планшет вертикальный»
+ * (node-id 2610:6736, 1200×58) и «Меню. Телефон» (node-id 2629:9732,
+ * 360×58) — обе высотой 58px (не fluid с десктоп-тиром, отдельная точка,
+ * высота не меняется на обеих реальных точках, так что тянуть нечего).
+ * Паддинг — clamp() между теми же реальными 1200/360 точками (25px/15px,
+ * те же цифры, что и в page-contacts.css/footer.css), а не плоское
+ * значение — чтобы не было ступеньки на промежуточных ширинах, как было
+ * найдено в других компонентах при реальном замере.
+ */
+@media (max-width: 1200px) {
+	.site-header__inner {
+		height: 58px;
+	}
+
+	.site-header__inner.container {
+		/* Флэт 25px на всём планшет-тире, не интерполяция к 15px: Figma даёт
+		   ровно 25px и на 1200 (node-id 2610:6736), и на 700 (node-id
+		   2610:6760) — на 15px переходим уже в телефонном тире (<=699). */
+		padding-left: clamp(25px, calc(-5px + 2.5vw), 35px);
+		padding-right: clamp(25px, calc(-5px + 2.5vw), 35px);
+	}
+
+	.site-header__logo {
+		width: 32px;
+		height: 32px;
+		margin-right: 0;
+	}
+
+	img.site-header__logo-full {
+		display: none;
+	}
+
+	img.site-header__logo-icon {
+		display: block;
+	}
+
+	.site-header__nav,
+	.site-header__telegram {
+		display: none;
+	}
+
+/* Страховка к JS-закрытию (main.js): панель бургера существует только в
+   планшетном диапазоне, на десктопе её быть не должно ни при каких
+   обстоятельствах — иначе она показывается нестилизованным списком. */
+@media (min-width: 1201px) {
+	.burger-menu {
+		display: none;
+	}
+}
+
+	.burger {
+		display: block;
+		margin-left: auto;
+	}
+
+	/*
+	 * Панель бургер-меню — Figma «1200x700 - Бургер-меню» (node-id
+	 * 2645:7739) и «360x640 - Бургер-меню» (node-id 2645:8838). Лого и
+	 * крестик на макете — это та же самая шапка (.site-header), просто в
+	 * открытом состоянии (бургер → крестик, см. выше), поэтому здесь не
+	 * дублируются — панель просто встаёт сразу под шапкой.
+	 *
+	 * position:absolute;top:100% ОТ .site-header (панель теперь её
+	 * дочерний элемент в разметке, см. header.php), а не position:fixed
+	 * с жёстким top:58px от viewport. Нашли реальный баг: при логине в
+	 * WP админ-бар до скролла реально сдвигает шапку вниз на свою высоту,
+	 * а фиксированные 58px этого не учитывали — верх панели («Проекты»)
+	 * рисовался под админ-баром. Абсолютное позиционирование от самой
+	 * шапки всегда верно, независимо от админ-бара и его высоты.
+	 * height:100vh — с запасом (без него пришлось бы точно вычислять
+	 * оставшуюся высоту с учётом того же админ-бара); лишнее уходит в
+	 * overflow-y:auto, не видно и не мешает.
+	 *
+	 * Разделители — border-bottom на каждом <li>, включая последний (в
+	 * макете так на обеих точках), а не gap на списке — реальные
+	 * Figma-цифры это 24px-зазор между текстом и линией с обеих сторон,
+	 * т.е. по факту padding 12px сверху/снизу на пункт.
+	 */
+	.burger-menu {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		height: 100vh;
+		z-index: 90;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		background-color: var(--color-white);
+		/* 52px = 110 (отметка первого пункта в макете, отсчёт от верха
+		   экрана) − 58 (высота шапки). Панель начинается под шапкой,
+		   поэтому внутри неё остаётся именно 52. Одинаково на 1200, 700 и
+		   360 — высота шапки на всех трёх точках 58px, интерполировать
+		   нечего. Раньше тут стояли все 110, и «Проекты» падали на 192. */
+		padding: 52px 25px 25px;
+	}
+
+	.burger-menu__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.burger-menu__list > li {
+		/* Шаг пункта в макете — 103px (текст 55 + 24 до линии + 24 от линии
+		   до следующего текста). Линия занимает реальный 1px, поэтому
+		   сверху 23, а не 24: с 24/24 шаг выходил 104 и к седьмому пункту
+		   набегало 6px. */
+		padding: 23px 0 24px;
+		border-bottom: 1px solid var(--color-divider);
+	}
+
+	/* Первый пункт стоит вплотную к отступу панели — в макете его текст и
+	   есть та самая отметка 110px, верхнего зазора у него нет. */
+	.burger-menu__list > li:first-child {
+		padding-top: 0;
+	}
+
+	/* У «Услуг» зазор до линии 16px, а не 24: строка со стрелкой в макете
+	   ниже прочих (компонент «Услуги бургер — Выпадающий список», h=71
+	   против 79 у обычного пункта). */
+	.burger-menu__list > li.menu-item-has-children {
+		padding-bottom: 16px;
+	}
+
+	.burger-menu__list a {
+		display: block;
+		font-size: 46px;
+		font-weight: var(--font-weight-heading);
+		line-height: var(--line-height-heading);
+		color: var(--color-text);
+		text-decoration: none;
+	}
+
+	.burger-menu__list .menu-item-has-children > a {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
+	.burger-menu__list .menu-item-has-children > a::after {
+		content: '';
+		flex-shrink: 0;
+		width: 32px;
+		height: 32px;
+		background: url('../../img/icon-chevron-down.svg?v=2') center/contain no-repeat;
+		transition: transform 0.2s ease;
+	}
+
+	.burger-menu__list .menu-item-has-children.is-open > a::after {
+		transform: rotate(180deg);
+	}
+
+	/* Раскрытое состояние подменю — реальный Figma-эталон (планшет:
+	   node-id 2637:12179 для 1200 и 2610:6760 для 700, оба дают одно и то
+	   же: пункт 26px Medium, line-height 1.1, зазор между пунктами 16px,
+	   отступ от строки «Услуги» до блока 24px). Раньше тут стояли 20px/16px,
+	   подобранные на глаз, — эталона на этот вид тогда не было. */
+	.burger-menu__list .sub-menu {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.25s ease, padding-top 0.25s ease;
+	}
+
+	.burger-menu__list .menu-item-has-children.is-open .sub-menu {
+		max-height: 400px;
+		padding-top: 24px;
+	}
+
+	.burger-menu__list .sub-menu a {
+		font-size: 26px;
+		font-weight: var(--font-weight-body);
+		line-height: 1.1;
+	}
+
+	.burger-menu__contacts {
+		/* Свела два эталона: на 1200 (node-id 2645:7739) зазор от низа
+		   списка до Telegram ≈100px, на 700 (node-id 2610:6760) ≈297px —
+		   но в ОБОИХ панель заканчивается ровно 25px под email. То есть в
+		   макете контакты прижаты к низу панели, а 100px — это просто то,
+		   что осталось на 1200. Поэтому margin-top:auto (прижать к низу,
+		   когда есть место) + padding-top:100px (гарантированный минимум,
+		   когда контент высокий и auto схлопывается в 0) — так верны обе
+		   точки, а не одна за счёт другой.
+		   gap:16px — реальный зазор Telegram↔email на обеих планшетных
+		   точках (было 10px, это значение с телефона). */
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		margin-top: auto;
+		padding-top: 100px;
+	}
+
+	.burger-menu__contacts a {
+		font-size: 26px;
+		font-weight: var(--font-weight-heading);
+		line-height: var(--line-height-heading);
+		color: var(--color-text);
+		text-decoration: none;
+	}
+}
+
+@media (max-width: 699px) {
+	.site-header__inner.container {
+		padding-left: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
+		padding-right: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
+	}
+
+	.burger-menu {
+		/* Те же 52px сверху. Снизу 25px, а не 15: в макете 360 (2645:8838)
+		   блок меню кончается на 742 при высоте экрана 767. Боковые 15px —
+		   от макета. */
+		padding: 52px 15px 25px;
+	}
+
+	.burger-menu__list a {
+		font-size: 32px;
+	}
+
+	.burger-menu__list > li {
+		/* Шаг пункта на 360 — 78px (текст 38 + 20 до линии + 20 после).
+		   Сверху 19, снизу 20 — тот же учёт 1px линии, что и на планшете.
+		   На этой точке «Услуги» не короче прочих (компонент h=58 = 38+20),
+		   поэтому отдельного правила для них тут нет. */
+		padding: 19px 0 20px;
+	}
+
+	.burger-menu__list > li.menu-item-has-children {
+		padding-bottom: 20px;
+	}
+
+	.burger-menu__contacts {
+		/* На 360 (node-id 2645:8838) контакты НЕ прижаты к низу — это
+		   отдельная группа в общем потоке с фиксированным зазором 52px от
+		   списка, поэтому auto-прижатие тут отключаем. Зазор между
+		   Telegram и email — 10px (на планшете 16px). */
+		gap: 10px;
+		margin-top: 52px;
+		padding-top: 0;
+	}
+
+	.burger-menu__contacts a {
+		font-size: 16px;
+		font-weight: var(--font-weight-body);
+		line-height: var(--line-height-body);
+	}
+
+	/* Подменю на 360 — свои реальные цифры (Figma node-id 2637:13302,
+	   «Услуги бургер — Выпадающий список. Телефон»): пункт 16px Medium,
+	   line-height 1.4, зазор 10px, отступ от «Услуги» 20px (совпадает с
+	   padding самого пункта на этой точке). */
+	.burger-menu__list .sub-menu {
+		gap: 10px;
+	}
+
+	.burger-menu__list .menu-item-has-children.is-open .sub-menu {
+		padding-top: 20px;
+	}
+
+	.burger-menu__list .sub-menu a {
+		font-size: 16px;
+		line-height: var(--line-height-body);
+	}
+}
+
+.site-header__telegram {
+	margin-left: auto;
+	font-size: var(--header-font-size);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text);
+	text-decoration: none;
+}

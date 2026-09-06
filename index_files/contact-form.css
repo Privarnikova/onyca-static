@@ -1,0 +1,363 @@
+/**
+ * Форма «Обсудить проект» на странице Контакты. Источник — Figma, две
+ * реальные точки: 1920 (node-id 1200:1943) и 1600 (node-id 2373:6844),
+ * fileKey 93JlTAOwjlBO4naQ7ReAFF. Все размеры — clamp() с линейной
+ * интерполяцией между этими точками (см. project_breakpoints и
+ * components/header.css — та же методология), не растяжка одной.
+ *
+ * Отступ секции сверху/снизу (188px на 1920, 160px на 1600) — реальный
+ * gap внешней обёртки между героем/формой/футером в макете, не выдумано.
+ * Горизонтальный паддинг секции — обычный контейнерный 40px на обеих
+ * точках (в отличие от героя/футера, где на 1600 честные 35px — здесь
+ * в макете сама форма подтверждает плоские 40, без интерполяции).
+ *
+ * Радиокнопки/чекбокс и пилюли-табы — отдельные переиспользуемые
+ * компоненты, см. components/radio.css (.radio-control) и
+ * components/tabs.css (.tab-pill), не здесь.
+ */
+
+/*
+ * Секция — сетка из ДВУХ РАВНЫХ колонок: слева текст, справа форма.
+ * Никаких фиксированных ширин и зазоров: колонки делят контейнер поровну,
+ * форма занимает вторую целиком, текст в первой ограничен по ширине
+ * строки (это ширина ТЕКСТА, а не колонки).
+ */
+.contact-form-section {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin-block: clamp(160px, calc(20px + 8.75vw), 188px);
+}
+
+.contact-form-intro {
+	grid-column: 1;
+	max-width: clamp(493px, calc(-457px + 59.375vw), 683px);
+}
+
+.contact-form {
+	grid-column: 2;
+}
+
+.contact-form-intro__title {
+	margin: 0 0 clamp(14px, calc(4px + 0.625vw), 16px);
+	font-size: clamp(34px, calc(4px + 1.875vw), 40px);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.contact-form-intro__text {
+	margin: 0;
+	max-width: clamp(493px, calc(-42px + 33.4375vw), 600px);
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text);
+}
+
+
+
+.contact-form__label {
+	margin: 0 0 clamp(14px, calc(4px + 0.625vw), 16px);
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.contact-form__tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: clamp(14px, calc(4px + 0.625vw), 16px);
+}
+
+.contact-form__fields {
+	display: grid;
+	grid-template-columns:
+		clamp(370px, calc(-5px + 23.4375vw), 445px)
+		clamp(370px, calc(-5px + 23.4375vw), 445px);
+	column-gap: clamp(16px, calc(-4px + 1.25vw), 20px);
+	row-gap: clamp(69px, calc(54px + 0.9375vw), 72px);
+	margin-top: clamp(69px, calc(54px + 0.9375vw), 72px);
+}
+
+.contact-form__field--full {
+	grid-column: 1 / -1;
+}
+
+.contact-form__field {
+	display: flex;
+	flex-direction: column;
+	gap: clamp(14px, calc(4px + 0.625vw), 16px);
+}
+
+.contact-form__field label {
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.contact-form__field input {
+	width: 100%;
+	padding: 0 0 8px;
+	border: none;
+	border-bottom: 1px solid var(--color-border);
+	background: none;
+	font-family: var(--font-family-base);
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text);
+}
+
+.contact-form__field input:focus {
+	outline: none;
+	border-bottom-color: var(--color-accent-blue);
+}
+
+.contact-form__budget {
+	margin: clamp(32px, calc(2px + 1.875vw), 38px) 0 0;
+	padding: 0;
+	border: none;
+}
+
+.contact-form__budget-grid {
+	display: grid;
+	grid-template-columns:
+		clamp(258px, calc(-2px + 16.25vw), 310px)
+		clamp(258px, calc(-2px + 16.25vw), 310px)
+		auto;
+	row-gap: clamp(14px, calc(4px + 0.625vw), 16px);
+}
+
+.contact-form__budget-option {
+	display: flex;
+	align-items: center;
+	gap: clamp(10px, 0.625vw, 12px);
+	width: fit-content;
+	cursor: pointer;
+}
+
+.contact-form__budget-option span {
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text);
+}
+
+/*
+ * Кнопки — сетка из двух равных колонок. max(174px, 45%) в минимуме трека
+ * держит ровно две колонки, пока каждая может вместить «Прикрепить файл»
+ * с паддингами; когда перестаёт — кнопки сами встают друг под друга во всю
+ * ширину (макет 360). Фиксированных ширин у кнопок больше нет.
+ */
+.contact-form__actions {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(max(174px, 45%), 1fr));
+	align-items: center;
+	gap: clamp(18px, calc(8px + 0.625vw), 20px);
+	margin-top: clamp(32px, calc(2px + 1.875vw), 38px);
+}
+
+.contact-form__attach {
+	justify-content: center;
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+}
+
+.contact-form__submit {
+	justify-content: center;
+	border: none;
+	cursor: pointer;
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+}
+
+/*
+ * Сетка «контрол | текст»: метка внутри прозрачна, поэтому оба ложатся
+ * прямо в колонки, а сообщение об ошибке встаёт во вторую колонку вторым
+ * рядом — по левому краю текста, как в макете.
+ */
+.contact-form__consent {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	align-items: start;
+	column-gap: 10px;
+	row-gap: 8px;
+	margin-top: clamp(32px, calc(2px + 1.875vw), 38px);
+}
+
+.contact-form__consent-label {
+	display: contents;
+	cursor: pointer;
+}
+
+/*
+ * Состояние «Ошибка» (Figma 1236:1915 и одноимённые узлы на остальных
+ * точках): краснеют подписи обязательных групп, контрол согласия и
+ * появляется сообщение под ним. Цвет — тот же токен, что у контрола.
+ */
+.contact-form__group.is-error .contact-form__label,
+.contact-form__budget.is-error .contact-form__label,
+.contact-form__field.is-error label {
+	color: var(--color-error);
+}
+
+.contact-form__error {
+	grid-column: 2;
+	margin: 0;
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-error);
+}
+
+.contact-form__consent span {
+	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text-footer);
+}
+
+.contact-form__consent a {
+	color: var(--color-text-footer);
+}
+
+/*
+ * Планшет (1200) — Figma «Форма 1. Планшет вертикальный» (node-id
+ * 2626:8902). Табы (3 ряда вместо 2) и радио-иконки/шрифты уже совпадают
+ * с существующими floor-значениями clamp() выше (не растяжка — реально
+ * так в макете, проверено). Бюджет — explicit grid-template-columns
+ * (292px 1fr), а не auto-колонки + gap — та же ошибка чуть не повторилась,
+ * что нашла и исправила в footer.css (implicit-колонки растягиваются
+ * непредсказуемо), фикс сразу через явную ширину надёжнее.
+ */
+@media (max-width: 1599px) {
+	/* .contact-form-section.container — раньше не было своего override
+	   вообще (в отличие от .site-header__inner.container/.site-footer__inner.
+	   container/.page-contacts__hero.container, у которых есть отдельные
+	   28/15px правила на каждом брейкпоинте) — секция молча наследовала
+	   плоскую global --container-padding:40px (main.css/tokens.css) на
+	   ЛЮБОЙ ширине, включая планшет и телефон. Отсюда «большие маргины по
+	   бокам» — контент был на 40px, а не на 25/15px, как везде на сайте. */
+	.contact-form-section.container {
+		padding-left: clamp(25px, calc(-20px + 3.75vw), 40px);
+		padding-right: clamp(25px, calc(-20px + 3.75vw), 40px);
+	}
+
+	/* flex:1 1 Npx + min-width:0 вместо плоского width:Npx — интро и форма
+	   вместе (493+91+567=1151px) впритык влезают ровно на 1200, но не
+	   сжимались на более узких (замерила: на 834/768 форма вылезала за
+	   пределы вьюпорта на ~150-200px). Flex-shrink пропорционально
+	   уменьшает оба блока, когда реальной ширины меньше суммы базисов —
+	   тот же принцип, что и minmax(0,Npx) в футере, только для flex. */
+	.contact-form-intro {
+		max-width: 493px;
+	}
+
+	.contact-form-intro__title {
+		font-size: 34px;
+	}
+
+
+
+	.contact-form__fields {
+		/* auto-fit + minmax: две колонки, пока каждая может быть не уже
+		   280px, дальше сетка сама схлопывается в одну (≈624px вьюпорта).
+		   На 700 даёт ровно 2×316px как в макете, на 360 — одну колонку.
+		   Раньше переключение стояло плоско на 699px и раскладка прыгала. */
+		/* max(260px, 45%) в минимуме трека: две колонки, пока каждая может
+		   быть не уже 260px, и НИКОГДА три — при 45% третья не помещается
+		   по определению. Раньше на 1599 форма становилась шире и auto-fit
+		   набирал три колонки вместо двух. */
+		grid-template-columns: repeat(auto-fit, minmax(max(200px, 45%), 1fr));
+		column-gap: 18px;
+	}
+
+	.contact-form__budget-grid {
+		/*
+		 * Две колонки, пока в них помещается самая длинная опция («менее
+		 * 200 тыс. руб» — 11.6em вместе с чекбоксом), ниже — одна, как в
+		 * макете 360 (там все шесть идут столбиком). Минимум трека в em, а
+		 * не в пикселях: он тянется вместе с кеглем и равен ширине
+		 * содержимого, а не выбран на глаз. Раньше тут стояли 240px, и
+		 * сетка схлопывалась уже на 500, хотя колонка была 231 при опции
+		 * 173. 45% удерживают ровно две колонки там, где по одной ширине
+		 * трека auto-fit набрал бы три.
+		 */
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(max(11.6em, 45%), 1fr));
+	}
+
+}
+
+/*
+ * Порог 1040: до него колонка шире 493px, то есть текст помещается целиком
+ * и не сжимается. Ниже переходим в одну колонку — текст сверху, форма под
+ * ним, как в макетах 700 и 360.
+ */
+@media (max-width: 1040px) {
+	.contact-form-section {
+		grid-template-columns: 1fr;
+		row-gap: clamp(40px, calc(12.47px + 7.6471vw), 66px);
+	}
+
+	.contact-form-intro,
+	.contact-form {
+		grid-column: 1;
+	}
+}
+
+/*
+ * Планшет узкий (700) — Figma «Форма. 700» (node-id 2610:8371).
+ * Отдельного media-блока на 700 нет специально: интро и форма
+ * перестраиваются в стопку сами (flex-wrap выше) ровно тогда, когда
+ * 493+91+560 перестаёт помещаться, а смещение второй колонки бюджета
+ * тянется 292 → 334. Остальные размеры на 700 совпадают с нижними
+ * значениями clamp() из блока 1599 — проверено по узлу: поля 2 колонки с
+ * зазором 18px, ряды 69px, лейбл 15px, табы 12/14/14 и 13px, бюджет ряды
+ * 14px, радио 21px, кнопки 15px с зазором 18px, группы 32px.
+ */
+
+/*
+ * Телефон (360) — Figma «Форма. Телефон» (node-id 2587:11714). Всё в
+ * один столбец. Табы: в макете видно только 5 + кнопка «Ещё»
+ * (прогрессивное раскрытие) — здесь вместо этого показаны все 12 сразу
+ * (заворачиваются сами), чтобы не городить отдельную JS-логику
+ * показать/скрыть ради этого брейкпоинта; менее точно по макету, но
+ * функциональнее половинчатого решения. Шрифт/паддинг табов на 360
+ * возвращаются к «десктопным» значениям (14px, 13/16/16) — не опечатка,
+ * так в самом макете (не монотонно с 1200/1600, где меньше).
+ */
+@media (max-width: 699px) {
+	.contact-form-section.container {
+		padding-left: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
+		padding-right: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
+	}
+
+	.contact-form-intro {
+		/* width:100% отсюда убран: он перебивал базис 493px и на 699 интро
+		   скачком растягивалось с 493 до 649. По макету 700 интро именно
+		   493px, а на узких оно и так сжимается через max-width:100%. */
+		margin-right: 0;
+	}
+
+	.contact-form-intro__title {
+		/* 34px на 700 → 32px на 360 (обе точки реальные), без ступеньки */
+		font-size: clamp(32px, calc(29.88px + 0.5882vw), 34px);
+	}
+
+	.contact-form {
+		width: 100%;
+	}
+
+	.contact-form__fields {
+		/* Колонки больше не переопределяем — auto-fit выше схлопывает их
+		   сам по нехватке места. Здесь только вертикальный зазор:
+		   69px на 700 → 32px на 360, продолжение той же кривой. */
+		row-gap: clamp(32px, calc(-7.18px + 10.8824vw), 69px);
+	}
+
+	.contact-form__actions {
+		gap: clamp(16px, calc(13.88px + 0.5882vw), 18px);
+	}
+
+}
