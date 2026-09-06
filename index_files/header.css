@@ -452,6 +452,13 @@ img.site-header__logo-icon {
 	   же: пункт 26px Medium, line-height 1.1, зазор между пунктами 16px,
 	   отступ от строки «Услуги» до блока 24px). Раньше тут стояли 20px/16px,
 	   подобранные на глаз, — эталона на этот вид тогда не было. */
+	/*
+	 * Высоту раскрытия задаёт JS по фактическому содержимому (main.js,
+	 * initBurgerMenu). Раньше в CSS стояло max-height: 400px при реальной
+	 * высоте списка ~140: анимация проходила контент за треть времени и
+	 * ещё две трети «доезжала» вхолостую — из-за этого открытие выглядело
+	 * запаздывающим.
+	 */
 	.burger-menu__list .sub-menu {
 		display: flex;
 		flex-direction: column;
@@ -461,18 +468,23 @@ img.site-header__logo-icon {
 		padding: 0;
 		max-height: 0;
 		overflow: hidden;
-		transition: max-height 0.25s ease, padding-top 0.25s ease;
+		/* Только max-height: padding-top должен примениться мгновенно,
+		   иначе в момент замера высоты в JS его ещё нет и последний пункт
+		   («Все услуги») обрезается на эти 24px. */
+		transition: max-height 0.3s ease;
 	}
 
 	.burger-menu__list .menu-item-has-children.is-open .sub-menu {
-		max-height: 400px;
 		padding-top: 24px;
 	}
 
 	.burger-menu__list .sub-menu a {
 		font-size: 26px;
 		font-weight: var(--font-weight-body);
-		line-height: 1.1;
+		/* 1.2 — высота пункта 31px, как в макетах выпадающего списка
+		   (2633:10398 для 700 и 2637:12180 для 1200): с 1.1 пункт был 29
+		   и шаг между ними 45 вместо 47. */
+		line-height: var(--line-height-heading);
 	}
 
 	.burger-menu__contacts {

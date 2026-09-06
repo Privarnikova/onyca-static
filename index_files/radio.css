@@ -22,6 +22,10 @@
 	position: relative;
 	width: clamp(21px, calc(1px + 1.25vw), 25px);
 	height: clamp(21px, calc(1px + 1.25vw), 25px);
+	/* Круг не должен вытягиваться, когда контрол попадает в сетку и та
+	   растягивает его по ячейке. */
+	aspect-ratio: 1;
+	align-self: start;
 	margin: 0;
 	flex-shrink: 0;
 	border: 1px solid var(--color-black);
@@ -34,7 +38,12 @@
 	border-color: var(--color-accent-blue);
 }
 
-.radio-control:hover::after {
+/*
+ * Точка при наведении — только у невыбранного контрола. Иначе снятый
+ * повторным кликом чекбокс оставался под курсором синим, и выглядело так,
+ * будто он не снялся.
+ */
+.radio-control:hover:not(:checked)::after {
 	content: '';
 	position: absolute;
 	inset: 14.286%;

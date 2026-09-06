@@ -137,7 +137,21 @@
 		menu.querySelectorAll( '.menu-item-has-children > a' ).forEach( function ( link ) {
 			link.addEventListener( 'click', function ( e ) {
 				e.preventDefault();
-				link.closest( '.menu-item-has-children' ).classList.toggle( 'is-open' );
+
+				var item = link.closest( '.menu-item-has-children' );
+				var sub = item.querySelector( '.sub-menu' );
+				var isOpen = item.classList.toggle( 'is-open' );
+
+				if ( ! sub ) {
+					return;
+				}
+
+				/*
+				 * Высота по фактическому содержимому: в CSS стояло
+				 * max-height: 400px при списке ~140, и анимация две трети
+				 * времени шла вхолостую — открытие выглядело подтормаживающим.
+				 */
+				sub.style.maxHeight = isOpen ? sub.scrollHeight + 'px' : '';
 			} );
 		} );
 	}
@@ -294,6 +308,160 @@
 		} );
 	}
 
+	/**
+	 * Кнопки ЦД (ТЗ п. 02, тип 1): притягиваются к курсору и заливаются
+	 * при наведении. Референс поведения — кнопка Telegram на EikoDigital.
+	 *
+	 * Разметку достраиваем здесь, а не в шаблонах: кнопке нужен слой
+	 * заливки и обёртка текста, и делать это в каждом месте вывода значило
+	 * бы дублировать её в разметке. Так любая новая .btn--cta получает
+	 * эффект сама.
+	 *
+	 * Сила притяжения: сама кнопка тянется на 25px, текст внутри — на 15,
+	 * из-за разницы кнопка выглядит «тянущейся», а не едущей целиком.
+	 * Зона, в которой курсор уже притягивает, — половина кнопки плюс 60px.
+	 */
+	function initMagneticButtons() {
+		var buttons = document.querySelectorAll( '.btn--cta' );
+
+		if ( ! buttons.length ) {
+			return;
+		}
+
+		// Тач и «уменьшить движение» — без магнита: там тянуть нечем и незачем.
+		var enabled = window.matchMedia( '(hover: hover)' ).matches &&
+			! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+
+		var items = [];
+
+		buttons.forEach( function ( btn ) {
+			if ( ! btn.querySelector( '.btn__fill' ) ) {
+				var fill = document.createElement( 'span' );
+				fill.className = 'btn__fill';
+				fill.setAttribute( 'aria-hidden', 'true' );
+
+				var text = document.createElement( 'span' );
+				text.className = 'btn__text';
+				while ( btn.firstChild ) {
+					text.appendChild( btn.firstChild );
+				}
+
+				btn.appendChild( fill );
+				btn.appendChild( text );
+			}
+
+			items.push( {
+				el: btn,
+				text: btn.querySelector( '.btn__text' ),
+				strength: 25,
+				textStrength: 15
+			} );
+		} );
+
+		if ( ! enabled ) {
+			return;
+		}
+
+		var ticking = false;
+		var pointer = { x: 0, y: 0 };
+
+		function update() {
+			ticking = false;
+
+			items.forEach( function ( item ) {
+				var rect = item.el.getBoundingClientRect();
+				var cx = rect.left + rect.width / 2;
+				var cy = rect.top + rect.height / 2;
+				var dx = pointer.x - cx;
+				var dy = pointer.y - cy;
+				var reach = Math.max( rect.width, rect.height ) / 2 + 60;
+				var distance = Math.sqrt( dx * dx + dy * dy );
+
+				if ( distance > reach ) {
+					item.el.style.transform = '';
+					item.text.style.transform = '';
+					return;
+				}
+
+				/*
+				 * Сдвиг пропорционален смещению курсора от центра: у самой
+				 * кнопки он около нуля, к границе зоны доходит до strength.
+				 * Резкость на границе снимает transition на самой кнопке —
+				 * она возвращается плавно, а не прыжком.
+				 */
+				var shiftX = ( dx / reach ) * item.strength;
+				var shiftY = ( dy / reach ) * item.strength;
+
+				item.el.style.transform = 'translate(' + shiftX + 'px, ' + shiftY + 'px)';
+				item.text.style.transform = 'translate(' +
+					( shiftX * item.textStrength / item.strength ) + 'px, ' +
+					( shiftY * item.textStrength / item.strength ) + 'px)';
+			} );
+		}
+
+		window.addEventListener( 'mousemove', function ( event ) {
+			pointer.x = event.clientX;
+			pointer.y = event.clientY;
+
+			if ( ! ticking ) {
+				ticking = true;
+				window.requestAnimationFrame( update );
+			}
+		} );
+
+		// При скролле кнопка уезжает из-под курсора — пересчитываем.
+		window.addEventListener( 'scroll', function () {
+			if ( ! ticking ) {
+				ticking = true;
+				window.requestAnimationFrame( update );
+			}
+		}, { passive: true } );
+	}
+
+	/**
+	 * Баннер о cookie (ТЗ, п. 01). Показываем, пока посетитель не нажал
+	 * «Принять»; отметку держим в localStorage, поэтому решение переживает
+	 * перезагрузку и переходы по страницам.
+	 *
+	 * Хранилище может быть недоступно (приватный режим, запрет на данные
+	 * сайта) — тогда баннер просто покажется снова, но ошибка наружу не
+	 * уйдёт и остальные скрипты не сломаются.
+	 */
+	function initCookieBanner() {
+		var banner = document.querySelector( '[data-cookie-banner]' );
+
+		if ( ! banner ) {
+			return;
+		}
+
+		var KEY = 'onyca-cookie-accepted';
+		var accepted = false;
+
+		try {
+			accepted = window.localStorage.getItem( KEY ) === '1';
+		} catch ( e ) {}
+
+		if ( accepted ) {
+			return;
+		}
+
+		banner.hidden = false;
+
+		var button = banner.querySelector( '[data-cookie-accept]' );
+
+		if ( ! button ) {
+			return;
+		}
+
+		button.addEventListener( 'click', function () {
+			banner.hidden = true;
+
+			try {
+				window.localStorage.setItem( KEY, '1' );
+			} catch ( e ) {}
+		} );
+	}
+
 	function initTabPills() {
 		var pills = document.querySelectorAll( '.tab-pill' );
 
@@ -355,6 +523,8 @@
 		initBurgerMenu();
 		initFilterTabs();
 		initTabPills();
+		initCookieBanner();
+		initMagneticButtons();
 		initContactForm();
 		initMoscowClock();
 	} );

@@ -36,6 +36,8 @@
 .site-footer__inner {
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
+	/* Зазор колонок — общий для всей сетки макета (20px на 1920, 18 ниже) */
+	column-gap: var(--grid-gap);
 	align-items: start;
 }
 
@@ -51,7 +53,7 @@
 .site-footer__bottom {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
-	column-gap: 0;
+	column-gap: var(--grid-gap);
 }
 
 .site-footer__contacts-link:first-child {
@@ -125,7 +127,7 @@
 	grid-auto-flow: column;
 	grid-template-rows: repeat(3, auto);
 	grid-template-columns: repeat(2, minmax(0, 1fr));
-	column-gap: 0;
+	column-gap: var(--grid-gap);
 	row-gap: clamp(7px, calc(2px + 0.3125vw), 8px);
 	list-style: none;
 	margin: 0;
@@ -155,12 +157,21 @@
 	margin: 0;
 }
 
+/*
+ * «Кнопка к15/к16 — Серая»: при наведении такие ссылки чернеют, а не
+ * подчёркиваются. Правило общее для всех серых кнопок, не только подвала.
+ */
 .site-footer__policy a {
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
 	line-height: var(--line-height-b1);
 	color: var(--color-text-disclaimer);
 	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.site-footer__policy a:hover {
+	color: var(--color-text);
 }
 
 .site-footer__disclaimer {
@@ -225,30 +236,29 @@
 @media (max-width: 1400px) {
 	.site-footer__inner {
 		/*
-		 * Колонка бренда сжимается медленнее остальных: в ней логотип
-		 * (200.5px), и при равных четвертях к 900 колонка доходила до 210,
-		 * то есть логотип упирался в её край. Минимум 15.6em — логотип плюс
-		 * воздух; пока четверть шире (до ~1130), колонки равные и на 1200
-		 * совпадают с макетом, ниже колонка держит минимум, а место отдают
-		 * три правые — там короткие строки и запас есть.
+		 * Четыре равные колонки сетки макета (на 1200 это 274px при зазоре
+		 * 18). Раньше первая колонка держала минимум под логотип, но с
+		 * зазорами это сбивало всю сетку — а логотип (200.5px) в колонку и
+		 * так помещается.
 		 *
-		 * min-content тут не годится: логотип — картинка с max-width:100%,
-		 * её min-content равен нулю, и колонке было куда сжиматься.
-		 *
-		 * minmax(0, 1fr) у правых, а не просто 1fr: 1fr не даёт колонке
-		 * сжаться уже min-content, и длинный текст (почта, 244px)
-		 * растягивал свой трек — колонки переставали быть равными
-		 * (135/135/244/135).
+		 * minmax(0, 1fr), а не просто 1fr: 1fr не даёт колонке сжаться уже
+		 * min-content, и длинный текст (почта, 244px) растягивал свой трек —
+		 * колонки переставали быть равными (135/135/244/135).
 		 */
 		display: grid;
-		grid-template-columns: max(25%, 15.6em) repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 		row-gap: clamp(78px, calc(123.29px - 6.4706vw), 100px);
 	}
 
 	.site-footer__inner.container {
-		padding-left: clamp(25px, calc(11px + 2vw), 35px);
-		padding-right: clamp(25px, calc(11px + 2vw), 35px);
+		/* 35px на 1600 → 25px на 1200 — поля сеток из макетов (2310:10067
+		   и 967:662). Прежняя формула давала на 1200 все 35, и вся сетка
+		   подвала уезжала на 5px относительно колонок. */
+		padding-left: clamp(25px, calc(-5px + 2.5vw), 35px);
+		padding-right: clamp(25px, calc(-5px + 2.5vw), 35px);
 	}
+
+
 
 	.site-footer__brand {
 		grid-column: 1;
@@ -267,7 +277,7 @@
 	.site-footer__legal {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
-		column-gap: 0;
+		column-gap: var(--grid-gap);
 	}
 
 	.site-footer__contacts {
@@ -294,7 +304,7 @@
 	.site-footer__menu {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		width: auto;
-		column-gap: 0;
+		column-gap: var(--grid-gap);
 		row-gap: 10px;
 	}
 
@@ -342,6 +352,18 @@
  * контент разворачивается на все четыре колонки. Тогда Telegram встаёт в
  * колонку 1, почта в 3, соцсети в 4 — раскладка макета 700.
  */
+/*
+ * Логотип в макете 1200 (2587:12167) стоит на 35, хотя колонка сетки
+ * начинается на 25 — единственное место, где макет расходится с сеткой.
+ * Держим как в макете: 10px сверх поля на 1200, к 1600 сходит на нет.
+ * Ниже 900 бренд занимает всю ширину и отступ не нужен.
+ */
+@media (max-width: 1400px) and (min-width: 901px) {
+	.site-footer__brand {
+		padding-left: clamp(0px, calc(40px - 2.5vw), 10px);
+	}
+}
+
 @media (max-width: 900px) {
 	.site-footer__inner.container {
 		/* 25px до 700, дальше к 15px на 360. Раньше эта формула стояла в
@@ -353,6 +375,19 @@
 	.site-footer__bottom {
 		/* 66px до 700, дальше к 48px на 360 */
 		row-gap: clamp(48px, calc(28.94px + 5.2941vw), 66px);
+	}
+
+	/*
+	 * Ниже 900 подвал в макете размечен без зазоров: на 700 (2610:7064)
+	 * колонки идут 25 / 187.5 / 350 / 512.5 — это ровно четверти
+	 * контейнера, а не колонки сетки с промежутками. Поэтому зазор здесь
+	 * снимаем; в сетке героя на этой же точке он, наоборот, есть (2×316
+	 * через 18) — так в макетах.
+	 */
+	.site-footer__contacts,
+	.site-footer__bottom,
+	.site-footer__legal {
+		column-gap: 0;
 	}
 
 	.site-footer__brand,

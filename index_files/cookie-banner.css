@@ -1,0 +1,58 @@
+/**
+ * Баннер о cookie — Figma, узел 1969:6089 (эталон 1920): блок 600×212 в
+ * левом нижнем углу с отступом 40, внутренний паддинг 28, светло-серая
+ * подложка Grey-30.
+ *
+ * Величины тянутся долями ширины окна вниз от 1920: своего макета на
+ * других точках нет, а на телефоне блок занимает всю ширину за вычетом
+ * поля — иначе 600px просто не помещаются.
+ */
+
+.cookie-banner {
+	position: fixed;
+	z-index: 200;
+	bottom: clamp(15px, 2.0833vw, 40px);
+	left: clamp(15px, 2.0833vw, 40px);
+	right: clamp(15px, 2.0833vw, 40px);
+	max-width: 600px;
+	background-color: var(--color-surface);
+	box-shadow: 0 8px 32px rgb(0 0 0 / 8%);
+}
+
+.cookie-banner__inner {
+	padding: clamp(20px, 1.4583vw, 28px);
+}
+
+.cookie-banner__title {
+	margin: 0;
+	font-size: clamp(18px, 1.0417vw, 20px);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.cookie-banner__text {
+	/* 16px от заголовка до текста (40 − 24 в макете) */
+	margin: clamp(12px, 0.8333vw, 16px) 0 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+/* Ссылка на политику: подчёркивание постоянное, при наведении синеет */
+.cookie-banner__text a {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	transition: color 0.2s ease;
+}
+
+.cookie-banner__text a:hover {
+	color: var(--color-accent-blue);
+}
+
+.cookie-banner__accept {
+	/* 28px от текста до кнопки (112 − 84 в макете) */
+	margin-top: clamp(20px, 1.4583vw, 28px);
+}

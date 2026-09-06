@@ -1,0 +1,102 @@
+/**
+ * Страница 404 — Figma, узел 1548:6970 (эталон 1920×1080). Синее полотно
+ * во весь экран, слева «:(» и текстовый блок, справа крупное размытое
+ * «404», уходящее за правый край.
+ *
+ * Величины 1920: «:(» на 148, заголовок на 570, текст на 715, кнопка на
+ * 791; «404» — 950×428 от x=970 до правого края. Ниже 1920 всё
+ * масштабируется долями ширины окна: своего макета на других точках нет,
+ * поэтому вёрстка тянет единственный имеющийся, а не выдумывает раскладку.
+ */
+
+.page-404 {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	min-height: 100vh;
+	padding: 0 clamp(15px, 2.0833vw, 40px);
+	overflow: hidden;
+	background-color: var(--color-accent-blue);
+	color: var(--color-white);
+}
+
+/*
+ * Размытое «404». Видимый прямоугольник в макете — 950×428 от x=970, а в
+ * файле вокруг него поля под размытие: по 50px слева и справа и по 100px
+ * сверху и снизу (экспорт 1050×628). На эти поля картинка и сдвинута.
+ */
+.page-404__code {
+	position: absolute;
+	top: clamp(-30px, 2.1875vw, 42px);
+	/* Порядок в clamp() от меньшего к большему: для отрицательных это
+	   -100 (на 1920) как нижняя граница и -52 как верхняя. */
+	/* Прижата к правому краю без отступа и не выходит за него */
+	right: 0;
+	/* Без нижней границы: на узких экранах фиксированный минимум делал
+	   «404» шире экрана, и он налезал на «:(». Доля от ширины держит их
+	   на своих местах на любой ширине. */
+	width: min(54.6875vw, 1050px);
+	height: auto;
+	pointer-events: none;
+}
+
+.page-404__inner {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding-block: clamp(77px, 7.7083vw, 148px) clamp(123px, 12.3438vw, 237px);
+}
+
+.page-404__face {
+	width: clamp(104px, 10.376vw, 199.219px);
+	height: auto;
+}
+
+.page-404__title {
+	/* 78px от «:(» до заголовка на 1920 */
+	margin: clamp(41px, 4.0625vw, 78px) 0 0;
+	max-width: 491px;
+	font-size: clamp(28px, 2.8125vw, 54px);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+}
+
+.page-404__text {
+	/* 15px от заголовка до текста на 1920 */
+	margin: clamp(12px, 0.78125vw, 15px) 0 0;
+	max-width: 600px;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+/*
+ * Кнопка «ЦД - 4»: та же геометрия, что у остальных кнопок ЦД (высота 52,
+ * скругление полное), но вывернутая — белая заливка и тёмный текст, чтобы
+ * читаться на синем.
+ */
+.page-404__button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	/* 32px от текста до кнопки на 1920 */
+	margin-top: clamp(24px, 1.6667vw, 32px);
+	min-width: clamp(118px, 7.0833vw, 136px);
+	/* 22px по бокам — из ширины кнопки в макете (136 при тексте 92) */
+	padding: 16px clamp(18px, 1.1458vw, 22px) 18px;
+	border-radius: 999px;
+	background-color: var(--color-white);
+	color: var(--color-text);
+	font-family: var(--font-family-base);
+	font-size: var(--font-size-button);
+	font-weight: var(--font-weight-button);
+	line-height: var(--line-height-button);
+	text-decoration: none;
+	transition: opacity 0.2s ease;
+}
+
+.page-404__button:hover {
+	opacity: 0.85;
+}

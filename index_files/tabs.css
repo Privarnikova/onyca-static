@@ -15,7 +15,9 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	padding: clamp(12px, calc(7px + 0.3125vw), 13px) clamp(14px, calc(4px + 0.625vw), 16px) clamp(14px, calc(4px + 0.625vw), 16px);
+	/* Одинаково сверху и снизу: с разными отступами (13 против 16) текст
+	   вставал выше середины. */
+	padding: clamp(13px, calc(8px + 0.3125vw), 14px) clamp(14px, calc(4px + 0.625vw), 16px);
 	border: none;
 	border-radius: var(--radius-pill);
 	background-color: var(--color-surface);
@@ -29,7 +31,12 @@
 	transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.tab-pill:hover {
+/*
+ * Наведение — только на невыбранный таб. Иначе уже выбранный под курсором
+ * синел, и выглядело так, будто выбор снялся (а снимался он лишь после
+ * увода курсора). То же правило и у .radio-control.
+ */
+.tab-pill:hover:not(.is-selected) {
 	background-color: var(--color-accent-blue);
 	color: var(--color-white);
 }

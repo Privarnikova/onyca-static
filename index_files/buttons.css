@@ -51,27 +51,86 @@
 	background-color: var(--color-black);
 	color: var(--color-white);
 
-	&:hover {
-		background-color: var(--color-accent-blue);
-	}
+	/* Цвет наведения — не фоном, а заливкой .btn__fill (см. ниже) */
+	--btn-fill-color: var(--color-accent-blue);
+}
+
+/*
+ * Заливка при наведении «выезжает» снизу, а не перекрашивает фон скачком
+ * (референс — кнопка Telegram на EikoDigital). Слой создаёт JS
+ * (initMagneticButtons в main.js), поэтому разметку кнопок трогать не
+ * нужно и любая новая кнопка ЦД получает эффект сама.
+ *
+ * z-index у слоя отрицательный, а у кнопки isolation: isolate — так
+ * заливка ложится под текст, не перекрывая его, и не выпадает из кнопки.
+ */
+.btn--cta {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	/* transform — притяжение к курсору (main.js): сглаживает вход в зону
+	   и возврат, когда курсор ушёл. */
+	transition: color 0.4s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * Заливка входит не прямой кромкой, а дугой — как в референсе: это эллипс
+ * шире и выше кнопки, который поднимается снизу. Пока он внизу, видна его
+ * скруглённая макушка, а когда доходит до места, кнопка закрыта целиком —
+ * потому эллипс и сделан с запасом по обеим сторонам.
+ */
+.btn__fill {
+	position: absolute;
+	top: 100%;
+	left: -25.5%;
+	z-index: -1;
+	/*
+	 * Пропорции и путь — из покадровой раскладки макета (975:3623): при
+	 * кнопке 176×52 эллипс 266×110, то есть 151% ширины и 211% высоты.
+	 * Кадры идут от y=52 (эллипс прямо под кнопкой) к y=-29, это −81px от
+	 * старта, или −74% высоты самого эллипса.
+	 */
+	width: 151%;
+	height: 211%;
+	border-radius: 50%;
+	background-color: var(--btn-fill-color);
+	transform: translateY(0);
+	transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+	pointer-events: none;
+}
+
+.btn--cta:hover .btn__fill,
+.btn--cta:focus-visible .btn__fill {
+	/* Конечный кадр макета: −74% высоты эллипса. Он остаётся эллипсом —
+	   кнопку закрывает за счёт того, что шире и выше её. */
+	transform: translateY(-74%);
+}
+
+/*
+ * Текст сдвигается вместе с курсором чуть слабее самой кнопки — за счёт
+ * этого кнопка «тянется», а не едет целиком. Величины сдвига задаёт JS.
+ */
+.btn__text {
+	display: inline-flex;
+	align-items: center;
+	gap: inherit;
+	transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+	will-change: transform;
 }
 
 /* ЦД-1: розовый — только для главной кнопки «Обсудить проект» */
 .btn--cta--primary {
 	background-color: var(--color-accent-pink);
-
-	&:hover {
-		background-color: var(--color-accent-blue);
-	}
+	--btn-fill-color: var(--color-accent-blue);
 }
 
 /* ЦД-4: инверсия для тёмной/серой подложки — светлая кнопка, тёмный текст */
 .btn--cta--inverse {
 	background-color: var(--color-white);
 	color: var(--color-text);
+	--btn-fill-color: var(--color-black);
 
 	&:hover {
-		background-color: var(--color-black);
 		color: var(--color-white);
 	}
 }
@@ -113,7 +172,9 @@
 
 /* Кнопка cookie-баннера */
 .btn--cookie {
-	padding: 13px 20px 15px;
+	/* 16px по бокам — из ширины кнопки в макете 1969:6089 (92 при тексте
+	   «Принять» 60). С 20px выходило 100. */
+	padding: 13px 16px 15px;
 	font-size: var(--font-size-button-sm);
 	background-color: var(--color-black);
 	color: var(--color-white);
@@ -155,5 +216,19 @@
 			clamp(15px, calc(17.06px - 0.2941vw), 16px)
 			clamp(18px, calc(26.24px - 1.1765vw), 22px)
 			clamp(16px, calc(20.12px - 0.5882vw), 18px);
+	}
+}
+
+/*
+ * Кому анимация мешает — отдаём статичную смену цвета: заливка появляется
+ * сразу, магнит JS отключает сам.
+ */
+@media (prefers-reduced-motion: reduce) {
+	.btn__fill {
+		transition: none;
+	}
+
+	.btn__text {
+		transform: none !important;
 	}
 }

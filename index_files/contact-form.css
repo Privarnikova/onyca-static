@@ -22,10 +22,25 @@
  * форма занимает вторую целиком, текст в первой ограничен по ширине
  * строки (это ширина ТЕКСТА, а не колонки).
  */
+/*
+ * Секция делится не пополам, а по колонкам сетки: форма начинается с
+ * четвёртой колонки (1920 — x=970, 1600 — x=809, 1200 — x=609). Левый трек
+ * включает зазор до формы, поэтому column-gap нулевой — так одна формула
+ * описывает и ширину текста, и промежуток.
+ */
 .contact-form-section {
+	--form-left: min(calc(48.75vw - 6px), 930px);
+
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: var(--form-left) minmax(0, 1fr);
+	column-gap: 0;
 	margin-block: clamp(160px, calc(20px + 8.75vw), 188px);
+}
+
+.contact-form-section.container {
+	/* Поля сеток: 40 на 1920, 35 на 1600 */
+	padding-left: clamp(35px, calc(10px + 1.5625vw), 40px);
+	padding-right: clamp(35px, calc(10px + 1.5625vw), 40px);
 }
 
 .contact-form-intro {
@@ -97,6 +112,26 @@
 	color: var(--color-text);
 }
 
+/*
+ * Подпись поля «плавающая», как в макете: пока поле пустое, она стоит у
+ * линии и поле низкое (35px на 1920), при вводе поднимается, а текст
+ * встаёт на её место. Раньше место под текст было занято всегда, поэтому
+ * пустое поле было вдвое выше макета.
+ *
+ * Работает на :placeholder-shown, поэтому у полей placeholder=" " —
+ * пробел, а не текст: видимая подпись это label.
+ */
+.contact-form__field {
+	position: relative;
+}
+
+.contact-form__field label {
+	position: absolute;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+}
+
 .contact-form__field input {
 	width: 100%;
 	padding: 0 0 8px;
@@ -108,11 +143,19 @@
 	font-weight: var(--font-weight-body);
 	line-height: var(--line-height-b1);
 	color: var(--color-text);
+	transition: padding-top 0.2s ease;
+}
+
+/* Поле с текстом (или в фокусе) — подпись наверх, текст на её место */
+.contact-form__field input:focus,
+.contact-form__field input:not(:placeholder-shown) {
+	padding-top: var(--field-label-shift);
 }
 
 .contact-form__field input:focus {
 	outline: none;
-	border-bottom-color: var(--color-accent-blue);
+	/* Чёрная, а не синяя — правка заказчика */
+	border-bottom-color: var(--color-black);
 }
 
 .contact-form__budget {
@@ -121,12 +164,23 @@
 	border: none;
 }
 
+/*
+ * Три равные колонки — до 1200 включительно по месту: опция «менее 200
+ * тыс. руб» это 11.6em, и три таких помещаются в форму вплоть до 1201.
+ * Раньше три колонки были только на 1600+, а ниже сетка сразу
+ * схлопывалась в две, хотя место оставалось.
+ */
 .contact-form__budget-grid {
 	display: grid;
-	grid-template-columns:
-		clamp(258px, calc(-2px + 16.25vw), 310px)
-		clamp(258px, calc(-2px + 16.25vw), 310px)
-		auto;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	/*
+	 * Порядок по столбцам, а не по строкам (макет 1225:1466): слева
+	 * «менее 200» и «200-500», в середине «500-1» и «1-2», справа «2-3» и
+	 * «более 3». Поэтому число строк задаётся явно, а поток идёт колонками.
+	 */
+	grid-template-rows: repeat(2, auto);
+	grid-auto-flow: column;
+	column-gap: var(--grid-gap);
 	row-gap: clamp(14px, calc(4px + 0.625vw), 16px);
 }
 
@@ -152,10 +206,16 @@
  * ширину (макет 360). Фиксированных ширин у кнопок больше нет.
  */
 .contact-form__actions {
+	/*
+	 * По макету (1920: 290 + 600 при форме 910) «Прикрепить файл»
+	 * занимает одну колонку сетки, «Отправить» — две. Форма шириной в три
+	 * колонки, поэтому первая кнопка это треть за вычетом двух зазоров.
+	 */
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(max(174px, 45%), 1fr));
+	grid-template-columns: calc((100% - 2 * var(--grid-gap)) / 3) minmax(0, 1fr);
 	align-items: center;
-	gap: clamp(18px, calc(8px + 0.625vw), 20px);
+	column-gap: var(--grid-gap);
+	row-gap: clamp(18px, calc(8px + 0.625vw), 20px);
 	margin-top: clamp(32px, calc(2px + 1.875vw), 38px);
 }
 
@@ -185,10 +245,7 @@
 	margin-top: clamp(32px, calc(2px + 1.875vw), 38px);
 }
 
-.contact-form__consent-label {
-	display: contents;
-	cursor: pointer;
-}
+	
 
 /*
  * Состояние «Ошибка» (Figma 1236:1915 и одноимённые узлы на остальных
@@ -210,6 +267,10 @@
 	color: var(--color-error);
 }
 
+.contact-form__consent-text {
+	grid-column: 2;
+}
+
 .contact-form__consent span {
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
@@ -217,8 +278,14 @@
 	color: var(--color-text-footer);
 }
 
+/* Ссылки согласия: при наведении синеют */
 .contact-form__consent a {
 	color: var(--color-text-footer);
+	transition: color 0.2s ease;
+}
+
+.contact-form__consent a:hover {
+	color: var(--color-accent-blue);
 }
 
 /*
@@ -238,9 +305,17 @@
 	   плоскую global --container-padding:40px (main.css/tokens.css) на
 	   ЛЮБОЙ ширине, включая планшет и телефон. Отсюда «большие маргины по
 	   бокам» — контент был на 40px, а не на 25/15px, как везде на сайте. */
+	.contact-form-section {
+		/* 774 на 1600 → 584 на 1200: форма встаёт в колонку 4 и 3
+		   соответственно (809 и 609 в макетах). */
+		--form-left: clamp(584px, calc(47.5vw + 14px), 774px);
+	}
+
 	.contact-form-section.container {
-		padding-left: clamp(25px, calc(-20px + 3.75vw), 40px);
-		padding-right: clamp(25px, calc(-20px + 3.75vw), 40px);
+		/* 35 на 1600 → 25 на 1200 — поля сеток (2310:10067, 967:662).
+		   Прежняя формула давала на 1600 все 40. */
+		padding-left: clamp(25px, calc(-5px + 2.5vw), 35px);
+		padding-right: clamp(25px, calc(-5px + 2.5vw), 35px);
 	}
 
 	/* flex:1 1 Npx + min-width:0 вместо плоского width:Npx — интро и форма
@@ -272,20 +347,7 @@
 		column-gap: 18px;
 	}
 
-	.contact-form__budget-grid {
-		/*
-		 * Две колонки, пока в них помещается самая длинная опция («менее
-		 * 200 тыс. руб» — 11.6em вместе с чекбоксом), ниже — одна, как в
-		 * макете 360 (там все шесть идут столбиком). Минимум трека в em, а
-		 * не в пикселях: он тянется вместе с кеглем и равен ширине
-		 * содержимого, а не выбран на глаз. Раньше тут стояли 240px, и
-		 * сетка схлопывалась уже на 500, хотя колонка была 231 при опции
-		 * 173. 45% удерживают ровно две колонки там, где по одной ширине
-		 * трека auto-fit набрал бы три.
-		 */
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(max(11.6em, 45%), 1fr));
-	}
+
 
 }
 
@@ -360,4 +422,42 @@
 		gap: clamp(16px, calc(13.88px + 0.5882vw), 18px);
 	}
 
+
+
+}
+
+/*
+ * Деление кнопок 1 : 2 — только на 1920 и 1600, как в правке заказчика.
+ * На 1200 и ниже они идут поровну.
+ */
+@media (max-width: 1300px) {
+	/*
+	 * Две колонки в бюджете и равные кнопки — с 1300 (правка заказчика;
+	 * в макете 1200 обе перестройки уже действуют).
+	 * Ниже сетка бюджета доходит до одной колонки сама: 11.6em это
+	 * ширина самой длинной опции, 45% удерживают ровно две, пока
+	 * помещаются.
+	 */
+	.contact-form__budget-grid {
+		grid-template-columns: repeat(auto-fit, minmax(max(11.6em, 45%), 1fr));
+		/* Три строки на две колонки — порядок по-прежнему по столбцам */
+		grid-template-rows: repeat(3, auto);
+	}
+
+	.contact-form__actions {
+		grid-template-columns: repeat(auto-fit, minmax(max(174px, 45%), 1fr));
+	}
+}
+
+/*
+ * Когда две колонки бюджета уже не помещаются (ширина сетки меньше двух
+ * опций по 11.6em с зазором), список идёт одним столбцом — как в макете
+ * 360. Явное число строк тут снимаем: с ним поток по колонкам создавал
+ * вторую колонку из неявных треков.
+ */
+@media (max-width: 415px) {
+	.contact-form__budget-grid {
+		grid-template-rows: none;
+		grid-auto-flow: row;
+	}
 }

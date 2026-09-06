@@ -127,6 +127,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <link rel="stylesheet" id="onyca-link-underline-css" href="./index_files/link-underline.css" media="all">
 <link rel="stylesheet" id="onyca-header-css" href="./index_files/header.css" media="all">
 <link rel="stylesheet" id="onyca-footer-css" href="./index_files/footer.css" media="all">
+<link rel="stylesheet" id="onyca-cookie-banner-css" href="./index_files/cookie-banner.css" media="all">
+<link rel="stylesheet" id="onyca-page-404-css" href="./index_files/page-404.css" media="all">
 <link rel="stylesheet" id="onyca-page-contacts-css" href="./index_files/page-contacts.css" media="all">
 <link rel="stylesheet" id="onyca-contact-form-css" href="./index_files/contact-form.css" media="all">
 <link rel="stylesheet" id="onyca-main-css" href="./index_files/main.css" media="all">
@@ -159,6 +161,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	<li id="menu-item-60" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-60"><a href="#" class="link-underline">UX/UI</a></li>
 	<li id="menu-item-61" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-61"><a href="#" class="link-underline">CG &amp; Motion</a></li>
 	<li id="menu-item-62" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-62"><a href="#" class="link-underline">Дизайн-поддержка</a></li>
+	<li id="menu-item-0" class="menu-item-all-services menu-item-0"><a href="#" class="link-underline">Все услуги</a></li>
 </ul>
 </li>
 <li id="menu-item-43" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-43"><a href="#" class="link-underline">Прайс-лист</a></li>
@@ -192,6 +195,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-60"><a href="#">UX/UI</a></li>
 	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-61"><a href="#">CG &amp; Motion</a></li>
 	<li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-62"><a href="#">Дизайн-поддержка</a></li>
+	<li class="menu-item-all-services menu-item-0"><a href="#">Все услуги</a></li>
 </ul>
 </li>
 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-43"><a href="#">Прайс-лист</a></li>
@@ -223,7 +227,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 								<p class="page-contacts__hours">Работаем в будние дни с 10:00 до 19:00 по МСК</p>
 				<div class="page-contacts__clock-status">
 					<p class="page-contacts__clock">
-						<span data-msk-day="">Воскресенье</span>, <span data-msk-clock="">17:54</span>
+						<span data-msk-day="">Воскресенье</span>, <span data-msk-clock="">20:52</span>
 					</p>
 					<p class="page-contacts__status" data-msk-status="">Сейчас отдыхаем</p>
 				</div>
@@ -274,24 +278,24 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 		<div class="contact-form__fields">
 			<div class="contact-form__field">
+				<input type="text" id="contact-name" name="contact_name" placeholder=" ">
 				<label for="contact-name">Ваше имя</label>
-				<input type="text" id="contact-name" name="contact_name">
 			</div>
 			<div class="contact-form__field">
+				<input type="text" id="contact-company" name="contact_company" placeholder=" ">
 				<label for="contact-company">Название компании</label>
-				<input type="text" id="contact-company" name="contact_company">
 			</div>
 			<div class="contact-form__field" data-required-group="email">
+				<input type="email" id="contact-email" name="contact_email" placeholder=" ">
 				<label for="contact-email">Ваш email</label>
-				<input type="email" id="contact-email" name="contact_email">
 			</div>
 			<div class="contact-form__field">
+				<input type="text" id="contact-telegram" name="contact_telegram" placeholder=" ">
 				<label for="contact-telegram">Ваш Telegram</label>
-				<input type="text" id="contact-telegram" name="contact_telegram">
 			</div>
 			<div class="contact-form__field contact-form__field--full">
+				<input type="text" id="contact-message" name="contact_message" placeholder=" ">
 				<label for="contact-message">Расскажите о проекте</label>
-				<input type="text" id="contact-message" name="contact_message">
 			</div>
 		</div>
 
@@ -327,16 +331,14 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 		<div class="contact-form__actions">
 			<button type="button" class="btn btn--secondary contact-form__attach">Прикрепить файл</button>
-			<button type="submit" class="btn btn--cta contact-form__submit">Отправить</button>
+			<button type="submit" class="btn btn--cta contact-form__submit"><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Отправить</span></button>
 		</div>
 
 		<div class="contact-form__consent" data-required-group="consent">
-						<label class="contact-form__consent-label">
-				<input class="radio-control" type="checkbox" name="contact_consent">
-				<span>
+						<input class="radio-control" type="checkbox" name="contact_consent" id="contact-consent">
+			<span class="contact-form__consent-text">
 					Нажимая на кнопку «Отправить», вы даете <a href="#">согласие на обработку персональных данных</a> и соглашаетесь с <a href="#">политикой обработки персональных данных</a>.
-				</span>
-			</label>
+			</span>
 			<p class="contact-form__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
 	</form>
@@ -380,8 +382,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 				<div class="site-footer__legal">
 					<p class="site-footer__policy">
-						<a class="link-underline" href="#">Политика обработки<br>персональных данных</a>
-						<a class="link-underline" href="#">Политика Cookie</a>
+						<a href="#">Политика обработки<br>персональных данных</a>
+						<a href="#">Политика Cookie</a>
 					</p>
 					<p class="site-footer__disclaimer">*принадлежит запрещенной<br>в РФ Meta</p>
 				</div>
@@ -389,6 +391,19 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</div>
 	</div>
 </footer>
+
+<div class="cookie-banner" data-cookie-banner="">
+	<div class="cookie-banner__inner">
+		<p class="cookie-banner__title">Мы используем файлы cookie</p>
+
+		<p class="cookie-banner__text">
+			Они помогают обеспечивать работу сайта. Оставаясь на сайте, вы соглашаетесь
+			с <a href="#">политикой использования файлов cookie</a>.
+		</p>
+
+		<button type="button" class="btn btn--cookie cookie-banner__accept" data-cookie-accept="">Принять</button>
+	</div>
+</div>
 
 <script type="speculationrules">
 {"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/onyca-digital/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}

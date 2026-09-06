@@ -19,6 +19,13 @@ body {
 }
 
 body {
+	/*
+	 * clip, а не hidden: не создаёт скролл-контейнер, поэтому sticky-шапка
+	 * продолжает работать. Страховка от горизонтального сдвига страницы —
+	 * его могут дать декоративные слои, выходящие за свою рамку (заливка
+	 * кнопок ЦД, размытое «404»).
+	 */
+	overflow-x: clip;
 	font-family: var(--font-family-base);
 	font-size: var(--font-size-body);
 	font-weight: var(--font-weight-body);
@@ -126,4 +133,43 @@ video {
 
 [hidden] {
 	display: none !important;
+}
+
+/*
+ * ПРАВИЛО ПРОЕКТА: любая анимация при наведении отключается ниже 1200 —
+ * подчёркивание ссылок, заливка кнопок ЦД, подсветка табов и контролов,
+ * смена цвета серых кнопок. Плюс то же самое на любом тач-устройстве,
+ * даже широком: там браузер применяет :hover после тапа и «залипает» на
+ * элементе до следующего касания.
+ */
+@media (max-width: 1199px), (hover: none) {
+	.link-underline::after,
+	.btn__fill {
+		display: none;
+	}
+
+	.tab-pill:hover:not(.is-selected) {
+		background-color: var(--color-surface);
+		color: var(--color-text);
+	}
+
+	.radio-control:hover {
+		border-color: var(--color-black);
+	}
+
+	.radio-control:hover:not(:checked)::after {
+		display: none;
+	}
+
+	.site-footer__policy a:hover,
+	.contact-form__consent a:hover,
+	.cookie-banner__text a:hover {
+		color: inherit;
+	}
+
+	.btn--cta:hover,
+	.btn--cookie:hover,
+	.btn--secondary:hover {
+		background-color: inherit;
+	}
 }
