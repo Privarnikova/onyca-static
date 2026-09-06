@@ -93,9 +93,9 @@
 
 .site-footer__copyright {
 	margin: 0;
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text-footer);
 }
 
@@ -141,9 +141,9 @@
 
 .site-footer__menu a,
 .site-footer__social a {
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text);
 	text-decoration: none;
 }
@@ -156,18 +156,18 @@
 }
 
 .site-footer__policy a {
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text-disclaimer);
 	text-decoration: none;
 }
 
 .site-footer__disclaimer {
 	margin: clamp(11px, calc(1px + 0.625vw), 13px) 0 0;
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text-disclaimer);
 }
 
@@ -425,12 +425,24 @@
  * столбик в первую, дисклеймер остаётся в своей.
  */
 @media (max-width: 780px) {
+	.site-footer {
+		/* 66px на 700 → 52px на 360 (обе точки реальные). Выше 700 остаётся
+		   плато 66, которое задано в базовом правиле. */
+		padding-block: clamp(52px, calc(37.18px + 4.118vw), 66px);
+	}
+
 	.site-footer__logo {
 		/* 200.571×39 на 700 → 160×31 на 360, обе точки реальные. Правило
 		   стояло в мобильном блоке, из-за чего от 700 до 531 логотип
 		   держал десктопный размер и на 530 менялся ступенькой. */
 		width: clamp(160px, calc(117.04px + 11.933vw), 200.571px);
 		height: clamp(31px, calc(22.53px + 2.3529vw), 39px);
+	}
+
+	.site-footer__brand {
+		/* Зазор логотип→копирайт: 14px на 700, 12px на 360 (макет
+		   2587:11783 — логотип 52..83, копирайт на 95). */
+		gap: clamp(12px, calc(9.88px + 0.588vw), 14px);
 	}
 
 	.site-footer__policy {
@@ -505,6 +517,8 @@
 
 	.site-footer__menu {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+		/* 18px — зазор макета 360: левая колонка с 15, правая с 189 */
+		column-gap: 18px;
 	}
 
 	.site-footer__menu > li:nth-child(4) {
@@ -525,11 +539,23 @@
 		grid-auto-flow: column;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		grid-template-rows: repeat(2, auto);
-		column-gap: 0;
+		column-gap: 18px;
 		row-gap: 10px;
 	}
 
 	.site-footer__disclaimer {
 		margin-top: 0;
+	}
+
+	/*
+	 * В мобильной раскладке политики и дисклеймер занимают всю ширину, и
+	 * переносы из разметки тут не нужны — они рассчитаны на узкие колонки
+	 * десктопа и планшета. Снимаем их, и текст ложится по месту:
+	 * «Политика обработки персональных / данных» (265px в колонке 330) и
+	 * «*принадлежит запрещенной в РФ Meta» одной строкой (290px).
+	 */
+	.site-footer__policy a br,
+	.site-footer__disclaimer br {
+		display: none;
 	}
 }

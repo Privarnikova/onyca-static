@@ -10,7 +10,7 @@
 
 @font-face {
 	font-family: 'Wix Madefor Display';
-	src: url('../font/WixMadeforDisplay-VariableFont_wght.ttf') format('truetype-variations');
+	src: url('./WixMadeforDisplay-VariableFont_wght.ttf') format('truetype-variations');
 	font-weight: 100 900;
 	font-style: normal;
 	font-display: swap;
@@ -33,6 +33,16 @@
 	/* Текст: два размера, вес 500, line-height 140% */
 	--font-size-body: 16px;
 	--font-size-body-sm: 15px;
+
+	/*
+	 * B1 — мелкий текст (часы, ссылки, подписи, пункты подвала). Величина
+	 * немонотонна по макетам: 16px на 1920, 15px на 1600–700 и снова 16px
+	 * на 360 («Кнопка к15» против «Кнопка к16» в Figma). Поэтому базовая
+	 * формула описывает верхний участок, а нижний переопределён в
+	 * media-блоке ниже — одним clamp такая кривая не выражается.
+	 */
+	--font-size-b1: clamp(15px, calc(10px + 0.3125vw), 16px);
+	--line-height-b1: 1.4;
 	--font-weight-body: 500;
 	--line-height-body: 1.4;
 
@@ -127,5 +137,17 @@
 		--font-size-body: clamp(15px, calc(17.0588px - 0.2941vw), 16px);
 		--font-size-button: clamp(15px, calc(17.0588px - 0.2941vw), 16px);
 		--container-padding: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
+	}
+}
+
+/*
+ * 700 → 360: кегль мелкого текста растёт обратно к 16px, строка — к 22px.
+ * Обе точки реальные (макеты 2587:11881 / 2610:7064 и 2483:9081 /
+ * 2587:11783), между ними линейная интерполяция.
+ */
+@media (max-width: 780px) {
+	:root {
+		--font-size-b1: clamp(15px, calc(17.06px - 0.294vw), 16px);
+		--line-height-b1: clamp(21px, calc(23.06px - 0.294vw), 22px);
 	}
 }

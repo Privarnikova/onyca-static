@@ -48,9 +48,9 @@
 .contact-form-intro__text {
 	margin: 0;
 	max-width: clamp(493px, calc(-42px + 33.4375vw), 600px);
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text);
 }
 
@@ -58,9 +58,9 @@
 
 .contact-form__label {
 	margin: 0 0 clamp(14px, calc(4px + 0.625vw), 16px);
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-heading);
-	line-height: var(--line-height-heading);
+	line-height: var(--line-height-b1);
 	color: var(--color-text);
 }
 
@@ -91,9 +91,9 @@
 }
 
 .contact-form__field label {
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-heading);
-	line-height: var(--line-height-heading);
+	line-height: var(--line-height-b1);
 	color: var(--color-text);
 }
 
@@ -104,9 +104,9 @@
 	border-bottom: 1px solid var(--color-border);
 	background: none;
 	font-family: var(--font-family-base);
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text);
 }
 
@@ -139,9 +139,9 @@
 }
 
 .contact-form__budget-option span {
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text);
 }
 
@@ -161,14 +161,14 @@
 
 .contact-form__attach {
 	justify-content: center;
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 }
 
 .contact-form__submit {
 	justify-content: center;
 	border: none;
 	cursor: pointer;
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 }
 
 /*
@@ -204,16 +204,16 @@
 .contact-form__error {
 	grid-column: 2;
 	margin: 0;
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-error);
 }
 
 .contact-form__consent span {
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text-footer);
 }
 

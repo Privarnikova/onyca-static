@@ -162,9 +162,9 @@
 .page-contacts__clock,
 .page-contacts__status {
 	margin: 0;
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text);
 	white-space: nowrap;
 }
@@ -201,9 +201,9 @@
 
 .page-contacts__downloads a,
 .page-contacts__social a {
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text);
 	text-decoration: none;
 }
@@ -217,9 +217,9 @@
 }
 
 .page-contacts__social-label {
-	font-size: clamp(15px, calc(10px + 0.3125vw), 16px);
+	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-body);
+	line-height: var(--line-height-b1);
 	color: var(--color-text-muted);
 }
 
