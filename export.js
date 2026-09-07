@@ -36,6 +36,17 @@ const FILES = path.join(OUT, 'index_files');
 
     await page.goto(item.url, { waitUntil: 'load' });
     await page.waitForTimeout(1500);
+
+    // Баннер cookie на живой странице уже раскрыт скриптом — в копию он
+    // должен попасть скрытым, иначе у посетителя появится до проверки согласия
+    await page.evaluate(() => {
+      const banner = document.querySelector('[data-cookie-banner]');
+      if (banner) {
+        banner.hidden = true;
+        banner.removeAttribute('data-accepted');
+      }
+    });
+
     pages.push({ out: item.out, html: await page.content() });
     await page.close();
   }
