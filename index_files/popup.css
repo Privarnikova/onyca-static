@@ -1,0 +1,193 @@
+/**
+ * Поп-апы (ТЗ, п. 04). Источник: Figma, эталон 1920 —
+ * 1293:4021 «Обсудить проект», 2271:7900 «Написать по вакансии»,
+ * 1845:3990 и 2271:8502 — результат отправки.
+ *
+ * ВНИМАНИЕ: раскладка здесь только под 1920 — макетов остальных
+ * разрешений на момент вёрстки нет. Сами элементы внутри (поля, радио,
+ * кнопки, согласие, заголовки) уже адаптивны, меняться будет положение
+ * блоков — тогда дописать медиазапросы сюда.
+ */
+
+.popup {
+	position: fixed;
+	inset: 0;
+	z-index: 300;
+	/*
+	 * Админ-панель WordPress висит поверх страницы (position: fixed) и
+	 * перекрывала логотип с крестиком: поп-ап начинается от самого верха
+	 * окна. Для залогиненного пользователя сдвигаем его вниз на её
+	 * высоту — 32px на десктопе и 46px ниже 783px, как в самой панели.
+	 */
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	background-color: var(--color-white);
+}
+
+body.admin-bar .popup {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	body.admin-bar .popup {
+		top: 46px;
+	}
+}
+
+/*
+ * Верхняя полоса с логотипом и крестиком — 54px, отступы по сетке
+ * (логотип на 40, крестик правым краем на 1880). Липкая: в поп-апе
+ * «Обсудить проект» контент выше экрана, и закрыть его нужно с любого
+ * места прокрутки.
+ */
+.popup__bar {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex: 0 0 auto;
+	height: 54px;
+	background-color: var(--color-white);
+}
+
+.popup__logo img {
+	display: block;
+	width: 115px;
+	height: 24px;
+}
+
+.popup__close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: none;
+	background: none;
+	color: var(--color-black);
+	cursor: pointer;
+}
+
+.popup__body {
+	flex: 1 0 auto;
+	/* 48px от низа полосы до формы (в макете форма начинается на 102) */
+	padding-top: 48px;
+}
+
+/*
+ * На странице Контактов у формы свои внешние отступы (160–188px сверху
+ * и снизу — она стоит между героем и подвалом). В поп-апе расстояние
+ * задаёт сам поп-ап, поэтому внешние отступы снимаем.
+ */
+.popup .contact-form-section {
+	margin-block: 0;
+}
+
+/*
+ * Нижняя подпись «Не любите заполнять формы?» — левая колонка, 600px в
+ * макете. margin-top: auto прижимает её к низу, когда контента мало, а
+ * при длинной форме она просто идёт следом.
+ */
+.popup__note {
+	flex: 0 0 auto;
+	/* margin-inline у .container центрует блок, поэтому сверху — auto,
+	   а по бокам оставляем центрирование контейнера */
+	margin-top: auto;
+	padding-block: 40px;
+}
+
+.popup__note-text {
+	/* Ширина текста из макета — 600px в левой колонке */
+	max-width: 600px;
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+.popup__note-text a {
+	color: inherit;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	transition: color 0.2s ease;
+}
+
+/*
+ * Экран результата: круг с иконкой, заголовок, текст и кнопка — всё по
+ * центру. Отступ сверху из макета: круг стоит на 359 при полосе 54,
+ * то есть 305 от неё.
+ */
+.popup__pane--result {
+	display: flex;
+	justify-content: center;
+}
+
+.form-result {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	/*
+	 * В макете круг стоит на 359 от верха поп-апа: 54 полоса + 48
+	 * (общий отступ .popup__body) + 257 здесь.
+	 */
+	padding-top: 257px;
+	text-align: center;
+}
+
+.form-result__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 50px;
+	height: 50px;
+	border: 2px solid currentColor;
+	border-radius: 50%;
+}
+
+/* Круг успеха синий (макет 1845:3990), круг ошибки — красный, тем же
+   цветом, что и ошибки в форме */
+.form-result__icon--success {
+	color: var(--color-accent-blue);
+}
+
+.form-result__icon--error {
+	color: var(--color-error);
+}
+
+.form-result__title {
+	/* 16px от круга до заголовка (409 → 425) */
+	margin: 16px 0 0;
+	font-size: var(--font-size-h2);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.form-result__text {
+	/* 16px от заголовка до текста (473 → 489) */
+	margin: 16px 0 0;
+	max-width: 600px;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+.form-result__action {
+	/* 32px от текста до кнопки (533 → 565) */
+	margin-top: 32px;
+}
+
+/* Наведение — только с 1200 и на устройствах с курсором */
+@media (hover: hover) and (min-width: 1200px) {
+	.popup__note-text a:hover {
+		color: var(--color-accent-blue);
+	}
+
+	.popup__close:hover {
+		color: var(--color-accent-blue);
+	}
+}

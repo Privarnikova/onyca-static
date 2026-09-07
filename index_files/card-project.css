@@ -39,7 +39,7 @@
 	object-fit: cover;
 }
 
-/* Название и метки — в левом верхнем углу: 28 от края, колонка 495 */
+/* Название и метки — в углу: 28 от края, колонка 495 */
 .card-project__content {
 	position: absolute;
 	top: 28px;
@@ -131,4 +131,28 @@
 .card-project.is-on-dark .project-tag--industry {
 	background-color: var(--color-white);
 	color: var(--color-text);
+}
+
+/*
+ * «Последняя работа» на главной (макет 1805:4768): тот же блок, только
+ * прижат к низу карточки — 28 от нижнего края.
+ */
+.card-project--bottom .card-project__content {
+	top: auto;
+	bottom: 28px;
+}
+
+/*
+ * Наведение на карточку: края скругляются (референс из ТЗ —
+ * qlo.agency). Эффект только там, откуда есть переход дальше по сайту,
+ * то есть у карточки-ссылки, и только с 1200 на устройствах с курсором.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.card-project {
+		transition: border-radius 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.card-project:hover {
+		border-radius: 24px;
+	}
 }

@@ -11,8 +11,15 @@
 	'use strict';
 
 	/**
-	 * Хедер: статичен на первом экране, при скролле вниз скрывается,
-	 * при скролле вверх — появляется (ТЗ, п. 03-01).
+	 * Хедер: при скролле вниз скрывается, при скролле вверх появляется
+	 * (ТЗ, п. 03-01).
+	 *
+	 * На первом экране шапка ведёт себя иначе — она полностью статична:
+	 * стоит на месте и не реагирует на прокрутку ни вниз, ни вверх.
+	 * Прятаться и выпадать она начинает только после первого экрана.
+	 *
+	 * Позиционирование при этом не меняется: шапка всё время липкая, а
+	 * переключение position давало бы скачок вёрстки на пороге.
 	 */
 	function initHeaderScroll() {
 		var header = document.querySelector( '[data-site-header]' );
@@ -20,26 +27,45 @@
 			return;
 		}
 
+		var firstScreen = document.querySelector( '[data-first-screen]' );
 		var lastScrollY = window.scrollY;
 		var headerHeight = header.offsetHeight;
 
-		window.addEventListener(
-			'scroll',
-			function () {
-				var currentScrollY = window.scrollY;
+		/*
+		 * Пока эта отметка не пройдена, шапка просто стоит на месте.
+		 * Отметка — низ первого экрана: он должен уйти за верхнюю кромку
+		 * окна целиком.
+		 */
+		function staticUntil() {
+			if ( ! firstScreen ) {
+				return 0;
+			}
 
-				if ( currentScrollY <= headerHeight ) {
-					header.classList.remove( 'is-hidden' );
-				} else if ( currentScrollY > lastScrollY ) {
-					header.classList.add( 'is-hidden' );
-				} else if ( currentScrollY < lastScrollY ) {
-					header.classList.remove( 'is-hidden' );
-				}
+			return firstScreen.offsetTop + firstScreen.offsetHeight;
+		}
 
-				lastScrollY = currentScrollY;
-			},
-			{ passive: true }
-		);
+		function update() {
+			var currentScrollY = window.scrollY;
+			var isStatic = currentScrollY < staticUntil();
+
+			header.classList.toggle( 'is-static', isStatic );
+
+			if ( isStatic ) {
+				header.classList.remove( 'is-hidden' );
+			} else if ( currentScrollY <= headerHeight ) {
+				header.classList.remove( 'is-hidden' );
+			} else if ( currentScrollY > lastScrollY ) {
+				header.classList.add( 'is-hidden' );
+			} else if ( currentScrollY < lastScrollY ) {
+				header.classList.remove( 'is-hidden' );
+			}
+
+			lastScrollY = currentScrollY;
+		}
+
+		update();
+		window.addEventListener( 'scroll', update, { passive: true } );
+		window.addEventListener( 'resize', update );
 	}
 
 	/**
@@ -280,13 +306,43 @@
 	 * показала бы свой пузырь и не дала бы состояние из макета.
 	 */
 	function initContactForm() {
-		var form = document.querySelector( '.contact-form' );
+		/*
+		 * Форм на странице может быть несколько: своя на Контактах и по
+		 * одной в каждой панели поп-апа. Раньше обработчик вешался только
+		 * на первую, и форма в поп-апе не проверялась вовсе.
+		 */
+		document.querySelectorAll( '.contact-form' ).forEach( setupForm );
+	}
 
-		if ( ! form ) {
+	/**
+	 * Прокрутка к первому незаполненному полю — общее правило для всех
+	 * форм сайта: после неудачной отправки посетитель должен видеть, что
+	 * именно просят исправить, а не искать красное сам.
+	 *
+	 * Если поле и так на экране, ничего не двигаем — иначе страница
+	 * дёргается на ровном месте.
+	 */
+	function scrollToFirstError( form ) {
+		var first = form.querySelector( '.is-error' );
+
+		if ( ! first ) {
 			return;
 		}
 
+		var box = first.getBoundingClientRect();
+		var visible = box.top >= 0 && box.bottom <= window.innerHeight;
+
+		if ( visible ) {
+			return;
+		}
+
+		first.scrollIntoView( { block: 'center', behavior: 'smooth' } );
+	}
+
+	function setupForm( form ) {
 		var consentError = form.querySelector( '[data-consent-error]' );
+		/* У формы вакансии нет ни тегов услуг, ни бюджета */
+		var isCareer = form.classList.contains( 'contact-form--career' );
 
 		/*
 		 * «Расскажите о проекте» растёт по содержимому: пустое поле в одну
@@ -300,12 +356,32 @@
 		if ( textarea ) {
 			var resize = function () {
 				textarea.style.height = 'auto';
+
+				/*
+				 * У скрытого элемента scrollHeight равен нулю — так было
+				 * с полем внутри закрытого поп-апа, и оно схлопывалось,
+				 * а подпись ложилась на линию. Мерить нечего: убираем
+				 * свою высоту, поле остаётся в одну строку по CSS, как
+				 * обычный input, и пересчитается, когда его покажут.
+				 */
+				if ( ! textarea.scrollHeight ) {
+					textarea.style.height = '';
+					return;
+				}
+
 				textarea.style.height = textarea.scrollHeight + 'px';
 			};
 
 			textarea.addEventListener( 'input', resize );
 			window.addEventListener( 'resize', resize );
 			resize();
+
+			/*
+			 * У скрытого элемента scrollHeight равен нулю, поэтому в
+			 * поп-апе поле схлопывалось и подпись ложилась прямо на
+			 * линию. Пересчитываем высоту, когда панель показали.
+			 */
+			form.addEventListener( 'onyca:shown', resize );
 		}
 
 		function group( name ) {
@@ -323,21 +399,21 @@
 		}
 
 		function checks() {
-			var email = form.querySelector( '[name="contact_email"]' );
+			var email = form.querySelector( 'input[type="email"]' );
 
 			return {
-				tags: ! form.querySelector( '.tab-pill.is-selected' ),
+				tags: ! isCareer && ! form.querySelector( '.tab-pill.is-selected' ),
 				// Точный разбор адреса тут не нужен: письмо всё равно
 				// проверяется на сервере, здесь — только форма записи.
 				email: ! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test( email.value.trim() ),
-				budget: ! form.querySelector( '[name="contact_budget"]:checked' ),
-				consent: ! form.querySelector( '[name="contact_consent"]' ).checked
+				budget: ! isCareer && ! form.querySelector( '[name="contact_budget"]:checked' ),
+				consent: ! form.querySelector( 'input[type="checkbox"]' ).checked
 			};
 		}
 
 		function validate() {
 			var state = checks();
-			var consentControl = form.querySelector( '[name="contact_consent"]' );
+			var consentControl = form.querySelector( 'input[type="checkbox"]' );
 
 			mark( group( 'tags' ), state.tags );
 			mark( group( 'email' ), state.email );
@@ -351,9 +427,21 @@
 		}
 
 		form.addEventListener( 'submit', function ( event ) {
-			if ( ! validate() ) {
-				event.preventDefault();
+			/*
+			 * Отправки на сервер пока нет (этап «Формы и интеграции»),
+			 * поэтому событие останавливаем всегда: прошла проверка —
+			 * показываем экран «Заявка отправлена». Когда появится
+			 * реальная отправка, экран успеха/ошибки будет выбираться по
+			 * ответу сервера — здесь же, в этом обработчике.
+			 */
+			event.preventDefault();
+
+			if ( validate() ) {
+				showFormResult( 'success', form );
+				return;
 			}
+
+			scrollToFirstError( form );
 		} );
 
 		/*
@@ -758,6 +846,160 @@
 	}
 
 	/**
+	 * Поп-апы: «Обсудить проект», «Написать по вакансии» и экран
+	 * результата отправки (макеты 1293:4021, 2271:7900, 1845:3990,
+	 * 2271:8502).
+	 *
+	 * Панели лежат в разметке все сразу, показывается одна — поэтому
+	 * после отправки формы, открытой в поп-апе, содержимое ЗАМЕНЯЕТСЯ
+	 * экраном результата, а не открывается второй поп-ап поверх первого.
+	 *
+	 * Наружу отдаём showFormResult: им пользуется обработчик форм — и
+	 * тех, что стоят прямо на странице (тогда поп-ап открывается сразу
+	 * на результате), и тех, что уже внутри поп-апа.
+	 */
+	var popupApi = null;
+
+	function initPopup() {
+		var popup = document.querySelector( '[data-popup]' );
+
+		if ( ! popup ) {
+			return;
+		}
+
+		var panes = popup.querySelectorAll( '[data-popup-pane]' );
+		var note = popup.querySelector( '[data-popup-note]' );
+		/* С какой формы пришли — чтобы «Попробовать снова» вернул её */
+		var lastFormPane = null;
+
+		function lockScroll() {
+			var scrollbar = window.innerWidth - document.documentElement.clientWidth;
+
+			document.documentElement.style.overflow = 'hidden';
+
+			if ( scrollbar > 0 ) {
+				document.documentElement.style.paddingRight = scrollbar + 'px';
+			}
+		}
+
+		function unlockScroll() {
+			document.documentElement.style.overflow = '';
+			document.documentElement.style.paddingRight = '';
+		}
+
+		/*
+		 * Формы в показанной панели пересчитывают то, что нельзя
+		 * измерить у скрытого элемента (высоту textarea с текстом).
+		 * Зовём это только когда поп-ап уже видим — иначе меряется
+		 * скрытый элемент и толку от пересчёта нет.
+		 */
+		function notify( name ) {
+			if ( popup.hidden ) {
+				return;
+			}
+
+			var pane = popup.querySelector( '[data-popup-pane="' + name + '"]' );
+
+			if ( ! pane ) {
+				return;
+			}
+
+			pane.querySelectorAll( 'form' ).forEach( function ( form ) {
+				form.dispatchEvent( new Event( 'onyca:shown' ) );
+			} );
+		}
+
+		function show( name ) {
+			panes.forEach( function ( pane ) {
+				pane.hidden = pane.dataset.popupPane !== name;
+			} );
+
+			notify( name );
+
+			/* Подписи «Не любите заполнять формы?» на экранах результата нет */
+			if ( note ) {
+				note.hidden = name === 'success' || name === 'error';
+			}
+
+			if ( name === 'project' || name === 'career' ) {
+				lastFormPane = name;
+			}
+		}
+
+		function open( name ) {
+			show( name );
+			popup.hidden = false;
+			lockScroll();
+			popup.scrollTop = 0;
+			notify( name );
+		}
+
+		function close() {
+			popup.hidden = true;
+			unlockScroll();
+		}
+
+		document.addEventListener( 'click', function ( event ) {
+			var opener = event.target.closest( '[data-popup-open]' );
+
+			if ( opener ) {
+				event.preventDefault();
+				open( opener.dataset.popupOpen );
+				return;
+			}
+
+			if ( event.target.closest( '[data-popup-close]' ) ) {
+				event.preventDefault();
+				close();
+				return;
+			}
+
+			if ( event.target.closest( '[data-popup-retry]' ) ) {
+				event.preventDefault();
+
+				/* Форма была на странице — возвращаться в поп-апе не к чему */
+				if ( lastFormPane ) {
+					show( lastFormPane );
+				} else {
+					close();
+				}
+			}
+		} );
+
+		document.addEventListener( 'keydown', function ( event ) {
+			if ( event.key === 'Escape' && ! popup.hidden ) {
+				close();
+			}
+		} );
+
+		popupApi = {
+			open: open,
+			close: close,
+			show: show,
+			contains: function ( node ) {
+				return popup.contains( node );
+			}
+		};
+	}
+
+	/**
+	 * Результат отправки. Форма со страницы открывает поп-ап на нужном
+	 * экране, форма из поп-апа — просто меняет панель.
+	 */
+	function showFormResult( status, form ) {
+		if ( ! popupApi ) {
+			return;
+		}
+
+		if ( popupApi.contains( form ) ) {
+			popupApi.show( status );
+			return;
+		}
+
+		popupApi.open( status );
+	}
+
+	/**
 	 * Плавающая кнопка «Обсудить проект» (макеты 933:555 и 975:2657).
 	 *
 	 * Два состояния помимо обычного:
@@ -768,7 +1010,7 @@
 	 *   — доехав до подвала, перестаёт быть приклеенной к экрану и
 	 *     останавливается в нём на одном уровне с логотипом, справа от
 	 *     него (макет подвала «С кнопкой» 975:2657: логотип и кнопка оба
-	 *     на 78 от верха). Ниже 420px кнопка стоит по центру и в подвале
+	 *     на 78 от верха). С 440px и уже кнопка стоит по центру и в подвале
 	 *     останавливается под блоком бренда (макет 360 — 2570:1970:
 	 *     бренд заканчивается на 117, кнопка на 141).
 	 *
@@ -793,7 +1035,16 @@
 
 			var firstScreen = document.querySelector( '[data-first-screen]' );
 
-			return firstScreen ? firstScreen.offsetHeight : window.innerHeight;
+			if ( ! firstScreen ) {
+				return window.innerHeight;
+			}
+
+			/*
+			 * Кнопка выезжает, когда первый экран ушёл целиком, а не как
+			 * только начали крутить: отсчитываем от НИЗА блока, иначе она
+			 * появлялась ещё на разворачивающемся шоуриле.
+			 */
+			return firstScreen.offsetTop + firstScreen.offsetHeight;
 		}
 
 		function bottomOffset() {
@@ -813,9 +1064,9 @@
 			var rect = brand.getBoundingClientRect();
 			var top = rect.top + window.scrollY;
 
-			/* По центру (уже 420) кнопка идёт под брендом, иначе — вровень
+			/* По центру (440 и уже) кнопка идёт под брендом, иначе — вровень
 			   с логотипом, то есть с верхом блока бренда */
-			if ( window.matchMedia( '(max-width: 419px)' ).matches ) {
+			if ( window.matchMedia( '(max-width: 440px)' ).matches ) {
 				return top + rect.height + 24;
 			}
 
@@ -860,6 +1111,260 @@
 		window.addEventListener( 'resize', schedule );
 	}
 
+	/**
+	 * Первый экран главной: шоурил разрастается по мере прокрутки.
+	 *
+	 * По кадрам макета (975:2391 → 975:2398 → 975:2405) он идёт от
+	 * 910×445 до 1840×901: правый и нижний края стоят на месте, а
+	 * пропорции не меняются — значит это увеличение от правого нижнего
+	 * угла в 1840/910 раз.
+	 *
+	 * Референс из ТЗ — kotelov.com, поведение снято замером. Там две
+	 * фазы:
+	 *   1) рост — ширина видео идёт от 58vw−58px до 100vw−60px и упирается
+	 *      в предел быстро, от небольшой прокрутки, при этом видео всё
+	 *      время остаётся в кадре целиком;
+	 * Прокрутку страницы анимация не задерживает: ничего не прилипает,
+	 * страница едет как обычно — видео просто растёт быстрее и успевает
+	 * раскрыться на первых сотнях пикселей. Растёт оно от правого края
+	 * симметрично: вверх и вниз одинаково, поэтому всё это время
+	 * остаётся в кадре.
+	 *
+	 * Рост заканчивается раньше, чем видео упрётся в шапку. Дальше оно
+	 * какое-то время едет вместе с окном — сдвигается вниз ровно на
+	 * пройденную прокрутку, — и всё это время видно целиком, от шапки
+	 * донизу. Страница при этом не стоит: текст первого экрана уезжает
+	 * как обычно, придерживается только видео.
+	 *
+	 * На весь возможный сдвиг секция получает поле снизу, чтобы до
+	 * специализаций осталось 188px.
+	 *
+	 * Значения не прыгают за курсором прокрутки, а догоняют его — они
+	 * сглажены.
+	 */
+	function initHeroShowreel() {
+		var hero = document.querySelector( '[data-first-screen]' );
+
+		if ( ! hero ) {
+			return;
+		}
+
+		var showreel = hero.querySelector( '.home-hero__showreel' );
+
+		if ( ! showreel || window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ) {
+			return;
+		}
+
+		var MAX_SCALE = 1840 / 910;
+		/*
+		 * Доля высоты первого экрана, за которую видео успевает
+		 * раскрыться. Берём меньше половины: к этому моменту оно ещё не
+		 * дошло до шапки, и дальше уже можно показывать его целиком.
+		 */
+		var GROW_PART = 0.35;
+		/* Отступ под шапкой, на котором держится раскрытое видео */
+		var GAP_UNDER_HEADER = 16;
+		/* Сколько пикселей прокрутки видео едет вместе с окном */
+		var HOLD_LENGTH = 250;
+
+		/*
+		 * Сверху видео должно начинаться сразу под шапкой. Её нижний край
+		 * берём по факту: у залогиненного пользователя выше ещё висит
+		 * админ-панель, и при отсчёте от нуля окна верх видео уходил под
+		 * неё — было видно только обрезанное начало.
+		 */
+		function topGap() {
+			var header = document.querySelector( '[data-site-header]' );
+
+			if ( ! header ) {
+				return GAP_UNDER_HEADER;
+			}
+
+			return header.getBoundingClientRect().bottom + GAP_UNDER_HEADER;
+		}
+
+		var scale = 1;
+		var shift = 0;
+		var targetScale = 1;
+		var targetShift = 0;
+		var running = false;
+
+		function measure() {
+			/* Путь прокрутки, за который видео раскрывается полностью */
+			var growth = hero.offsetHeight * GROW_PART;
+
+			if ( growth <= 0 ) {
+				return;
+			}
+
+			/* Считаем от первого пикселя прокрутки страницы */
+			var scrolled = window.scrollY;
+
+			targetScale = 1 + ( Math.min( scrolled, growth ) / growth ) * ( MAX_SCALE - 1 );
+
+			/*
+			 * Где окажется верх раскрытого видео в документе: растёт оно
+			 * симметрично, значит середина остаётся на месте.
+			 */
+			var box = showreel.getBoundingClientRect();
+			var middle = box.top + window.scrollY + box.height / 2 - shift;
+			var openTop = middle - showreel.offsetHeight * MAX_SCALE / 2;
+
+			/*
+			 * Как только верх подошёл к шапке, видео едет вместе с окном:
+			 * сдвиг равен пройденной с этого места прокрутке. Так оно
+			 * какое-то время стоит на экране целиком.
+			 */
+			targetShift = Math.min(
+				Math.max( scrolled - ( openTop - topGap() ), 0 ),
+				HOLD_LENGTH
+			);
+
+			/*
+			 * Видео растёт в обе стороны и потом едет вниз — вместе это
+			 * выход за низ своего блока. На него секция получает отступ
+			 * снизу, иначе видео наезжает на специализации, между
+			 * которыми должно оставаться поле в 188px.
+			 */
+			hero.style.setProperty(
+				'--showreel-overflow',
+				( showreel.offsetHeight * ( MAX_SCALE - 1 ) / 2 + HOLD_LENGTH ) + 'px'
+			);
+
+			if ( ! running ) {
+				running = true;
+				window.requestAnimationFrame( frame );
+			}
+		}
+
+		function frame() {
+			/* 0.12 — насколько значения догоняют цель за кадр */
+			scale += ( targetScale - scale ) * 0.12;
+			shift += ( targetShift - shift ) * 0.12;
+
+			showreel.style.setProperty( '--showreel-scale', scale );
+			showreel.style.setProperty( '--showreel-shift', shift + 'px' );
+
+			/* Разошлись меньше чем на десятую долю пикселя — можно встать */
+			if ( Math.abs( targetScale - scale ) < 0.0005 && Math.abs( targetShift - shift ) < 0.1 ) {
+				scale = targetScale;
+				shift = targetShift;
+				showreel.style.setProperty( '--showreel-scale', scale );
+				showreel.style.setProperty( '--showreel-shift', shift + 'px' );
+				running = false;
+				return;
+			}
+
+			window.requestAnimationFrame( frame );
+		}
+
+		measure();
+		window.addEventListener( 'scroll', measure, { passive: true } );
+		window.addEventListener( 'resize', measure );
+	}
+
+	/**
+	 * Специализации на главной: при наведении строка остаётся чёрной,
+	 * остальные уходят в серый, а рядом появляется баннер.
+	 *
+	 * Баннер стоит на своём месте по сетке (макет 1774:3970: колонки
+	 * 3–4, 600×294, поднят на 127 над строкой) — за курсором он не
+	 * следует, поэтому здесь только переключение классов, вся геометрия
+	 * в components/front-page.css.
+	 */
+	function initServicesHover() {
+		var list = document.querySelector( '[data-services]' );
+
+		if ( ! list ) {
+			return;
+		}
+
+		/* Ниже 1200 и на тач-экранах эффектов наведения в проекте нет */
+		if ( ! window.matchMedia( '(hover: hover) and (min-width: 1200px)' ).matches ) {
+			return;
+		}
+
+		var items = list.querySelectorAll( '.home-services__item' );
+
+		items.forEach( function ( item ) {
+			item.addEventListener( 'mouseenter', function () {
+				list.classList.add( 'is-hovered' );
+
+				items.forEach( function ( other ) {
+					other.classList.toggle( 'is-active', other === item );
+				} );
+			} );
+
+			item.addEventListener( 'mouseleave', function () {
+				item.classList.remove( 'is-active' );
+
+				if ( ! list.querySelector( '.is-active' ) ) {
+					list.classList.remove( 'is-hovered' );
+				}
+			} );
+		} );
+	}
+
+	/**
+	 * Лента логотипов клиентов: едет сама по себе, а направление задаёт
+	 * прокрутка страницы — вниз двигает влево, вверх вправо (референс из
+	 * ТЗ). Лента продублирована в разметке, поэтому сдвиг зациклен по
+	 * ширине одной копии.
+	 */
+	function initClientLogos() {
+		var track = document.querySelector( '[data-client-logos]' );
+
+		if ( ! track ) {
+			return;
+		}
+
+		if ( window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ) {
+			return;
+		}
+
+		var row = track.querySelector( '.client-logos__row' );
+		var offset = 0;
+		var direction = -1;
+		var lastScroll = window.scrollY;
+		/* Пикселей за кадр: базовая скорость и добавка от прокрутки */
+		var speed = 0.6;
+		var boost = 0;
+
+		window.addEventListener( 'scroll', function () {
+			var delta = window.scrollY - lastScroll;
+
+			if ( delta !== 0 ) {
+				direction = delta > 0 ? -1 : 1;
+				boost = Math.min( Math.abs( delta ) * 0.35, 12 );
+			}
+
+			lastScroll = window.scrollY;
+		}, { passive: true } );
+
+		function frame() {
+			var width = row.offsetWidth;
+
+			offset += direction * ( speed + boost );
+			boost *= 0.92;
+
+			/* Зацикливаем по ширине одной копии — стык не виден */
+			if ( width ) {
+				if ( offset <= -width ) {
+					offset += width;
+				}
+
+				if ( offset > 0 ) {
+					offset -= width;
+				}
+			}
+
+			track.style.transform = 'translateX(' + offset + 'px)';
+			window.requestAnimationFrame( frame );
+		}
+
+		window.requestAnimationFrame( frame );
+	}
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		initHeaderScroll();
 		initBurgerMenu();
@@ -867,9 +1372,13 @@
 		initTabPills();
 		initCookieBanner();
 		initMagneticButtons();
+		initPopup();
 		initContactForm();
 		initMoscowClock();
 		initCoverContrast();
 		initDiscussButton();
+		initHeroShowreel();
+		initServicesHover();
+		initClientLogos();
 	} );
 } )();

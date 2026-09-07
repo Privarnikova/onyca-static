@@ -1,0 +1,412 @@
+/**
+ * Блоки главной страницы. Источник — Figma 860:2154 «1920х1080 —
+ * Главная», fileKey 93JlTAOwjlBO4naQ7ReAFF.
+ *
+ * ВНИМАНИЕ: свёрстано ТОЛЬКО под 1920 — макетов остальных разрешений
+ * пока нет, поэтому все значения здесь плоские, без второй точки для
+ * clamp(). Адаптив добавится отдельным проходом.
+ *
+ * Сетка та же, что на всём сайте: шесть колонок по 290 с зазором 20 при
+ * поле 40. Из неё и берутся все опорные координаты ниже.
+ */
+
+/*
+ * Страница целиком: поля по краям берутся из .container, а расстояние
+ * между блоками — зазор сетки. Раньше каждый блок носил и свой
+ * контейнер, и свой нижний маргин: маргин последнего блока терялся
+ * (после кнопки «Все проекты» пропадал отступ), а поля дублировались.
+ */
+.front-page {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	row-gap: 188px;
+	/* Перед подвалом такое же поле, как между блоками */
+	padding-bottom: 188px;
+}
+
+/*
+ * Лента логотипов идёт во всю ширину окна, поэтому выходит за поля
+ * страницы: приём с отрицательным margin работает и когда контейнер
+ * центрирован (выше 1920).
+ */
+.client-logos {
+	width: 100vw;
+	margin-inline: calc(50% - 50vw);
+}
+
+/*
+ * Первый экран (860:2155). Заголовок занимает левую половину, короткие
+ * тезисы стоят в пятой колонке сверху и в первой снизу, шоурил — правая
+ * половина (970..1880).
+ *
+ * Прокрутку страницы разворот шоурила не задерживает: секция обычной
+ * высоты, ничего не прилипает. Видео просто растёт быстрее, чем идёт
+ * прокрутка, и успевает раскрыться на первых сотнях пикселей.
+ */
+.home-hero {
+	position: relative;
+	/*
+	 * Видео растёт в обе стороны и выходит за низ секции — этот вылет
+	 * добавляем к полю снизу, чтобы до специализаций осталось
+	 * положенные 188px. Величину считает JS (initHeroShowreel).
+	 */
+	margin-bottom: var(--showreel-overflow, 0px);
+}
+
+.home-hero__inner {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+}
+
+.home-hero__title {
+	grid-column: 1 / 4;
+	/*
+	 * В макете строка заголовка тянется до левого края шоурила — это
+	 * три колонки плюс зазор перед четвёртой, 930px при 1920. Без
+	 * последнего зазора (910) текст ломается на четвёртую строку.
+	 */
+	width: calc(100% + var(--grid-gap));
+	margin: 0;
+	font-size: var(--font-size-h1);
+}
+
+.home-hero__note {
+	grid-column: 5 / 6;
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+/* Верхний тезис стоит вровень с заголовком */
+.home-hero__note--top {
+	grid-row: 1;
+}
+
+/* Нижний — в первой колонке, на одной высоте с шоурилом (416 от верха) */
+.home-hero__note--bottom {
+	grid-column: 1 / 2;
+	grid-row: 2;
+	margin-top: 221px;
+}
+
+.home-hero__showreel {
+	grid-column: 4 / -1;
+	grid-row: 2;
+	margin-top: 221px;
+	/* 910×445 в макете */
+	aspect-ratio: 910 / 445;
+	/*
+	 * Анимация первого экрана (кадры 975:2391 / 975:2398 / 975:2405):
+	 * шоурил разрастается с 910×445 до 1840×901. Правый и нижний края
+	 * при этом стоят на месте, а отношение сторон не меняется — то есть
+	 * это чистое увеличение от правого нижнего угла, без искажения
+	 * картинки. Масштаб задаёт JS (initHeroShowreel) по прокрутке.
+	 */
+	/*
+	 * Растёт от правого края и в обе стороны по вертикали — так же ведёт
+	 * себя референс из ТЗ (kotelov.com). Правый край при этом остаётся
+	 * на месте, как в кадрах макета.
+	 */
+	transform-origin: 100% 50%;
+	transform: translateY(var(--showreel-shift, 0px)) scale(var(--showreel-scale, 1));
+	will-change: transform;
+	overflow: hidden;
+}
+
+.home-hero__video {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/*
+ * Специализации (860:2222). Строка — название слева, стрелка справа,
+ * линия снизу; высота строки 90, шаг 140.
+ */
+.home-services__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.home-services__item + .home-services__item {
+	margin-top: 50px;
+}
+
+.home-services__link {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--grid-gap);
+	padding-bottom: 50px;
+	border-bottom: 1px solid var(--color-divider);
+	color: var(--color-text);
+	text-decoration: none;
+}
+
+.home-services__title {
+	font-size: var(--font-size-h3);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+}
+
+.home-services__arrow {
+	/* 7px сверху — стрелка выровнена по оптическому центру строки */
+	margin-top: 7px;
+}
+
+.home-services__item {
+	position: relative;
+}
+
+/*
+ * Наведение на специализацию: у курсора появляется баннер, остальные
+ * строки уходят в серый (референс из ТЗ — sloy.design). Класс на списке
+ * ставит JS (initServicesHover), он же двигает баннер за курсором.
+ */
+.home-services__link {
+	transition: color 0.25s ease;
+}
+
+.home-services__list.is-hovered .home-services__link {
+	/* Тот же серый, что у стрелки в состоянии «наведение — не выбрано» */
+	color: var(--color-border);
+}
+
+.home-services__list.is-hovered .home-services__item.is-active .home-services__link {
+	color: var(--color-text);
+}
+
+/*
+ * Баннер стоит на своём месте по сетке (макет 1774:3970): третья и
+ * четвёртая колонки — это 600px при отступе 620 от левого края блока —
+ * и поднят на 127 над строкой. За курсором он не следует.
+ */
+.home-services__preview {
+	position: absolute;
+	top: -127px;
+	left: calc(2 * (100% - 5 * var(--grid-gap)) / 6 + 2 * var(--grid-gap));
+	z-index: 2;
+	display: block;
+	width: calc(2 * (100% - 5 * var(--grid-gap)) / 6 + var(--grid-gap));
+	height: 294px;
+	overflow: hidden;
+	background-color: var(--color-surface-alt);
+	opacity: 0;
+	transform: translateY(12px);
+	transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+	pointer-events: none;
+}
+
+.home-services__item.is-active .home-services__preview {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.home-services__preview img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* Последняя работа (860:2182): заголовок и под ним карточка проекта */
+.home-latest__title {
+	margin: 0 0 38px;
+	font-size: var(--font-size-h2);
+}
+
+/*
+ * Telegram (860:2195). Блок 1840×900 с подложкой, текстовая колонка
+ * стоит в правой половине (930 от левого края блока).
+ */
+.home-telegram__inner {
+	position: relative;
+	overflow: hidden;
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	align-content: center;
+	min-height: 900px;
+	background-color: var(--color-surface-alt);
+}
+
+/* Ролик за текстом: заполняет блок, текст лежит поверх него */
+.home-telegram__video {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.home-telegram__content {
+	position: relative;
+	z-index: 1;
+	grid-column: 4 / -1;
+	/* 600px — ширина текстовой колонки в макете */
+	max-width: 600px;
+}
+
+.home-telegram__title {
+	margin: 0;
+	font-size: var(--font-size-h1);
+}
+
+.home-telegram__text {
+	/* 16px от заголовка до текста (130 → 146 в макете) */
+	margin: 16px 0 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+.home-telegram__actions {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	/* 32px от текста до кнопок (234 → 266) */
+	margin-top: 32px;
+}
+
+/* Круглая кнопка со стрелкой — 52px, серая подложка (860:2196) */
+.home-telegram__arrow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 52px;
+	height: 52px;
+	border-radius: var(--radius-pill);
+	background-color: var(--color-surface);
+	color: var(--color-text);
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/*
+ * Блог (860:2201). Строка: дата в первой колонке, название и кнопка —
+ * в правой половине, снизу линия.
+ */
+.home-blog__title {
+	margin: 0 0 38px;
+	font-size: var(--font-size-h2);
+}
+
+.home-blog__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.home-blog__item {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 52px от линии до следующей строки */
+	padding-top: 52px;
+	padding-bottom: 52px;
+	border-bottom: 1px solid var(--color-divider);
+}
+
+.home-blog__item:first-child {
+	padding-top: 0;
+}
+
+.home-blog__date {
+	grid-column: 1 / 2;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+.home-blog__content {
+	grid-column: 4 / 6;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	/* 32px от названия до кнопки */
+	gap: 32px;
+}
+
+.home-blog__post-title {
+	margin: 0;
+	font-size: var(--font-size-h3);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+}
+
+/*
+ * Кнопка под списком статей занимает две колонки и стоит в четвёртой —
+ * ровно под названиями статей (макет 860:2201: x=970, 600×52). Раньше
+ * она была растянута во всю ширину.
+ */
+.home-blog__footer {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 52px после последней строки списка */
+	margin-top: 52px;
+}
+
+.home-blog__all {
+	grid-column: 4 / 6;
+	justify-content: center;
+}
+
+/*
+ * Логотипы клиентов (2544:12375): лента 80px высотой, ячейки 210×80 с
+ * зазором 60. По краям лента растворяется в фон страницы.
+ */
+.client-logos {
+	overflow: hidden;
+	-webkit-mask-image: linear-gradient(to right, transparent 0, #000 330px, #000 calc(100% - 330px), transparent 100%);
+	mask-image: linear-gradient(to right, transparent 0, #000 330px, #000 calc(100% - 330px), transparent 100%);
+}
+
+.client-logos__track {
+	display: flex;
+	width: max-content;
+}
+
+.client-logos__row {
+	display: flex;
+	gap: 60px;
+	/* Между копиями ленты тот же зазор, иначе на стыке будет провал */
+	padding-right: 60px;
+}
+
+.client-logos__item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 210px;
+	height: 80px;
+}
+
+.client-logos__item img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+}
+
+/* Наведение — только с 1200 и на устройствах с курсором */
+@media (hover: hover) and (min-width: 1200px) {
+	.home-services__link:hover .home-services__arrow {
+		transform: translateX(8px);
+	}
+
+	.home-services__arrow {
+		transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.home-telegram__arrow:hover {
+		background-color: var(--color-black);
+		color: var(--color-white);
+	}
+}

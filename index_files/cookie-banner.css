@@ -34,7 +34,8 @@
 	);
 	right: clamp(15px, 2.0833vw, 40px);
 	max-width: 600px;
-	background-color: var(--color-surface);
+	/* Grey-30 #F7F7F7 — по макету 1969:6089 (не Grey-50, как было) */
+	background-color: var(--color-surface-alt);
 }
 
 .cookie-banner__inner {
