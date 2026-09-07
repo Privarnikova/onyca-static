@@ -14,12 +14,9 @@
 	 * Хедер: при скролле вниз скрывается, при скролле вверх появляется
 	 * (ТЗ, п. 03-01).
 	 *
-	 * На первом экране шапка ведёт себя иначе — она полностью статична:
-	 * стоит на месте и не реагирует на прокрутку ни вниз, ни вверх.
-	 * Прятаться и выпадать она начинает только после первого экрана.
-	 *
-	 * Позиционирование при этом не меняется: шапка всё время липкая, а
-	 * переключение position давало бы скачок вёрстки на пороге.
+	 * На первом экране шапка не закреплена: она уезжает вместе со
+	 * страницей и при прокрутке вверх не выпадает. Липкой — и, значит,
+	 * выпадающей — она становится после первого экрана.
 	 */
 	function initHeaderScroll() {
 		var header = document.querySelector( '[data-site-header]' );
@@ -32,22 +29,43 @@
 		var headerHeight = header.offsetHeight;
 
 		/*
-		 * Пока эта отметка не пройдена, шапка просто стоит на месте.
-		 * Отметка — низ первого экрана: он должен уйти за верхнюю кромку
-		 * окна целиком.
+		 * Пока эта отметка не пройдена, шапка не закреплена и не
+		 * выпадает. Отметка — конец первого блока ВМЕСТЕ с вылетом
+		 * разросшегося видео (это нижнее поле секции), то есть начало
+		 * зазора перед специализациями. На самом зазоре шапка уже ведёт
+		 * себя обычно, а над ним — при прокрутке снизу вверх — исчезает,
+		 * чтобы не наезжать на видео.
 		 */
 		function staticUntil() {
 			if ( ! firstScreen ) {
 				return 0;
 			}
 
-			return firstScreen.offsetTop + firstScreen.offsetHeight;
+			var overflow = parseFloat( getComputedStyle( firstScreen ).marginBottom ) || 0;
+
+			return firstScreen.offsetTop + firstScreen.offsetHeight + overflow;
 		}
+
+		var wasStatic = null;
 
 		function update() {
 			var currentScrollY = window.scrollY;
 			var isStatic = currentScrollY < staticUntil();
 
+			/*
+			 * На самом переходе шапка меняет способ позиционирования и
+			 * оказывается вверху экрана — с плавным переходом это
+			 * выглядело как «моргание»: шапка выпрыгивала и тут же
+			 * уезжала. Поэтому на этот кадр переход отключаем.
+			 */
+			if ( wasStatic !== null && wasStatic !== isStatic ) {
+				header.classList.add( 'is-instant' );
+				window.requestAnimationFrame( function () {
+					header.classList.remove( 'is-instant' );
+				} );
+			}
+
+			wasStatic = isStatic;
 			header.classList.toggle( 'is-static', isStatic );
 
 			if ( isStatic ) {
@@ -1165,22 +1183,19 @@
 		/* Отступ под шапкой, на котором держится раскрытое видео */
 		var GAP_UNDER_HEADER = 16;
 		/* Сколько пикселей прокрутки видео едет вместе с окном */
-		var HOLD_LENGTH = 250;
+		var HOLD_LENGTH = 150;
 
 		/*
-		 * Сверху видео должно начинаться сразу под шапкой. Её нижний край
-		 * берём по факту: у залогиненного пользователя выше ещё висит
-		 * админ-панель, и при отсчёте от нуля окна верх видео уходил под
-		 * неё — было видно только обрезанное начало.
+		 * Отсчёт идёт от верхней кромки ЭКРАНА: она не двигается, в
+		 * отличие от шапки, которая на первом экране уезжает вместе со
+		 * страницей. Как только видео подходит к этой кромке, оно едет
+		 * вместе с окном. Единственное, что учитываем сверх этого, —
+		 * админ-панель: она тоже прибита к экрану и перекрывает верх.
 		 */
 		function topGap() {
-			var header = document.querySelector( '[data-site-header]' );
+			var adminBar = document.getElementById( 'wpadminbar' );
 
-			if ( ! header ) {
-				return GAP_UNDER_HEADER;
-			}
-
-			return header.getBoundingClientRect().bottom + GAP_UNDER_HEADER;
+			return ( adminBar ? adminBar.offsetHeight : 0 ) + GAP_UNDER_HEADER;
 		}
 
 		var scale = 1;

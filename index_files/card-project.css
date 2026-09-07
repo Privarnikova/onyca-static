@@ -25,6 +25,14 @@
 	background-color: var(--color-surface-alt);
 }
 
+/*
+ * Карточка без обложки: тёмная подложка, чтобы название и метки читались
+ * (цвета им даёт .is-on-dark — тот же набор, что и на тёмном снимке).
+ */
+.card-project--blank {
+	background-color: var(--color-dark-grey);
+}
+
 .card-project__link {
 	display: block;
 	width: 100%;
