@@ -169,9 +169,6 @@ img.site-header__logo-icon {
 	transition: transform 0.15s ease;
 }
 
-.site-header__menu .menu-item-has-children:hover > a::after {
-	transform: rotate(180deg);
-}
 
 .site-header__menu .sub-menu {
 	display: flex;
@@ -199,12 +196,6 @@ img.site-header__logo-icon {
 	transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0.4s;
 }
 
-.site-header__menu .menu-item-has-children:hover > .sub-menu {
-	opacity: 1;
-	visibility: visible;
-	transform: translate3d(0, 0, 0);
-	transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0s;
-}
 
 .site-header__menu .sub-menu li:last-child {
 	margin-top: 26px; /* Figma: отступ перед «Все услуги» — 32px вместо обычных 6px между пунктами */
@@ -466,21 +457,20 @@ img.site-header__logo-icon {
 		list-style: none;
 		margin: 0;
 		padding: 0;
+		/*
+		 * Отступ до первого пункта анимируется вместе с высотой: если он
+		 * появляется сразу, список «прыгает» на 24px и только потом едет.
+		 * Высоту раскрытия считает JS уже после применения отступа
+		 * (main.js, initBurgerMenu), поэтому последний пункт не обрезается.
+		 */
 		max-height: 0;
+		padding-top: 0;
 		overflow: hidden;
-		transition: max-height 0.3s ease;
+		transition: max-height 0.3s ease, padding-top 0.3s ease;
 	}
 
-	/*
-	 * Отступ до первого пункта — маргином внутри списка, а не паддингом
-	 * контейнера: так он схлопывается вместе с содержимым при max-height: 0
-	 * и входит в scrollHeight, по которому JS считает высоту раскрытия.
-	 * Паддинг же оставался видимым в закрытом состоянии (пустые 24px под
-	 * «Услугами»), а когда переключался по классу — пропадал рывком до
-	 * начала анимации, из-за чего раскрытие выглядело подтормаживающим.
-	 */
-	.burger-menu__list .sub-menu > li:first-child {
-		margin-top: 24px;
+	.burger-menu__list .menu-item-has-children.is-open .sub-menu {
+		padding-top: 24px;
 	}
 
 	.burger-menu__list .sub-menu a {
@@ -589,4 +579,22 @@ img.site-header__logo-icon {
 	line-height: var(--line-height-body);
 	color: var(--color-text);
 	text-decoration: none;
+}
+
+/*
+ * Наведение — только с 1200 и на устройствах с курсором: ниже этой ширины
+ * правил :hover просто нет, иначе на тач-экране они применяются после
+ * тапа и «залипают» до следующего касания.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.site-header__menu .menu-item-has-children:hover > a::after {
+		transform: rotate(180deg);
+	}
+
+	.site-header__menu .menu-item-has-children:hover > .sub-menu {
+		opacity: 1;
+		visibility: visible;
+		transform: translate3d(0, 0, 0);
+		transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0s;
+	}
 }

@@ -8,6 +8,15 @@
  * поля — иначе 600px просто не помещаются.
  */
 
+/*
+ * Скрываем и классом, и атрибутом hidden: в Safari на iOS у элемента с
+ * position: fixed атрибут иногда не срабатывает, и баннер оставался на
+ * экране после нажатия «Принять».
+ */
+.cookie-banner.is-hidden {
+	display: none;
+}
+
 .cookie-banner {
 	position: fixed;
 	z-index: 200;
@@ -48,11 +57,19 @@
 	transition: color 0.2s ease;
 }
 
-.cookie-banner__text a:hover {
-	color: var(--color-accent-blue);
-}
 
 .cookie-banner__accept {
 	/* 28px от текста до кнопки (112 − 84 в макете) */
 	margin-top: clamp(20px, 1.4583vw, 28px);
+}
+
+/*
+ * Наведение — только с 1200 и на устройствах с курсором: ниже этой ширины
+ * правил :hover просто нет, иначе на тач-экране они применяются после
+ * тапа и «залипают» до следующего касания.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.cookie-banner__text a:hover {
+		color: var(--color-accent-blue);
+	}
 }

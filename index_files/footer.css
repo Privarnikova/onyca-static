@@ -170,9 +170,6 @@
 	transition: color 0.2s ease;
 }
 
-.site-footer__policy a:hover {
-	color: var(--color-text);
-}
 
 .site-footer__disclaimer {
 	margin: clamp(11px, calc(1px + 0.625vw), 13px) 0 0;
@@ -592,5 +589,16 @@
 	.site-footer__policy a br,
 	.site-footer__disclaimer br {
 		display: none;
+	}
+}
+
+/*
+ * Наведение — только с 1200 и на устройствах с курсором: ниже этой ширины
+ * правил :hover просто нет, иначе на тач-экране они применяются после
+ * тапа и «залипают» до следующего касания.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.site-footer__policy a:hover {
+		color: var(--color-text);
 	}
 }

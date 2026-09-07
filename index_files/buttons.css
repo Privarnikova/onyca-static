@@ -99,7 +99,6 @@
 	pointer-events: none;
 }
 
-.btn--cta:hover .btn__fill,
 .btn--cta:focus-visible .btn__fill {
 	/* Конечный кадр макета: −74% высоты эллипса. Он остаётся эллипсом —
 	   кнопку закрывает за счёт того, что шире и выше её. */
@@ -130,9 +129,6 @@
 	color: var(--color-text);
 	--btn-fill-color: var(--color-black);
 
-	&:hover {
-		color: var(--color-white);
-	}
 }
 
 /* ЦД-2: увеличенный размер (68px). Padding — пропорциональная оценка,
@@ -148,10 +144,6 @@
 	background-color: var(--color-surface);
 	color: var(--color-text);
 
-	&:hover {
-		background-color: var(--color-accent-blue);
-		color: var(--color-white);
-	}
 
 	&.is-selected {
 		background-color: var(--color-accent-blue);
@@ -179,9 +171,6 @@
 	background-color: var(--color-black);
 	color: var(--color-white);
 
-	&:hover {
-		background-color: var(--color-accent-blue);
-	}
 }
 
 /* Кнопка лид-магнита */
@@ -191,10 +180,6 @@
 	background-color: var(--color-dark-grey);
 	color: var(--color-white);
 
-	&:hover {
-		background-color: var(--color-text);
-		color: var(--color-text-dimmed);
-	}
 }
 
 /*
@@ -230,5 +215,35 @@
 
 	.btn__text {
 		transform: none !important;
+	}
+}
+
+/*
+ * Наведение — только с 1200 и только на устройствах с курсором. Ниже
+ * этой ширины правил :hover просто нет: на тач-экране браузер применяет
+ * их после тапа и оставляет «залипшими» до следующего касания.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.btn--cta:hover .btn__fill {
+		/* Конечный кадр макета: −74% высоты эллипса */
+		transform: translateY(-74%);
+	}
+
+	.btn--cta--inverse:hover {
+		color: var(--color-white);
+	}
+
+	.btn--cookie:hover {
+		background-color: var(--color-accent-blue);
+	}
+
+	.btn--secondary:hover {
+		background-color: var(--color-accent-blue);
+		color: var(--color-white);
+	}
+
+	.btn--lead-magnet:hover {
+		background-color: var(--color-text);
+		color: var(--color-text-dimmed);
 	}
 }

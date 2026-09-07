@@ -30,9 +30,6 @@
 	transition: color 0.2s ease;
 }
 
-.consent__text a:hover {
-	color: var(--color-accent-blue);
-}
 
 .consent__error {
 	grid-column: 2;
@@ -46,4 +43,15 @@
 /* Ошибка: контрол краснеет вместе с сообщением (класс вешает форма) */
 .consent.is-error .radio-control {
 	border-color: var(--color-error);
+}
+
+/*
+ * Наведение — только с 1200 и на устройствах с курсором: ниже этой ширины
+ * правил :hover просто нет, иначе на тач-экране они применяются после
+ * тапа и «залипают» до следующего касания.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.consent__text a:hover {
+		color: var(--color-accent-blue);
+	}
 }

@@ -36,10 +36,6 @@
  * синел, и выглядело так, будто выбор снялся (а снимался он лишь после
  * увода курсора). То же правило и у .radio-control.
  */
-.tab-pill:hover:not(.is-selected) {
-	background-color: var(--color-accent-blue);
-	color: var(--color-white);
-}
 
 .tab-pill.is-selected {
 	background-color: var(--color-black);
@@ -62,5 +58,17 @@
 			clamp(14px, calc(18.12px - 0.5882vw), 16px)
 			clamp(14px, calc(18.12px - 0.5882vw), 16px);
 		font-size: clamp(13px, calc(15.06px - 0.2941vw), 14px);
+	}
+}
+
+/*
+ * Наведение — только с 1200 и на устройствах с курсором: ниже этой ширины
+ * правил :hover просто нет, иначе на тач-экране они применяются после
+ * тапа и «залипают» до следующего касания.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.tab-pill:hover:not(.is-selected) {
+		background-color: var(--color-accent-blue);
+		color: var(--color-white);
 	}
 }

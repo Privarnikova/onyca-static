@@ -204,16 +204,6 @@
 	color: var(--color-text-footer);
 }
 
-/* Ссылки согласия: при наведении синеют */
-.contact-form__consent a {
-	color: var(--color-text-footer);
-	transition: color 0.2s ease;
-}
-
-.contact-form__consent a:hover {
-	color: var(--color-accent-blue);
-}
-
 /*
  * Планшет (1200) — Figma «Форма 1. Планшет вертикальный» (node-id
  * 2626:8902). Табы (3 ряда вместо 2) и радио-иконки/шрифты уже совпадают

@@ -34,22 +34,12 @@
 	cursor: pointer;
 }
 
-.radio-control:hover {
-	border-color: var(--color-accent-blue);
-}
 
 /*
  * Точка при наведении — только у невыбранного контрола. Иначе снятый
  * повторным кликом чекбокс оставался под курсором синим, и выглядело так,
  * будто он не снялся.
  */
-.radio-control:hover:not(:checked)::after {
-	content: '';
-	position: absolute;
-	inset: 14.286%;
-	border-radius: 50%;
-	background-color: var(--color-accent-blue);
-}
 
 .radio-control.is-required-error {
 	border-color: var(--color-error);
@@ -65,4 +55,23 @@
 	inset: 14.286%;
 	border-radius: 50%;
 	background-color: var(--color-black);
+}
+
+/*
+ * Наведение — только с 1200 и на устройствах с курсором: ниже этой ширины
+ * правил :hover просто нет, иначе на тач-экране они применяются после
+ * тапа и «залипают» до следующего касания.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.radio-control:hover:not(:checked)::after {
+		content: '';
+		position: absolute;
+		inset: 14.286%;
+		border-radius: 50%;
+		background-color: var(--color-accent-blue);
+	}
+
+	.radio-control:hover {
+		border-color: var(--color-accent-blue);
+	}
 }

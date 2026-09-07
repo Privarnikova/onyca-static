@@ -34,7 +34,14 @@
 	pointer-events: none;
 }
 
-.link-underline:hover::after,
-.link-underline:focus-visible::after {
-	transform: scaleX(1);
+/*
+ * Наведение — только с 1200 и на устройствах с курсором: ниже этой ширины
+ * правил :hover просто нет, иначе на тач-экране они применяются после
+ * тапа и «залипают» до следующего касания.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.link-underline:hover::after,
+	.link-underline:focus-visible::after {
+		transform: scaleX(1);
+	}
 }

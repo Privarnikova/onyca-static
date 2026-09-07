@@ -157,18 +157,45 @@
 
 				var item = link.closest( '.menu-item-has-children' );
 				var sub = item.querySelector( '.sub-menu' );
-				var isOpen = item.classList.toggle( 'is-open' );
 
 				if ( ! sub ) {
+					item.classList.toggle( 'is-open' );
+					return;
+				}
+
+				if ( item.classList.contains( 'is-open' ) ) {
+					item.classList.remove( 'is-open' );
+					sub.style.maxHeight = '';
 					return;
 				}
 
 				/*
-				 * Высота по фактическому содержимому: в CSS стояло
-				 * max-height: 400px при списке ~140, и анимация две трети
-				 * времени шла вхолостую — открытие выглядело подтормаживающим.
+				 * Итоговую высоту снимаем «вхолостую»: на миг применяем
+				 * открытое состояние с выключенной анимацией, запоминаем
+				 * scrollHeight (в него входит и padding-top) и тут же
+				 * возвращаем всё назад. Иначе одно из двух: либо отступ не
+				 * попадает в замер и последний пункт («Все услуги»)
+				 * обрезается, либо он применяется мгновенно и список
+				 * прыгает на 24px до начала анимации.
+				 *
+				 * Фиксированного значения тут быть не может: в CSS раньше
+				 * стояли 400px при списке ~140, и анимация две трети
+				 * времени шла вхолостую.
 				 */
-				sub.style.maxHeight = isOpen ? sub.scrollHeight + 'px' : '';
+				sub.style.transition = 'none';
+				sub.style.maxHeight = 'none';
+				item.classList.add( 'is-open' );
+
+				var target = sub.scrollHeight;
+
+				item.classList.remove( 'is-open' );
+				sub.style.maxHeight = '0px';
+				void sub.offsetHeight;
+				sub.style.transition = '';
+
+				// Теперь по-настоящему: и высота, и отступ едут вместе
+				item.classList.add( 'is-open' );
+				sub.style.maxHeight = target + 'px';
 			} );
 		} );
 	}
@@ -478,11 +505,18 @@
 			accepted = window.localStorage.getItem( KEY ) === '1';
 		} catch ( e ) {}
 
+		// Дубль в cookie: в приватном режиме Safari localStorage бросает
+		// исключение на запись, и решение иначе не пережило бы перезагрузку.
+		if ( ! accepted ) {
+			accepted = document.cookie.indexOf( KEY + '=1' ) !== -1;
+		}
+
 		if ( accepted ) {
 			return;
 		}
 
 		banner.hidden = false;
+		banner.classList.remove( 'is-hidden' );
 
 		var button = banner.querySelector( '[data-cookie-accept]' );
 
@@ -490,14 +524,29 @@
 			return;
 		}
 
-		button.addEventListener( 'click', function () {
+		function accept() {
 			banner.hidden = true;
+			banner.classList.add( 'is-hidden' );
 			// Метка в DOM: по ней бургер понимает, что возвращать баннер не нужно.
 			banner.dataset.accepted = '1';
 
 			try {
 				window.localStorage.setItem( KEY, '1' );
 			} catch ( e ) {}
+
+			document.cookie = KEY + '=1; path=/; max-age=' + ( 60 * 60 * 24 * 365 ) + '; SameSite=Lax';
+		}
+
+		button.addEventListener( 'click', accept );
+
+		/*
+		 * touchend вдобавок к click: в Safari на iOS click у кнопки внутри
+		 * position: fixed иногда не доходит. Повторный вызов безвреден —
+		 * accept идемпотентен.
+		 */
+		button.addEventListener( 'touchend', function ( event ) {
+			event.preventDefault();
+			accept();
 		} );
 	}
 
