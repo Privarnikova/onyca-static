@@ -1,7 +1,8 @@
 /**
  * Снимает статическую копию сайта с локального WordPress в
- * ~/Desktop/onyca-static: страницу Контактов (index.html) и страницу 404
- * (404.html — GitHub Pages сам отдаёт её на несуществующие адреса).
+ * ~/Desktop/onyca-static: главную (index.html), страницу Контактов
+ * (contacts.html) и страницу 404 (404.html — GitHub Pages сам отдаёт её
+ * на несуществующие адреса).
  *
  * Скачивает стили, скрипты, картинки и шрифты в index_files/, переписывает
  * пути на относительные, убирает ссылки на localhost и служебные скрипты
@@ -45,7 +46,8 @@ function findChromium() {
 }
 
 const PAGES = [
-  { url: 'http://localhost:8080/contacts/', out: 'index.html' },
+  { url: 'http://localhost:8080/', out: 'index.html' },
+  { url: 'http://localhost:8080/contacts/', out: 'contacts.html' },
   { url: 'http://localhost:8080/no-such-page-for-404/', out: '404.html' },
 ];
 const OUT = path.join(process.env.HOME, 'Desktop/onyca-static');
@@ -70,6 +72,19 @@ const FILES = path.join(OUT, 'index_files');
 
     await page.goto(item.url, { waitUntil: 'load' });
     await page.waitForTimeout(1500);
+
+    // Прокрутка до низа и обратно: так подгружаются ленивые картинки
+    // (обложки проектов, логотипы), а анимации первого экрана
+    // возвращаются в исходное состояние — иначе в снимок попал бы
+    // разросшийся шоурил.
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.body.scrollHeight; y += 600) {
+        window.scrollTo(0, y);
+        await new Promise(r => setTimeout(r, 120));
+      }
+      window.scrollTo(0, 0);
+    });
+    await page.waitForTimeout(1200);
 
     // Баннер cookie на живой странице уже раскрыт скриптом — в копию он
     // должен попасть скрытым, иначе у посетителя появится до проверки согласия
@@ -121,8 +136,13 @@ const FILES = path.join(OUT, 'index_files');
     html = html.replace(/<script[^>]*>(?:(?!<\/script>)[\s\S])*?_wpemojiSettings[\s\S]*?<\/script>\s*/g, '');
     html = html.replace(/<script[^>]*wp-emoji-release[^>]*><\/script>\s*/g, '');
 
+    // Внутренние адреса: Контакты и главная есть в копии, остальное
+    // (Проекты, Блог, страницы услуг) на статике не существует — такие
+    // ссылки гасим, чтобы они не вели на localhost.
     html = html.replace(/http:\/\/localhost:8080\/contacts\/#/g, '#');
-    html = html.replace(/http:\/\/localhost:8080\/contacts\//g, 'index.html');
+    html = html.replace(/http:\/\/localhost:8080\/contacts\//g, 'contacts.html');
+    html = html.replace(/http:\/\/localhost:8080\/"/g, 'index.html"');
+    html = html.replace(/http:\/\/localhost:8080\/'/g, "index.html'");
     html = html.replace(/http:\\?\/\\?\/localhost:8080\\?\/[^"'\s>]*/g,
       'https://privarnikova.github.io/onyca-static/');
     html = html.replace(/href="https:\/\/privarnikova\.github\.io\/onyca-static\/"/g, 'href="index.html"');
