@@ -103,6 +103,15 @@ video {
 	display: block;
 }
 
+/*
+ * Общий отступ от шапки до контента — один на все страницы (токен
+ * --page-top). Страница, которой отступ не нужен (герой во всю высоту),
+ * снимает его классом .site-main--flush.
+ */
+.site-main {
+	padding-top: var(--page-top);
+}
+
 .container {
 	width: 100%;
 	max-width: var(--container-max-width);

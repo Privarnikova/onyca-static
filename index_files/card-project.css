@@ -1,0 +1,134 @@
+/**
+ * Карточка проекта. Источник — Figma 975:2437 («Проекты студии»,
+ * десктоп 1920), карточка 975:2423, метки 767:377 (отрасль) и 764:3359
+ * (услуга), fileKey 93JlTAOwjlBO4naQ7ReAFF.
+ *
+ * ВНИМАНИЕ: блок свёрстан ТОЛЬКО под 1920 — макетов 1600 / 1200 / 700 /
+ * 360 на момент вёрстки нет. Все размеры ниже (28px отступ контента,
+ * колонка 495px, пропорция 1840×900, зазоры 16 и 32) — плоские значения
+ * этой одной точки, без второй точки для clamp(). Когда макеты
+ * остальных разрешений будут утверждены, для них нужны свои стили:
+ * интерполировать здесь же, по двум реальным точкам, а не переключать
+ * медиазапросом (см. правило про адаптив без скачков).
+ *
+ * Кегли берём токенами (--font-size-h1 у названия, --font-size-button-sm
+ * у меток): в Figma это те же стили H1 и «Кнопки SemiBold 14 - B2», а не
+ * отдельные размеры карточки.
+ */
+
+.card-project {
+	/* 1840×900 в макете — держим пропорцию, ширину даёт контейнер */
+	position: relative;
+	aspect-ratio: 1840 / 900;
+	overflow: hidden;
+	/* Пока обложка не загрузилась, видно подложку макета (Grey-30) */
+	background-color: var(--color-surface-alt);
+}
+
+.card-project__link {
+	display: block;
+	width: 100%;
+	height: 100%;
+	color: inherit;
+	text-decoration: none;
+}
+
+.card-project__cover {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* Название и метки — в левом верхнем углу: 28 от края, колонка 495 */
+.card-project__content {
+	position: absolute;
+	top: 28px;
+	left: 28px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 16px;
+	max-width: 495px;
+}
+
+.card-project__title {
+	margin: 0;
+	font-size: var(--font-size-h1);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.card-project__tags {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 16px;
+}
+
+/*
+ * Метка отрасли и услуги — один компонент с двумя вариантами заливки.
+ *
+ * Отступы те же, что у пилюль-табов (components/tabs.css): сверху и
+ * снизу одинаково. В экспорте Figma они асимметричны (13 сверху, 16
+ * снизу), но это особенность самого макета — с такими значениями текст
+ * встаёт выше середины, и метка перестаёт совпадать с табом, хотя это
+ * один и тот же визуальный элемент. Формулы взяты из tabs.css целиком,
+ * чтобы на 1600 метка и таб не разъехались.
+ */
+.project-tag {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: clamp(13px, calc(8px + 0.3125vw), 14px) clamp(14px, calc(4px + 0.625vw), 16px);
+	border-radius: var(--radius-pill);
+	font-family: var(--font-family-base);
+	font-size: var(--font-size-button-sm);
+	font-weight: var(--font-weight-button);
+	line-height: var(--line-height-button);
+	white-space: nowrap;
+}
+
+/* Отрасль — сплошная подложка; отраслей у проекта может быть две, каждая
+   идёт своей меткой (в макете 975:2419 их как раз две) */
+.project-tag--industry {
+	background-color: var(--color-black);
+	color: var(--color-white);
+}
+
+/* Услуга — полупрозрачная подложка, чтобы обложка сквозь неё читалась */
+.project-tag--service {
+	background-color: rgba(255, 255, 255, 0.4);
+	color: var(--color-text);
+}
+
+/*
+ * Инверсия на тёмной обложке. Класс .is-on-dark ставит JS
+ * (initCoverContrast), посчитав яркость того угла обложки, где лежит
+ * текст.
+ */
+
+/* Название — светлеет целиком */
+.card-project.is-on-dark .card-project__title {
+	color: var(--color-white);
+}
+
+/*
+ * Услуга: по макету 764:3361 («Светлый фон» / «Темный фон») подложка у
+ * обоих вариантов ОДНА И ТА ЖЕ — белая полупрозрачная, меняется только
+ * цвет текста. Заливку здесь не трогаем.
+ */
+.card-project.is-on-dark .project-tag--service {
+	color: var(--color-white);
+}
+
+/*
+ * Отрасль: отдельного варианта под тёмный фон в Figma нет, но
+ * зеркалить её нужно (подтверждено 2026-09-07) — иначе чёрная пилюля
+ * на тёмной обложке с ней сливается. Меняются оба цвета: подложка на
+ * белую, текст на тёмный.
+ */
+.card-project.is-on-dark .project-tag--industry {
+	background-color: var(--color-white);
+	color: var(--color-text);
+}

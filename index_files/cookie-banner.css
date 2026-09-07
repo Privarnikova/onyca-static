@@ -21,11 +21,20 @@
 	position: fixed;
 	z-index: 200;
 	bottom: clamp(15px, 2.0833vw, 40px);
-	left: clamp(15px, 2.0833vw, 40px);
+	/*
+	 * Баннер стоит по той же сетке, что и контент: выше 1920 контейнер
+	 * перестаёт растягиваться и центруется, поэтому левый край баннера
+	 * должен отходить от края КОНТЕЙНЕРА, а не окна — иначе на 2560
+	 * баннер убегает за рабочую область. max() и берёт то из двух,
+	 * которое дальше от края экрана.
+	 */
+	left: max(
+		clamp(15px, 2.0833vw, 40px),
+		calc(50vw - var(--container-max-width) / 2 + var(--container-padding))
+	);
 	right: clamp(15px, 2.0833vw, 40px);
 	max-width: 600px;
 	background-color: var(--color-surface);
-	box-shadow: 0 8px 32px rgb(0 0 0 / 8%);
 }
 
 .cookie-banner__inner {

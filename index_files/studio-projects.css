@@ -1,0 +1,48 @@
+/**
+ * Блок «Проекты студии» — Figma 975:2437 (десктоп 1920).
+ *
+ * ВНИМАНИЕ: блок свёрстан ТОЛЬКО под 1920 — макетов остальных
+ * разрешений нет. Значения ниже (отступ шапки 38, зазор карточек 32)
+ * плоские, под 1600 / 1200 / 700 / 360 понадобятся свои стили.
+ *
+ * Раскладка шапки блока: подпись прижата к левому краю, заголовок стоит
+ * по центру КОНТЕЙНЕРА, а не по остатку строки — поэтому три колонки
+ * (1fr auto 1fr), где боковые уравновешивают друг друга. Выравнивание
+ * по базовой линии: в макете заголовок 40px и подпись 16px стоят
+ * именно так (базовые линии 36 и 38).
+ */
+
+.studio-projects__head {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: baseline;
+	/* От базовой линии заголовка до первой карточки — 38px (86 − 48) */
+	margin-bottom: 38px;
+}
+
+.studio-projects__lead {
+	margin: 0;
+	font-size: var(--font-size-body);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-body);
+	color: var(--color-text);
+}
+
+.studio-projects__title {
+	grid-column: 2;
+	margin: 0;
+	font-size: var(--font-size-h2);
+	text-align: center;
+}
+
+/* Карточки идут в столбик с зазором 32 (у макета шаг 932 при высоте 900) */
+.studio-projects__list {
+	display: grid;
+	gap: 32px;
+}
+
+.studio-projects__all {
+	/* Кнопка во всю ширину блока — 1840 при контейнере 1840 */
+	margin-top: 32px;
+	width: 100%;
+}

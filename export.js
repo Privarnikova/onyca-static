@@ -9,7 +9,40 @@
  */
 const { chromium } = require('playwright');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+
+/**
+ * Playwright ждёт браузер строго своей ревизии и, не найдя, требует
+ * `npx playwright install`. Качать сотню мегабайт незачем: сначала
+ * смотрим в кеш Playwright, потом — на обычный Chrome из /Applications.
+ * Ничего не нашли — оставляем пустым, тогда Playwright сам скажет, что
+ * нужно доустановить. Тот же приём, что в tests/playwright.config.js.
+ */
+function findChromium() {
+  if (process.env.CHROMIUM_PATH) {
+    return process.env.CHROMIUM_PATH;
+  }
+
+  const cache = path.join(os.homedir(), 'Library/Caches/ms-playwright');
+
+  if (fs.existsSync(cache)) {
+    const dirs = fs.readdirSync(cache).filter(n => n.startsWith('chromium-')).sort().reverse();
+
+    for (const dir of dirs) {
+      const macOs = path.join(cache, dir, 'chrome-mac-arm64');
+      if (!fs.existsSync(macOs)) continue;
+      const app = fs.readdirSync(macOs).find(n => n.endsWith('.app'));
+      if (!app) continue;
+      const binary = path.join(macOs, app, 'Contents/MacOS', app.replace('.app', ''));
+      if (fs.existsSync(binary)) return binary;
+    }
+  }
+
+  const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+
+  return fs.existsSync(chrome) ? chrome : undefined;
+}
 
 const PAGES = [
   { url: 'http://localhost:8080/contacts/', out: 'index.html' },
@@ -19,7 +52,8 @@ const OUT = path.join(process.env.HOME, 'Desktop/onyca-static');
 const FILES = path.join(OUT, 'index_files');
 
 (async () => {
-  const browser = await chromium.launch();
+  const executablePath = findChromium();
+  const browser = await chromium.launch(executablePath ? { executablePath } : {});
   const assets = new Map();
   const pages = [];
 

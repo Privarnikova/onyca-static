@@ -95,11 +95,18 @@
 		}
 
 		/*
-		 * Баннер cookie перекрывал бы открытую панель (он fixed внизу
-		 * экрана), поэтому на время открытого меню его прячем и возвращаем
-		 * при закрытии — если посетитель ещё не нажал «Принять».
+		 * Баннер cookie и кнопка «Обсудить проект» перекрывали бы открытую
+		 * панель (оба fixed внизу экрана), поэтому на время открытого меню
+		 * их прячем и возвращаем при закрытии — баннер только если
+		 * посетитель ещё не нажал «Принять».
 		 */
 		function toggleCookieBanner( menuOpen ) {
+			var discuss = document.querySelector( '[data-discuss-button]' );
+
+			if ( discuss ) {
+				discuss.hidden = menuOpen;
+			}
+
 			var banner = document.querySelector( '[data-cookie-banner]' );
 
 			if ( ! banner || banner.dataset.accepted === '1' ) {
@@ -383,8 +390,40 @@
 	 *
 	 * Сила притяжения: сама кнопка тянется на 25px, текст внутри — на 15,
 	 * из-за разницы кнопка выглядит «тянущейся», а не едущей целиком.
-	 * Зона, в которой курсор уже притягивает, — половина кнопки плюс 60px.
+	 *
+	 * Зона притяжения — ореол ровно в 32px вокруг кнопки, одинаковый у
+	 * всех ЦД-кнопок и одинаковой толщины по всему периметру. Раньше она
+	 * считалась кругом по большей стороне (половина плюс 60px), и у
+	 * широкой кнопки «Отправить» радиус доходил до 360px: она начинала
+	 * тянуться, когда курсор был ещё у поля «Расскажите о проекте».
 	 */
+	var MAGNET_REACH = 32;
+
+	/**
+	 * Сдвиг, который сейчас реально применён к элементу. В matrix(...)
+	 * последние две цифры — перенос по x и y; во время перехода это
+	 * промежуточные значения, они-то и нужны.
+	 */
+	function currentShift( element ) {
+		var transform = getComputedStyle( element ).transform;
+
+		if ( ! transform || transform === 'none' ) {
+			return { x: 0, y: 0 };
+		}
+
+		var values = transform.match( /matrix\(([^)]+)\)/ );
+
+		if ( ! values ) {
+			return { x: 0, y: 0 };
+		}
+
+		var parts = values[ 1 ].split( ',' );
+
+		return {
+			x: parseFloat( parts[ 4 ] ) || 0,
+			y: parseFloat( parts[ 5 ] ) || 0
+		};
+	}
 	function initMagneticButtons() {
 		var buttons = document.querySelectorAll( '.btn--cta' );
 
@@ -434,27 +473,48 @@
 
 			items.forEach( function ( item ) {
 				var rect = item.el.getBoundingClientRect();
-				var cx = rect.left + rect.width / 2;
-				var cy = rect.top + rect.height / 2;
+				var halfWidth = rect.width / 2;
+				var halfHeight = rect.height / 2;
+				/*
+				 * Центр берём БЕЗ текущего сдвига: притянутая кнопка стоит
+				 * ближе к курсору, и если считать зону по её новому месту,
+				 * зона тянется следом — кнопка залипает притянутой далеко
+				 * за ореолом.
+				 *
+				 * Сдвиг снимаем именно с ФАКТИЧЕСКОГО transform, а не с
+				 * последнего заданного значения: между ними идёт переход
+				 * (transition), и пока он не закончился, эти числа разные —
+				 * от их расхождения кнопка при входе в зону дёргалась.
+				 */
+				var applied = currentShift( item.el );
+				var cx = rect.left + halfWidth - applied.x;
+				var cy = rect.top + halfHeight - applied.y;
 				var dx = pointer.x - cx;
 				var dy = pointer.y - cy;
-				var reach = Math.max( rect.width, rect.height ) / 2 + 60;
-				var distance = Math.sqrt( dx * dx + dy * dy );
 
-				if ( distance > reach ) {
+				/*
+				 * Насколько курсор вышел за края кнопки по каждой оси.
+				 * Внутри кнопки оба значения нулевые, снаружи растут — и
+				 * зоной оказывается сама кнопка, расширенная на ореол, а
+				 * не круг вокруг её центра.
+				 */
+				var outsideX = Math.max( 0, Math.abs( dx ) - halfWidth );
+				var outsideY = Math.max( 0, Math.abs( dy ) - halfHeight );
+
+				if ( outsideX > MAGNET_REACH || outsideY > MAGNET_REACH ) {
 					item.el.style.transform = '';
 					item.text.style.transform = '';
 					return;
 				}
 
 				/*
-				 * Сдвиг пропорционален смещению курсора от центра: у самой
-				 * кнопки он около нуля, к границе зоны доходит до strength.
+				 * Сдвиг пропорционален смещению курсора от центра: в центре
+				 * кнопки он около нуля, у границы зоны доходит до strength.
 				 * Резкость на границе снимает transition на самой кнопке —
 				 * она возвращается плавно, а не прыжком.
 				 */
-				var shiftX = ( dx / reach ) * item.strength;
-				var shiftY = ( dy / reach ) * item.strength;
+				var shiftX = ( dx / ( halfWidth + MAGNET_REACH ) ) * item.strength;
+				var shiftY = ( dy / ( halfHeight + MAGNET_REACH ) ) * item.strength;
 
 				item.el.style.transform = 'translate(' + shiftX + 'px, ' + shiftY + 'px)';
 				item.text.style.transform = 'translate(' +
@@ -618,6 +678,188 @@
 		setInterval( render, 1000 * 30 );
 	}
 
+	/**
+	 * Инверсия текста на карточке проекта.
+	 *
+	 * Обложка у каждого проекта своя: на светлом снимке название должно
+	 * быть тёмным, на тёмном — светлым, иначе текст пропадает. Считаем
+	 * среднюю яркость того угла обложки, где в макете (975:2423) стоят
+	 * название и метки — примерно 27% ширины и 23% высоты от левого
+	 * верхнего края — и при тёмном угле ставим карточке .is-on-dark,
+	 * дальше цвета зеркалит components/card-project.css.
+	 *
+	 * Картинка обрезается по object-fit: cover, поэтому доля берётся от
+	 * исходного снимка приблизительно — для решения «светлый или тёмный»
+	 * этой точности достаточно.
+	 */
+	function initCoverContrast() {
+		var cards = document.querySelectorAll( '[data-cover-contrast]' );
+
+		if ( ! cards.length ) {
+			return;
+		}
+
+		cards.forEach( function ( card ) {
+			var image = card.querySelector( 'img' );
+
+			if ( ! image ) {
+				return;
+			}
+
+			function measure() {
+				if ( ! image.naturalWidth || ! image.naturalHeight ) {
+					return;
+				}
+
+				var areaWidth = Math.max( 1, Math.round( image.naturalWidth * 0.27 ) );
+				var areaHeight = Math.max( 1, Math.round( image.naturalHeight * 0.23 ) );
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 20;
+				canvas.height = 10;
+
+				var context = canvas.getContext( '2d' );
+
+				if ( ! context ) {
+					return;
+				}
+
+				try {
+					context.drawImage( image, 0, 0, areaWidth, areaHeight, 0, 0, canvas.width, canvas.height );
+
+					var pixels = context.getImageData( 0, 0, canvas.width, canvas.height ).data;
+					var sum = 0;
+
+					for ( var i = 0; i < pixels.length; i += 4 ) {
+						/* Яркость по восприятию: зелёный весит больше синего */
+						sum += 0.2126 * pixels[ i ] + 0.7152 * pixels[ i + 1 ] + 0.0722 * pixels[ i + 2 ];
+					}
+
+					var average = sum / ( pixels.length / 4 );
+
+					/* 140 из 255 — середина с запасом в сторону тёмного:
+					   белый текст на среднем сером читается лучше чёрного */
+					card.classList.toggle( 'is-on-dark', average < 140 );
+				} catch ( error ) {
+					/*
+					 * Обложка с другого домена закрывает canvas от чтения.
+					 * Оставляем светлый вариант макета — он же вариант по
+					 * умолчанию, когда обложки нет вовсе.
+					 */
+				}
+			}
+
+			if ( image.complete ) {
+				measure();
+			} else {
+				image.addEventListener( 'load', measure );
+			}
+		} );
+	}
+
+	/**
+	 * Плавающая кнопка «Обсудить проект» (макеты 933:555 и 975:2657).
+	 *
+	 * Два состояния помимо обычного:
+	 *   — до появления кнопка уведена под кромку экрана. На главной она
+	 *     выезжает, когда прокручен первый экран (так же сделано у
+	 *     Лебедева, referenceвый пример из ТЗ); на остальных страницах
+	 *     видна сразу;
+	 *   — доехав до подвала, перестаёт быть приклеенной к экрану и
+	 *     останавливается в нём на одном уровне с логотипом, справа от
+	 *     него (макет подвала «С кнопкой» 975:2657: логотип и кнопка оба
+	 *     на 78 от верха). Ниже 420px кнопка стоит по центру и в подвале
+	 *     останавливается под блоком бренда (макет 360 — 2570:1970:
+	 *     бренд заканчивается на 117, кнопка на 141).
+	 *
+	 * Первого экрана на главной пока нет: пока он не свёрстан, порогом
+	 * служит высота окна, а когда появится — размечается атрибутом
+	 * data-first-screen, и порог берётся по нему (см. PLAN.md).
+	 */
+	function initDiscussButton() {
+		var wrap = document.querySelector( '[data-discuss-button]' );
+
+		if ( ! wrap ) {
+			return;
+		}
+
+		var footer = document.querySelector( '.site-footer' );
+		var pending = false;
+
+		function threshold() {
+			if ( ! document.body.classList.contains( 'home' ) ) {
+				return 0;
+			}
+
+			var firstScreen = document.querySelector( '[data-first-screen]' );
+
+			return firstScreen ? firstScreen.offsetHeight : window.innerHeight;
+		}
+
+		function bottomOffset() {
+			var value = getComputedStyle( wrap ).getPropertyValue( '--discuss-bottom' );
+
+			return parseFloat( value ) || 0;
+		}
+
+		/* Где кнопка останавливается — в координатах документа */
+		function dockTop() {
+			var brand = footer.querySelector( '.site-footer__brand' );
+
+			if ( ! brand ) {
+				return footer.offsetTop;
+			}
+
+			var rect = brand.getBoundingClientRect();
+			var top = rect.top + window.scrollY;
+
+			/* По центру (уже 420) кнопка идёт под брендом, иначе — вровень
+			   с логотипом, то есть с верхом блока бренда */
+			if ( window.matchMedia( '(max-width: 419px)' ).matches ) {
+				return top + rect.height + 24;
+			}
+
+			return top;
+		}
+
+		function update() {
+			pending = false;
+
+			var scrolled = window.scrollY;
+
+			wrap.classList.toggle( 'is-visible', scrolled >= threshold() );
+
+			if ( ! footer ) {
+				return;
+			}
+
+			var stopAt = dockTop();
+			/* Где кнопка оказалась бы, оставаясь приклеенной к экрану */
+			var floatingTop = scrolled + window.innerHeight - bottomOffset() - wrap.offsetHeight;
+
+			if ( floatingTop >= stopAt ) {
+				wrap.style.top = stopAt + 'px';
+				wrap.classList.add( 'is-docked' );
+			} else {
+				wrap.classList.remove( 'is-docked' );
+				wrap.style.top = '';
+			}
+		}
+
+		function schedule() {
+			if ( pending ) {
+				return;
+			}
+
+			pending = true;
+			window.requestAnimationFrame( update );
+		}
+
+		update();
+		window.addEventListener( 'scroll', schedule, { passive: true } );
+		window.addEventListener( 'resize', schedule );
+	}
+
 	document.addEventListener( 'DOMContentLoaded', function () {
 		initHeaderScroll();
 		initBurgerMenu();
@@ -627,5 +869,7 @@
 		initMagneticButtons();
 		initContactForm();
 		initMoscowClock();
+		initCoverContrast();
+		initDiscussButton();
 	} );
 } )();

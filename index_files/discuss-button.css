@@ -1,0 +1,120 @@
+/**
+ * Плавающая кнопка «Обсудить проект».
+ * Макеты: Figma 933:555 (на экране) и 975:2657 (остановка в подвале),
+ * эталон 1920. Разметка — template-parts/components/discuss-button.php,
+ * поведение — initDiscussButton в assets/js/main.js.
+ */
+
+.discuss-button {
+	/*
+	 * Отступ от низа экрана: 40px на 1920 (макет 933:555 — кнопка на 988
+	 * при экране 1080 и высоте 52) и 20px на 360 (макет 2645:5427 —
+	 * кнопка на 568 при экране 640). Между ними тянется долей ширины.
+	 */
+	--discuss-bottom: clamp(20px, 2.0833vw, 40px);
+
+	position: fixed;
+	z-index: 190;
+	bottom: var(--discuss-bottom);
+	/*
+	 * Правый край — по сетке, а не по краю окна: выше 1920 контейнер
+	 * центруется, и кнопка должна остаться в рабочей области (то же
+	 * правило, что у баннера cookie).
+	 */
+	right: max(
+		var(--container-padding),
+		calc(50vw - var(--container-max-width) / 2 + var(--container-padding))
+	);
+
+	/*
+	 * До появления кнопка уведена под нижнюю кромку экрана и не ловит
+	 * клики. Показ — класс .is-visible от JS: на главной после первого
+	 * экрана, на остальных страницах сразу.
+	 */
+	transform: translateY(calc(100% + var(--discuss-bottom)));
+	opacity: 0;
+	pointer-events: none;
+	transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+
+.discuss-button.is-visible {
+	transform: translateY(0);
+	opacity: 1;
+	pointer-events: auto;
+}
+
+/*
+ * Доехав до подвала, кнопка перестаёт быть приклеенной к экрану и
+ * останавливается внутри него (макет 975:2657). Координату top
+ * пересчитывает JS — она зависит от высоты документа.
+ */
+.discuss-button.is-docked {
+	position: absolute;
+	bottom: auto;
+	/* В absolute проценты считаются от ширины документа, поэтому здесь
+	   50% вместо 50vw — иначе полоса прокрутки сдвигает кнопку */
+	right: max(
+		var(--container-padding),
+		calc(50% - var(--container-max-width) / 2 + var(--container-padding))
+	);
+}
+
+/*
+ * Ниже 420px кнопка уходит из правой колонки в центр экрана (макет 360 —
+ * 2645:5427). Точка перехода выбрана заказчиком: на более узких экранах
+ * прижатая к краю кнопка перекрывает контент.
+ */
+@media (max-width: 419px) {
+	.discuss-button {
+		right: auto;
+		left: 50%;
+		transform: translate(-50%, calc(100% + var(--discuss-bottom)));
+	}
+
+	.discuss-button.is-visible {
+		transform: translate(-50%, 0);
+	}
+
+	/*
+	 * В подвале кнопка тоже встаёт по центру — под логотипом и
+	 * копирайтом (макет подвала 360 — 2570:1970). Точку по вертикали
+	 * считает JS, он же учитывает высоту блока бренда.
+	 */
+	.discuss-button.is-docked {
+		left: 50%;
+		right: auto;
+	}
+}
+
+/*
+ * Горизонтальные отступы — 22px по макету 933:555 (у чёрной ЦД-кнопки
+ * в форме они шире, 32). Формулы те же, что у .btn--secondary в
+ * components/buttons.css, чтобы на 1600 обе кнопки совпали.
+ */
+.discuss-button__btn {
+	padding-left: clamp(18px, calc(14.89px + 0.4444vw), 22px);
+	padding-right: clamp(18px, calc(14.89px + 0.4444vw), 22px);
+}
+
+@media (max-width: 699px) {
+	.discuss-button__btn {
+		padding-left: clamp(18px, calc(26.24px - 1.1765vw), 22px);
+		padding-right: clamp(18px, calc(26.24px - 1.1765vw), 22px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.discuss-button {
+		transition: opacity 0.2s ease;
+		transform: none;
+	}
+
+	/* В центрированной раскладке сдвиг на половину ширины — не анимация,
+	   его снимать нельзя, иначе кнопка уедет вправо от центра */
+	@media (max-width: 419px) {
+		.discuss-button,
+		.discuss-button.is-visible {
+			transform: translateX(-50%);
+		}
+	}
+}

@@ -165,7 +165,7 @@ img.site-header__logo-icon {
 	   CSS/JS-файлов (версionируются по mtime через wp_enqueue), путь внутри
 	   url() тут статический текст, PHP его не трогает — без версии браузер
 	   может продолжать показывать старую закэшированную картинку */
-	background: url('./icon-chevron-down.svg?v=2') center / contain no-repeat;
+	background: url('./chevron-down.svg') center / contain no-repeat;
 	transition: transform 0.15s ease;
 }
 
@@ -430,7 +430,7 @@ img.site-header__logo-icon {
 		flex-shrink: 0;
 		width: 32px;
 		height: 32px;
-		background: url('./icon-chevron-down.svg?v=2') center/contain no-repeat;
+		background: url('./chevron-down.svg') center/contain no-repeat;
 		transition: transform 0.2s ease;
 	}
 

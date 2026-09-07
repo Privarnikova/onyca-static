@@ -17,7 +17,6 @@
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	gap: clamp(14px, calc(4px + 0.625vw), 16px);
 }
 
 .field label {
@@ -35,8 +34,18 @@
 .field input,
 .field textarea {
 	width: 100%;
-	/* Место под поднятую подпись зарезервировано всегда — линия не ездит */
-	padding: var(--field-label-shift) 0 8px;
+	/*
+	 * Место под поднятую подпись зарезервировано всегда — линия не ездит.
+	 *
+	 * Отступ вокруг текста одинаков сверху и снизу (--field-gap): в
+	 * пустом поле он отделяет подпись от линии, в заполненном — подпись
+	 * от текста и текст от линии. По макетам это 16px на 1920, 14px на
+	 * 1600 / 1200 / 700 и снова 16px на 360.
+	 *
+	 * Сверху к отступу добавляется строка подписи: она уезжает наверх и
+	 * занимает своё место, поэтому текст начинается ниже неё.
+	 */
+	padding: var(--field-label-shift) 0 var(--field-gap);
 	border: none;
 	border-bottom: 1px solid var(--color-border);
 	background: none;

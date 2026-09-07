@@ -1,0 +1,104 @@
+/**
+ * Пагинация — переиспользуемый компонент (архивы блога и проектов).
+ * Источник: Figma, fileKey 93JlTAOwjlBO4naQ7ReAFF, десктоп 1920 —
+ * раскладка 2093:14126 (четыре варианта), состояния номера 2093:14103,
+ * стрелки 2153:14866 (вправо) и 2153:14888 (влево).
+ *
+ * Макеты остальных разрешений на момент вёрстки не утверждены, поэтому
+ * размеры круга и зазоров здесь фиксированные, значениями 1920, и второй
+ * реальной точки для clamp() пока нет. Когда макеты 1600/1200/700/360
+ * появятся — интерполировать здесь, по двум реальным точкам, а не
+ * переключать медиазапросом.
+ *
+ * Кегль берём токеном --font-size-button: в Figma это тот же стиль
+ * «Кнопки SemiBold 16 - B1», что и у остальных кнопок, отдельного размера
+ * у пагинации нет.
+ */
+
+.pagination {
+	display: flex;
+	align-items: center;
+	/*
+	 * Перенос — не дизайнерское решение, а защита от горизонтальной
+	 * прокрутки: ряд из четырёх номеров и двух стрелок (376px) шире
+	 * телефона. До утверждения мобильного макета элементы переносятся и
+	 * центруются, страница при этом никуда не едет.
+	 */
+	flex-wrap: wrap;
+	justify-content: center;
+	/* Зазор между стрелками и блоком номеров — 32 (макет 2093:14126) */
+	gap: 32px;
+}
+
+.pagination__pages {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: center;
+	/* Между номерами — 16 (там же) */
+	gap: 16px;
+}
+
+/*
+ * Круг 44×44 — общая основа номера и стрелки. Ширину и высоту задаём
+ * жёстко: это круг, он не тянется по содержимому, иначе двузначный номер
+ * превратил бы его в овал.
+ */
+.pagination__page,
+.pagination__arrow {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 44px;
+	height: 44px;
+	border: none;
+	border-radius: var(--radius-pill);
+	background-color: var(--color-surface);
+	color: var(--color-text);
+	font-family: var(--font-family-base);
+	font-size: var(--font-size-button);
+	font-weight: var(--font-weight-button);
+	line-height: var(--line-height-button);
+	text-decoration: none;
+	cursor: pointer;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Текущая страница — чёрный круг с белой цифрой (2093:14096) */
+.pagination__page.is-current {
+	background-color: var(--color-black);
+	color: var(--color-white);
+	cursor: default;
+}
+
+/*
+ * Стрелка — общая пиктограмма chevron-right (components/icon.css,
+ * узел 1224:876). Обводка у неё currentColor, поэтому при наведении она
+ * белеет вместе с текстом, отдельного файла под состояние не нужно.
+ */
+.pagination__arrow {
+	color: var(--color-black);
+}
+
+/* «Назад» — та же пиктограмма зеркально: в макете это один и тот же глиф */
+.pagination__arrow--prev .icon {
+	transform: scaleX(-1);
+}
+
+/*
+ * Наведение — только с 1200 и только на устройствах с курсором: ниже
+ * этой ширины правил :hover нет, иначе на тач-экране они применяются
+ * после тапа и залипают до следующего касания.
+ *
+ * Текущая страница из наведения исключена: у неё своё состояние
+ * «выбрано», и подсветка выглядела бы как снятие выбора (то же правило,
+ * что у .tab-pill).
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.pagination__page:not(.is-current):hover,
+	.pagination__arrow:hover {
+		background-color: var(--color-accent-blue);
+		color: var(--color-white);
+	}
+}

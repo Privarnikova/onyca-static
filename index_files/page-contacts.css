@@ -9,11 +9,6 @@
  * обеих точках, взято по факту, не сглажено.
  */
 
-.page-contacts__hero {
-	/* Разница между низом шапки и началом контента: 1600 → 68px, 1920 → 78px */
-	padding-top: clamp(68px, calc(18px + 3.125vw), 78px);
-}
-
 .page-contacts__hero.container {
 	padding-left: clamp(35px, calc(10px + 1.5625vw), 40px);
 	padding-right: clamp(35px, calc(10px + 1.5625vw), 40px);
@@ -270,10 +265,6 @@
 		--links-pair2: max(0px, min(calc(var(--hero-pair2) + var(--grid-gap)), calc(73.74vw - 884.9px)));
 	}
 
-	.page-contacts__hero {
-		padding-top: clamp(20px, calc(-124px + 12vw), 68px);
-	}
-
 	.page-contacts__hero.container {
 		/* 35px@1600 → 25px@1200, дальше плато 25px до 700 */
 		padding-left: clamp(25px, calc(-5px + 2.5vw), 35px);
@@ -388,8 +379,6 @@
 		   ограничение включается только ниже. */
 		--hero-pair2: max(11.13%, 121px);
 		--links-pair2: 0px;
-
-		padding-top: clamp(20px, calc(130.4px - 9.2vw), 66px);
 	}
 
 	.page-contacts__info-row {
@@ -562,10 +551,6 @@
  * (189).
  */
 @media (max-width: 699px) {
-	.page-contacts__hero {
-		padding-top: clamp(15px, calc(-39px + 15vw), 66px);
-	}
-
 	.page-contacts__hero.container {
 		/* 25px на 700 → 15px на 360 */
 		padding-left: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
