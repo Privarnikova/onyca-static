@@ -51,8 +51,18 @@
 
 .radio-control:checked::after {
 	content: '';
+	/*
+	 * Центрируем от середины, а не отступами: inset считается от
+	 * padding-box, то есть зависит от толщины рамки — стоит ей измениться,
+	 * и точка уезжает. Размер 71.5% от внутренней области повторяет макет (13.6 при
+	 * контроле 21).
+	 */
 	position: absolute;
-	inset: 14.286%;
+	top: 50%;
+	left: 50%;
+	width: 71.5%;
+	height: 71.5%;
+	transform: translate(-50%, -50%);
 	border-radius: 50%;
 	background-color: var(--color-black);
 }
@@ -66,12 +76,20 @@
 	.radio-control:hover:not(:checked)::after {
 		content: '';
 		position: absolute;
-		inset: 14.286%;
+		top: 50%;
+		left: 50%;
+		width: 71.5%;
+		height: 71.5%;
+		transform: translate(-50%, -50%);
 		border-radius: 50%;
 		background-color: var(--color-accent-blue);
 	}
 
-	.radio-control:hover {
+	/*
+	 * Только у невыбранного: у отмеченного контрола синяя рамка при
+	 * наведении читалась как «вот-вот снимется», хотя выбор остаётся.
+	 */
+	.radio-control:hover:not(:checked) {
 		border-color: var(--color-accent-blue);
 	}
 }
