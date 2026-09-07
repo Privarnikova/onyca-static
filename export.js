@@ -1,38 +1,50 @@
 /**
- * Снимает статическую копию страницы Контакты с локального WordPress
- * в ~/Desktop/onyca-static: скачивает стили, скрипт, картинки и шрифты
- * в index_files/, переписывает пути на относительные, убирает ссылки на
- * localhost и служебные скрипты WordPress.
+ * Снимает статическую копию сайта с локального WordPress в
+ * ~/Desktop/onyca-static: страницу Контактов (index.html) и страницу 404
+ * (404.html — GitHub Pages сам отдаёт её на несуществующие адреса).
+ *
+ * Скачивает стили, скрипты, картинки и шрифты в index_files/, переписывает
+ * пути на относительные, убирает ссылки на localhost и служебные скрипты
+ * WordPress, которые на статике падают с ошибкой.
  */
 const { chromium } = require('playwright');
 const fs = require('fs');
 const path = require('path');
 
-const SRC = 'http://localhost:8080/contacts/';
+const PAGES = [
+  { url: 'http://localhost:8080/contacts/', out: 'index.html' },
+  { url: 'http://localhost:8080/no-such-page-for-404/', out: '404.html' },
+];
 const OUT = path.join(process.env.HOME, 'Desktop/onyca-static');
 const FILES = path.join(OUT, 'index_files');
 
 (async () => {
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
-
   const assets = new Map();
-  page.on('response', async r => {
-    const u = r.url();
-    if (!/\.(css|js|svg|woff2?|ttf|png|jpe?g)(\?|$)/i.test(u)) return;
-    if (u.includes('wp-emoji')) return;
-    try { assets.set(u, await r.body()); } catch (e) {}
-  });
+  const pages = [];
 
-  await page.goto(SRC, { waitUntil: 'load' });
-  await page.waitForTimeout(1500);
-  let html = await page.content();
+  for (const item of PAGES) {
+    const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+
+    page.on('response', async r => {
+      const u = r.url();
+      if (!/\.(css|js|svg|woff2?|ttf|png|jpe?g)(\?|$)/i.test(u)) return;
+      if (u.includes('wp-emoji')) return;
+      if (assets.has(u)) return;
+      try { assets.set(u, await r.body()); } catch (e) {}
+    });
+
+    await page.goto(item.url, { waitUntil: 'load' });
+    await page.waitForTimeout(1500);
+    pages.push({ out: item.out, html: await page.content() });
+    await page.close();
+  }
+
   await browser.close();
 
   fs.rmSync(FILES, { recursive: true, force: true });
   fs.mkdirSync(FILES, { recursive: true });
 
-  // карта: исходный URL → имя файла рядом с index.html
   const map = new Map();
   for (const [url, body] of assets) {
     const name = path.basename(new URL(url).pathname);
@@ -49,7 +61,6 @@ const FILES = path.join(OUT, 'index_files');
     return text;
   };
 
-  // пути внутри самих стилей — файлы лежат рядом
   for (const name of fs.readdirSync(FILES)) {
     if (!name.endsWith('.css')) continue;
     const f = path.join(FILES, name);
@@ -58,22 +69,23 @@ const FILES = path.join(OUT, 'index_files');
     fs.writeFileSync(f, css);
   }
 
-  html = rewrite(html, './index_files/');
+  for (const page of pages) {
+    let html = rewrite(page.html, './index_files/');
 
-  // служебные скрипты WordPress: на статике падают с ошибкой
-  html = html.replace(/<script id="wp-emoji-settings"[^>]*>[\s\S]*?<\/script>\s*/g, '');
-  html = html.replace(/<script[^>]*>(?:(?!<\/script>)[\s\S])*?_wpemojiSettings[\s\S]*?<\/script>\s*/g, '');
-  html = html.replace(/<script[^>]*wp-emoji-release[^>]*><\/script>\s*/g, '');
+    html = html.replace(/<script id="wp-emoji-settings"[^>]*>[\s\S]*?<\/script>\s*/g, '');
+    html = html.replace(/<script[^>]*>(?:(?!<\/script>)[\s\S])*?_wpemojiSettings[\s\S]*?<\/script>\s*/g, '');
+    html = html.replace(/<script[^>]*wp-emoji-release[^>]*><\/script>\s*/g, '');
 
-  // ссылки: страница Контакты — это сама копия, остальных страниц в ней нет
-  html = html.replace(/http:\/\/localhost:8080\/contacts\/#/g, '#');
-  html = html.replace(/http:\/\/localhost:8080\/contacts\//g, 'index.html');
-  html = html.replace(/http:\\?\/\\?\/localhost:8080\\?\/[^"'\s>]*/g,
-    'https://privarnikova.github.io/onyca-static/');
-  html = html.replace(/href="https:\/\/privarnikova\.github\.io\/onyca-static\/"/g, 'href="#"');
-  html = html.replace(/http:\/\/localhost:8080\/[^"'\s>]*/g, '#');
+    html = html.replace(/http:\/\/localhost:8080\/contacts\/#/g, '#');
+    html = html.replace(/http:\/\/localhost:8080\/contacts\//g, 'index.html');
+    html = html.replace(/http:\\?\/\\?\/localhost:8080\\?\/[^"'\s>]*/g,
+      'https://privarnikova.github.io/onyca-static/');
+    html = html.replace(/href="https:\/\/privarnikova\.github\.io\/onyca-static\/"/g, 'href="index.html"');
+    html = html.replace(/http:\/\/localhost:8080\/[^"'\s>]*/g, '#');
 
-  fs.writeFileSync(path.join(OUT, 'index.html'), html);
+    fs.writeFileSync(path.join(OUT, page.out), html);
+    console.log(page.out + ': localhost —', (html.match(/localhost/g) || []).length);
+  }
+
   console.log('файлов в index_files:', fs.readdirSync(FILES).length);
-  console.log('localhost в index.html:', (html.match(/localhost/g) || []).length);
 })();

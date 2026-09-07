@@ -468,14 +468,19 @@ img.site-header__logo-icon {
 		padding: 0;
 		max-height: 0;
 		overflow: hidden;
-		/* Только max-height: padding-top должен примениться мгновенно,
-		   иначе в момент замера высоты в JS его ещё нет и последний пункт
-		   («Все услуги») обрезается на эти 24px. */
 		transition: max-height 0.3s ease;
 	}
 
-	.burger-menu__list .menu-item-has-children.is-open .sub-menu {
-		padding-top: 24px;
+	/*
+	 * Отступ до первого пункта — маргином внутри списка, а не паддингом
+	 * контейнера: так он схлопывается вместе с содержимым при max-height: 0
+	 * и входит в scrollHeight, по которому JS считает высоту раскрытия.
+	 * Паддинг же оставался видимым в закрытом состоянии (пустые 24px под
+	 * «Услугами»), а когда переключался по классу — пропадал рывком до
+	 * начала анимации, из-за чего раскрытие выглядело подтормаживающим.
+	 */
+	.burger-menu__list .sub-menu > li:first-child {
+		margin-top: 24px;
 	}
 
 	.burger-menu__list .sub-menu a {

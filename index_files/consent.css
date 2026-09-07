@@ -1,0 +1,49 @@
+/**
+ * Согласие с политикой — переиспользуемый компонент: круглый контрол,
+ * текст со ссылками и сообщение об ошибке под ним.
+ *
+ * Сетка «контрол | текст»: сообщение встаёт во вторую колонку вторым
+ * рядом, по левому краю текста. Текст НЕ обёрнут в <label> — иначе клик
+ * по нему переключал бы контрол и ссылки на политику стали бы
+ * некликабельными. Отмечается согласие только самим контролом.
+ */
+
+.consent {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	align-items: start;
+	column-gap: 10px;
+	row-gap: 8px;
+}
+
+.consent__text {
+	grid-column: 2;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-footer);
+}
+
+/* Ссылки на политику: при наведении синеют */
+.consent__text a {
+	color: var(--color-text-footer);
+	transition: color 0.2s ease;
+}
+
+.consent__text a:hover {
+	color: var(--color-accent-blue);
+}
+
+.consent__error {
+	grid-column: 2;
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-error);
+}
+
+/* Ошибка: контрол краснеет вместе с сообщением (класс вешает форма) */
+.consent.is-error .radio-control {
+	border-color: var(--color-error);
+}

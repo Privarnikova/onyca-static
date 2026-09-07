@@ -99,63 +99,8 @@
 	grid-column: 1 / -1;
 }
 
-.contact-form__field {
-	display: flex;
-	flex-direction: column;
-	gap: clamp(14px, calc(4px + 0.625vw), 16px);
-}
-
-.contact-form__field label {
-	font-size: var(--font-size-b1);
-	font-weight: var(--font-weight-heading);
-	line-height: var(--line-height-b1);
-	color: var(--color-text);
-}
-
-/*
- * Подпись поля «плавающая», как в макете: пока поле пустое, она стоит у
- * линии и поле низкое (35px на 1920), при вводе поднимается, а текст
- * встаёт на её место. Раньше место под текст было занято всегда, поэтому
- * пустое поле было вдвое выше макета.
- *
- * Работает на :placeholder-shown, поэтому у полей placeholder=" " —
- * пробел, а не текст: видимая подпись это label.
- */
-.contact-form__field {
-	position: relative;
-}
-
-.contact-form__field label {
-	position: absolute;
-	top: 0;
-	left: 0;
-	pointer-events: none;
-}
-
-.contact-form__field input {
-	width: 100%;
-	padding: 0 0 8px;
-	border: none;
-	border-bottom: 1px solid var(--color-border);
-	background: none;
-	font-family: var(--font-family-base);
-	font-size: var(--font-size-b1);
-	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-b1);
-	color: var(--color-text);
-	transition: padding-top 0.2s ease;
-}
-
-/* Поле с текстом (или в фокусе) — подпись наверх, текст на её место */
-.contact-form__field input:focus,
-.contact-form__field input:not(:placeholder-shown) {
-	padding-top: var(--field-label-shift);
-}
-
-.contact-form__field input:focus {
-	outline: none;
-	/* Чёрная, а не синяя — правка заказчика */
-	border-bottom-color: var(--color-black);
+.contact-form__field--full {
+	grid-column: 1 / -1;
 }
 
 .contact-form__budget {
@@ -232,40 +177,21 @@
 }
 
 /*
- * Сетка «контрол | текст»: метка внутри прозрачна, поэтому оба ложатся
- * прямо в колонки, а сообщение об ошибке встаёт во вторую колонку вторым
- * рядом — по левому краю текста, как в макете.
+ * Состояние «Ошибка» (Figma 1236:1915 и одноимённые узлы на остальных
+ * точках): краснеют подписи обязательных групп. Поле формы красит себя
+ * само (.field.is-error в field.css), здесь — группы формы: теги проекта
+ * и бюджет.
  */
+.contact-form__group.is-error .contact-form__label,
+.contact-form__budget.is-error .contact-form__label {
+	color: var(--color-error);
+}
+
+/* Отступ до согласия — место в форме; сам компонент в consent.css */
 .contact-form__consent {
-	display: grid;
-	grid-template-columns: auto minmax(0, 1fr);
-	align-items: start;
-	column-gap: 10px;
-	row-gap: 8px;
 	margin-top: clamp(32px, calc(2px + 1.875vw), 38px);
 }
 
-	
-
-/*
- * Состояние «Ошибка» (Figma 1236:1915 и одноимённые узлы на остальных
- * точках): краснеют подписи обязательных групп, контрол согласия и
- * появляется сообщение под ним. Цвет — тот же токен, что у контрола.
- */
-.contact-form__group.is-error .contact-form__label,
-.contact-form__budget.is-error .contact-form__label,
-.contact-form__field.is-error label {
-	color: var(--color-error);
-}
-
-.contact-form__error {
-	grid-column: 2;
-	margin: 0;
-	font-size: var(--font-size-b1);
-	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-b1);
-	color: var(--color-error);
-}
 
 .contact-form__consent-text {
 	grid-column: 2;

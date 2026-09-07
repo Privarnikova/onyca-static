@@ -94,10 +94,26 @@
 			document.documentElement.style.paddingRight = '';
 		}
 
+		/*
+		 * Баннер cookie перекрывал бы открытую панель (он fixed внизу
+		 * экрана), поэтому на время открытого меню его прячем и возвращаем
+		 * при закрытии — если посетитель ещё не нажал «Принять».
+		 */
+		function toggleCookieBanner( menuOpen ) {
+			var banner = document.querySelector( '[data-cookie-banner]' );
+
+			if ( ! banner || banner.dataset.accepted === '1' ) {
+				return;
+			}
+
+			banner.hidden = menuOpen;
+		}
+
 		function closeMenu() {
 			toggle.setAttribute( 'aria-expanded', 'false' );
 			menu.hidden = true;
 			unlockScroll();
+			toggleCookieBanner( false );
 		}
 
 		toggle.addEventListener( 'click', function () {
@@ -112,6 +128,7 @@
 			menu.hidden = false;
 			lockScroll();
 			setMenuHeight();
+			toggleCookieBanner( true );
 		} );
 
 		window.addEventListener( 'resize', function () {
@@ -236,6 +253,26 @@
 		}
 
 		var consentError = form.querySelector( '[data-consent-error]' );
+
+		/*
+		 * «Расскажите о проекте» растёт по содержимому: пустое поле в одну
+		 * строку, как соседние, дальше высота по фактическому тексту (в
+		 * макете заполненное поле втрое выше обычного). Считаем по
+		 * scrollHeight, сбрасывая высоту перед замером, иначе она только
+		 * растёт и никогда не уменьшается.
+		 */
+		var textarea = form.querySelector( 'textarea' );
+
+		if ( textarea ) {
+			var resize = function () {
+				textarea.style.height = 'auto';
+				textarea.style.height = textarea.scrollHeight + 'px';
+			};
+
+			textarea.addEventListener( 'input', resize );
+			window.addEventListener( 'resize', resize );
+			resize();
+		}
 
 		function group( name ) {
 			return form.querySelector( '[data-required-group="' + name + '"]' );
@@ -455,6 +492,8 @@
 
 		button.addEventListener( 'click', function () {
 			banner.hidden = true;
+			// Метка в DOM: по ней бургер понимает, что возвращать баннер не нужно.
+			banner.dataset.accepted = '1';
 
 			try {
 				window.localStorage.setItem( KEY, '1' );

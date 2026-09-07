@@ -18,14 +18,19 @@ body {
 	padding: 0;
 }
 
-body {
-	/*
-	 * clip, а не hidden: не создаёт скролл-контейнер, поэтому sticky-шапка
-	 * продолжает работать. Страховка от горизонтального сдвига страницы —
-	 * его могут дать декоративные слои, выходящие за свою рамку (заливка
-	 * кнопок ЦД, размытое «404»).
-	 */
+/*
+ * Страховка от горизонтального сдвига страницы: его могут дать
+ * декоративные слои, выходящие за свою рамку (заливка кнопок ЦД, размытое
+ * «404»). clip, а не hidden — не создаёт скролл-контейнер, sticky-шапка
+ * продолжает работать. На <html>, а не на <body>: в Safari clip на body
+ * ломает position: fixed у потомков — баннер cookie переставал слушать
+ * нажатия.
+ */
+html {
 	overflow-x: clip;
+}
+
+body {
 	font-family: var(--font-family-base);
 	font-size: var(--font-size-body);
 	font-weight: var(--font-weight-body);
@@ -165,11 +170,5 @@ video {
 	.contact-form__consent a:hover,
 	.cookie-banner__text a:hover {
 		color: inherit;
-	}
-
-	.btn--cta:hover,
-	.btn--cookie:hover,
-	.btn--secondary:hover {
-		background-color: inherit;
 	}
 }

@@ -1,0 +1,24 @@
+/**
+ * Шоурил — переиспользуемый блок под видео: серое полотно во всю ширину
+ * родителя. Пропорции и отступы задаёт страница, компонент отвечает
+ * только за вид и за то, что содержимое (видео или превью) заполняет его
+ * целиком.
+ */
+
+.showreel {
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+	background-color: var(--color-surface-alt);
+}
+
+.showreel video,
+.showreel img,
+.showreel iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: none;
+	object-fit: cover;
+}

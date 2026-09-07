@@ -1,0 +1,89 @@
+/**
+ * Поле ввода — переиспользуемый компонент. Класс .field на обёртке,
+ * внутри input (или textarea) и label ПОСЛЕ него: порядок нужен для
+ * селектора состояния, а placeholder=" " (пробел) включает
+ * :placeholder-shown. Видимая подпись — это label, не placeholder.
+ *
+ * Подпись «плавающая»: пока поле пустое, она стоит на месте будущего
+ * текста, при вводе уезжает наверх. Высота поля при этом НЕ меняется —
+ * нижняя линия всегда на одном месте, иначе при заполнении одной колонки
+ * соседняя уезжала бы вниз и форма прыгала.
+ *
+ * Место в сетке (в какой колонке стоит поле) задаёт страница или форма,
+ * компонент об этом ничего не знает.
+ */
+
+.field {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: clamp(14px, calc(4px + 0.625vw), 16px);
+}
+
+.field label {
+	position: absolute;
+	top: var(--field-label-shift);
+	left: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+	transition: top 0.2s ease, font-size 0.2s ease;
+	pointer-events: none;
+}
+
+.field input,
+.field textarea {
+	width: 100%;
+	/* Место под поднятую подпись зарезервировано всегда — линия не ездит */
+	padding: var(--field-label-shift) 0 8px;
+	border: none;
+	border-bottom: 1px solid var(--color-border);
+	background: none;
+	font-family: var(--font-family-base);
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+.field textarea {
+	/* Тянуть за уголок нельзя — высоту считает скрипт по содержимому */
+	display: block;
+	resize: none;
+	overflow: hidden;
+}
+
+/* Поле с текстом (или в фокусе) — подпись уезжает наверх */
+.field input:focus + label,
+.field input:not(:placeholder-shown) + label,
+.field textarea:focus + label,
+.field textarea:not(:placeholder-shown) + label {
+	top: 0;
+}
+
+.field input:focus,
+.field textarea:focus {
+	outline: none;
+	/* Чёрная, а не синяя — правка заказчика */
+	border-bottom-color: var(--color-black);
+}
+
+/*
+ * Автозаполнение: браузер подставляет свой фон (жёлтый в Chrome, голубой
+ * в Safari). Убираем его заливкой внутренней тенью — сам background у
+ * автозаполненного поля переопределить нельзя.
+ */
+.field input:-webkit-autofill,
+.field input:-webkit-autofill:hover,
+.field input:-webkit-autofill:focus {
+	-webkit-box-shadow: 0 0 0 1000px var(--color-white) inset;
+	box-shadow: 0 0 0 1000px var(--color-white) inset;
+	-webkit-text-fill-color: var(--color-text);
+	transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Состояние ошибки — подпись краснеет (валидацию вешает форма) */
+.field.is-error label {
+	color: var(--color-error);
+}
