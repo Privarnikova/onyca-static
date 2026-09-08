@@ -1,0 +1,151 @@
+/**
+ * Страница блога — Figma 1236:4304 (десктоп 1920).
+ *
+ * Сетка неоднородная: два ряда по три карточки, затем статья во всю
+ * ширину, и снова. Внутри ряда одна карточка выше остальных — размеры
+ * обложек из макета: 600×293, 600×500 и 1840×899. Какой размер у какой
+ * статьи, решает шаблон (home.php), CSS только рисует.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов остальных разрешений пока нет.
+ */
+
+.blog-page {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	/* 48px от табов до сетки статей (макет: 321 − 273) */
+	row-gap: 48px;
+	padding-bottom: 118px;
+}
+
+.blog-page__head {
+	display: grid;
+	/* 32px от заголовка до табов (макет: 229 − 197) */
+	row-gap: 32px;
+}
+
+.blog-page__title {
+	margin: 0;
+	font-size: var(--font-size-h1);
+}
+
+/* Табы-фильтры (1236:4378): ряд кнопок, перенос на новую строку */
+.blog-page__filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.blog-page__grid {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 52px между рядами карточек (макет: 606 − 554) */
+	row-gap: 52px;
+	/* Карточки разной высоты выравниваются по верху ряда */
+	align-items: start;
+}
+
+/* Обычная и высокая занимают две колонки, широкая — всю сетку */
+.card-post {
+	grid-column: span 2;
+}
+
+.card-post--wide {
+	grid-column: 1 / -1;
+}
+
+.card-post__link {
+	display: grid;
+	/* 16px от обложки до строки с датой и названием */
+	row-gap: 16px;
+	color: var(--color-text);
+	text-decoration: none;
+}
+
+.card-post__cover {
+	display: block;
+	overflow: hidden;
+	/* Пока обложки нет — светлая подложка, как у карточки проекта */
+	background-color: var(--color-surface-alt);
+	aspect-ratio: 600 / 293;
+}
+
+.card-post--tall .card-post__cover {
+	aspect-ratio: 600 / 500;
+}
+
+.card-post--wide .card-post__cover {
+	aspect-ratio: 1840 / 899;
+}
+
+.card-post__cover img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/*
+ * Дата и название стоят по колонкам сетки: в карточке 600 это две
+ * половины, у широкой — первая колонка и четвёртая с пятой (макет:
+ * дата на 0, название на 930 шириной 600).
+ */
+.card-post__text {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	align-items: start;
+}
+
+.card-post--wide .card-post__text {
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.card-post--wide .card-post__title {
+	grid-column: 4 / 6;
+}
+
+.card-post__date {
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-muted);
+}
+
+.card-post__title {
+	font-size: var(--font-size-h6);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.blog-page__empty {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	color: var(--color-text-muted);
+}
+
+/*
+ * Низ страницы (2093:14193): пагинация у левого края сетки, кнопка
+ * «Посмотреть еще» — по центру страницы, поэтому она в своей колонке
+ * по центру, а не после пагинации.
+ */
+.blog-page__footer {
+	display: grid;
+	/*
+	 * Кнопка стоит ровно по середине страницы, а не по линии сетки:
+	 * равные крайние колонки центрируют её, пагинация в левой прижата
+	 * к краю контейнера.
+	 */
+	grid-template-columns: 1fr auto 1fr;
+	column-gap: var(--grid-gap);
+	align-items: center;
+}
+
+.blog-page__pagination {
+	justify-self: start;
+}
+
+/* Табы-фильтры — тот же компонент, что в форме: ссылка, но без подчёркивания */
+.blog-page__filters .tab-pill {
+	text-decoration: none;
+}

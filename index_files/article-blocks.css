@@ -1,0 +1,433 @@
+/**
+ * Блоки статьи — Figma 1545:3022 (этапы), 1548:3041 (таблица),
+ * 1548:3243 (цифры), 1545:3204 (тезисы), 1548:2951 (буллеты),
+ * 1257:4739 (цитата), 1288:2999 (фото с подписью). Десктоп 1920.
+ *
+ * Всё, что редактор собирает внутри статьи. Файл отдельный от страницы:
+ * те же блоки пойдут в кейсы проектов, когда дойдёт очередь до них.
+ *
+ * Ширины нигде не фиксированы: блок занимает колонку текста целиком, а
+ * внутренние колонки — доли сетки.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов других разрешений пока нет.
+ */
+
+/* Цитата — кавычки и серый текст, 16 между ними (1257:4739) */
+.article-quote {
+	display: flex;
+	gap: 16px;
+	align-items: flex-start;
+	margin: 0;
+}
+
+/*
+ * Текст занимает остаток ширины и не распирает цитату: без min-width
+ * длинное слово без пробелов растягивает флекс-элемент, и цитата
+ * вылезает из своих колонок на соседний блок.
+ */
+.article-quote__text {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.article-quote__mark {
+	flex: none;
+	color: var(--color-black);
+}
+
+.article-quote__text {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-secondary);
+}
+
+/* Фото или видео с подписью (1288:2999) */
+.article-media {
+	margin: 0;
+}
+
+.article-media__frame {
+	aspect-ratio: 910 / 600;
+}
+
+.article-media__caption {
+	/* 16 от полотна до подписи */
+	margin: 16px 0 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-secondary);
+}
+
+/* Этапы (1545:3022): номер и заголовок в строку, снизу линия */
+.article-stages {
+	display: grid;
+	/* 24 между этапами */
+	row-gap: 24px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.article-stages__item {
+	display: grid;
+	/* 16 от заголовка до описания, 24 от описания до линии */
+	row-gap: 16px;
+	padding-bottom: 24px;
+	border-bottom: 1px solid var(--color-divider);
+}
+
+.article-stages__heading {
+	display: flex;
+	/* Номер занимает свою долю строки: 47px при кегле 20 — 2.35em */
+	gap: 0;
+	margin: 0;
+	font-size: var(--font-size-h5);
+}
+
+.article-stages__number {
+	flex: 0 0 2.35em;
+}
+
+.article-stages__text {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-secondary);
+}
+
+/* Цифры (1548:3243): до трёх показателей в ряд, по колонкам */
+.article-numbers {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--grid-gap);
+	margin: 0;
+}
+
+.article-numbers__item {
+	display: grid;
+	/* 16 от числа до подписи */
+	row-gap: 16px;
+	align-content: start;
+}
+
+.article-numbers__value {
+	margin: 0;
+	font-size: var(--font-size-number-inline);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.article-numbers__label {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-secondary);
+}
+
+/* Тезисы (1545:3204): две колонки, заголовок и серый текст */
+.article-theses {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--grid-gap);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.article-theses__item {
+	display: grid;
+	/* 16 от заголовка до текста */
+	row-gap: 16px;
+	align-content: start;
+}
+
+.article-theses__title {
+	margin: 0;
+	font-size: var(--font-size-h5);
+}
+
+.article-theses__text {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-secondary);
+}
+
+/**
+ * Содержимое статьи: отступы между блоками и вид стандартных блоков
+ * редактора — абзацев, заголовков, буллетов и таблицы.
+ *
+ * Отступы в макете задаются перед элементом и зависят от его типа
+ * (легенды «64px», «32px», «16px», «48px» рядом с телом статьи
+ * 1274:1773). Поэтому здесь margin-top по типам, а не общий row-gap.
+ */
+.article-content {
+	/*
+	 * Тело статьи — сетка страницы целиком: текст стоит в колонках 3–5,
+	 * а заголовок раздела и цитата выносятся на поля, в колонки 1–2.
+	 * Раскладка именно сеткой, а не выносом из потока: так вынесенные
+	 * элементы занимают своё место и не наезжают друг на друга, какой бы
+	 * длины ни было содержимое.
+	 */
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* Блоки в строке держатся верха, а не растягиваются по её высоте */
+	align-items: start;
+	/*
+	 * Слово, которое не влезает в свою колонку, переносится по буквам
+	 * (в макете у всех текстов статьи стоит word-break: break-word).
+	 * Иначе длинная строка без пробелов ломает сетку.
+	 */
+	overflow-wrap: anywhere;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+.article-content > * {
+	grid-column: 3 / 6;
+	/* Текст, буллеты, подписи — 16 от предыдущего блока */
+	margin-top: 16px;
+}
+
+.article-content > :first-child {
+	margin-top: 0;
+}
+
+.article-content > h2 {
+	margin-top: 64px;
+}
+
+.article-content > h3 {
+	margin-top: 32px;
+}
+
+/* Крупные блоки отбиваются сильнее — 48 (легенды у таблицы, этапов,
+   цифр, тезисов и фото) */
+.article-content > .wp-block-table,
+.article-content > .article-stages,
+.article-content > .article-numbers,
+.article-content > .article-theses,
+.article-content > .article-media {
+	margin-top: 48px;
+}
+
+.article-content > p {
+	margin-bottom: 0;
+}
+
+/*
+ * Заголовки внутри статьи мельче заголовков страницы: в макете строка
+ * H1 в теле — 29px, H2 — 24, H3 — 19, то есть кегли 24, 20 и 16. Это
+ * готовые стили типографики H4, H5 и H6, поэтому берём их токенами, а
+ * не задаём числа заново: на 1600 и ниже размеры уедут вместе со всей
+ * типографикой сайта.
+ */
+.article-content > h1 {
+	font-size: var(--font-size-h4);
+}
+
+.article-content > h2 {
+	font-size: var(--font-size-h5);
+}
+
+.article-content > h3 {
+	font-size: var(--font-size-h6);
+}
+
+/*
+ * Поля слева. Два элемента стоят не в колонке текста, а в колонках 1–2:
+ * заголовок раздела H1 (1257:4845 и 1865:4161 — оба на x 40) и цитата
+ * (1257:4739).
+ *
+ * Блок, который идёт следом, встаёт в ту же строку сетки — справа от
+ * них. А два вынесенных элемента подряд идут друг под другом, каждый со
+ * своим отступом.
+ */
+.article-content > h1,
+.article-content > .article-quote {
+	grid-column: 1 / 3;
+}
+
+/*
+ * Заголовок раздела и блок, который идёт за ним, — это одна строка
+ * статьи: слева заголовок, справа текст. Поэтому оба отбиваются от
+ * предыдущего блока одинаково — на 118, как первый экран отбивается от
+ * шоурила, — и их верхние границы совпадают.
+ */
+.article-content > h1,
+.article-content > h1 + :is(h2, h3, p, ul, .wp-block-table, .article-stages, .article-numbers, .article-theses, .article-media) {
+	margin-top: 118px;
+}
+
+/* Первая строка тела своего отступа не имеет: его задаёт первый экран */
+.article-content > h1:first-child,
+.article-content > h1:first-child + :is(h2, h3, p, ul, .wp-block-table, .article-stages, .article-numbers, .article-theses, .article-media) {
+	margin-top: 0;
+}
+
+/*
+ * Цитата так же встаёт вровень с блоком, рядом с которым её поставил
+ * редактор (в макете — вровень с верхом второго шоурила), поэтому
+ * отступ сверху берёт такой же, какой у следующего блока.
+ */
+.article-content > .article-quote:has(+ h2) {
+	margin-top: 64px;
+}
+
+.article-content > .article-quote:has(+ h3) {
+	margin-top: 32px;
+}
+
+.article-content > .article-quote:has(+ .wp-block-table),
+.article-content > .article-quote:has(+ .article-stages),
+.article-content > .article-quote:has(+ .article-numbers),
+.article-content > .article-quote:has(+ .article-theses),
+.article-content > .article-quote:has(+ .article-media) {
+	margin-top: 48px;
+}
+
+/*
+ * Буллеты (1548:2951): точка 6px в поле шириной 36, между пунктами 4.
+ * Селектор именно по классу блока списка: тезисы и этапы — тоже списки,
+ * но со своей раскладкой.
+ */
+.article-content ul.wp-block-list {
+	display: grid;
+	row-gap: 4px;
+	/* Отступ сверху общий для всех блоков — здесь только низ */
+	margin-bottom: 0;
+	padding-left: 0;
+	list-style: none;
+}
+
+.article-content ul.wp-block-list > li {
+	position: relative;
+	/* 36px при кегле 16 — 2.25em, дальше растёт вместе с текстом */
+	padding-left: 2.25em;
+}
+
+.article-content ul.wp-block-list > li::before {
+	content: "";
+	position: absolute;
+	/* Центр точки на 18px от края: 1.125em минус её радиус */
+	left: 0.9375em;
+	/* Середина первой строки минус радиус */
+	top: calc(var(--line-height-b1) / 2 * 1em - 0.1875em);
+	width: 0.375em;
+	height: 0.375em;
+	border-radius: 50%;
+	background-color: var(--color-black);
+}
+
+/*
+ * Таблица (1548:3041): заголовки серые, строки разделены линией.
+ * Вертикальных линий и заливки нет — только сетка отступов: 24 от
+ * текста до линии и столько же до следующей строки.
+ *
+ * Колонки должны совпадать с колонками сетки (290 при трёх колонках в
+ * колонке текста 910), а между ними стоит общий зазор. Обычная
+ * табличная раскладка так не умеет: она делит ширину поровну вместе с
+ * отступами, и колонки уезжают с сетки на 7–14 пикселей. Поэтому строка
+ * раскладывается сеткой, как и остальные блоки страницы.
+ *
+ * Роли таблицы при этом не теряются: их проставляет PHP (см.
+ * onyca_table_roles в inc/blocks.php) — без них display: grid лишает
+ * таблицу смысла для чтения с экрана.
+ *
+ * Сколько в таблице колонок, видно только из разметки — :has() читает
+ * это по последней ячейке строки.
+ */
+.article-content .wp-block-table {
+	--table-columns: 3;
+}
+
+.article-content .wp-block-table:has(tr > :nth-child(2):last-child) {
+	--table-columns: 2;
+}
+
+/*
+ * Две колонки в макете не равные: первая — одна колонка сетки, вторая —
+ * две (290 и 600, вариант «4 пункта 2 столбца»). Поэтому строка делится
+ * на три доли, а вторая ячейка занимает две.
+ */
+.article-content .wp-block-table:has(tr > :nth-child(2):last-child) tr {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.article-content .wp-block-table:has(tr > :nth-child(2):last-child) tr > :last-child {
+	grid-column: span 2;
+}
+
+.article-content .wp-block-table:has(tr > :nth-child(4):last-child) {
+	--table-columns: 4;
+}
+
+/*
+ * Обёртка таблицы: боковые отступы у figure браузерные, снизу — от
+ * стилей блоков WordPress, нам они не нужны.
+ */
+.article-content .wp-block-table {
+	margin-inline: 0;
+	margin-bottom: 0;
+}
+
+.article-content .wp-block-table table,
+.article-content .wp-block-table thead,
+.article-content .wp-block-table tbody {
+	display: block;
+	width: 100%;
+	/* Своей линии под шапкой в макете нет — у блока таблицы WordPress
+	   она стоит по умолчанию (3px) */
+	border: none;
+	border-collapse: collapse;
+	/*
+	 * Между строками в разметке стоят переводы строк. При обычной
+	 * табличной раскладке они не видны, а у блочной становятся строкой
+	 * текста и добавляют лишние 3 пикселя между шапкой и первой строкой.
+	 */
+	line-height: 0;
+}
+
+.article-content .wp-block-table tr {
+	display: grid;
+	grid-template-columns: repeat(var(--table-columns), minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 24 от текста до линии */
+	padding-bottom: 24px;
+}
+
+.article-content .wp-block-table tbody tr {
+	border-bottom: 1px solid var(--color-divider);
+}
+
+/* Каждая следующая строка отбивается от линии предыдущей */
+.article-content .wp-block-table tbody tr + tr {
+	padding-top: 24px;
+}
+
+.article-content .wp-block-table th,
+.article-content .wp-block-table td {
+	padding: 0;
+	border: none;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	text-align: left;
+}
+
+.article-content .wp-block-table th {
+	color: var(--color-text-disclaimer);
+}
+
+.article-content .wp-block-table td {
+	color: var(--color-text);
+}

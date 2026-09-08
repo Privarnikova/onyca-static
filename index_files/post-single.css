@@ -1,0 +1,208 @@
+/**
+ * Страница статьи — Figma 1257:4539 (десктоп 1920), fileKey
+ * 93JlTAOwjlBO4naQ7ReAFF.
+ *
+ * Первый экран: крошки, заголовок и описание, обложка во всю ширину.
+ * Ниже — тело статьи в колонках 3–5 сетки; его содержимое описано в
+ * components/article-blocks.css.
+ *
+ * Отступы по вертикали разные (18 от крошек, 118 от обложки до текста,
+ * 188 до «Других статей»), поэтому это не общий row-gap, а отступ у
+ * каждой части.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов других разрешений пока нет.
+ */
+
+.post-single {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 188 от последней карточки «Других статей» до подвала */
+	padding-bottom: 188px;
+}
+
+.post-single > * {
+	grid-column: 1 / -1;
+}
+
+.post-single__hero {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 52 от заголовка с описанием до обложки */
+	row-gap: 52px;
+	/* 18 от крошек */
+	margin-top: 18px;
+}
+
+.post-single__title {
+	grid-column: 1 / 4;
+	margin: 0;
+}
+
+.post-single__summary {
+	grid-column: 4 / 6;
+	display: grid;
+	align-content: start;
+	/* 42 от описания до «Темы статьи» */
+	row-gap: 42px;
+}
+
+.post-single__lead {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+.post-single__facts {
+	display: grid;
+	/* 42 между парами «подпись — значение» */
+	row-gap: 42px;
+	margin: 0;
+}
+
+.post-single__fact {
+	display: grid;
+	/* 12 от подписи до значения */
+	row-gap: 12px;
+}
+
+.post-single__fact-label {
+	margin: 0;
+	font-size: var(--font-size-h6);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+}
+
+.post-single__fact-value {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-secondary);
+}
+
+.post-single__cover {
+	/* Обложка идёт во всю ширину сетки, под заголовком и описанием */
+	grid-column: 1 / -1;
+	aspect-ratio: 1840 / 900;
+}
+
+.post-single__body {
+	/* Тело занимает всю сетку: колонки внутри распределяет само —
+	   текст в 3–5, поля с цитатой и заголовком раздела в 1–2 */
+	grid-column: 1 / -1;
+	/* 118 от обложки до первой строки текста */
+	margin-top: 118px;
+}
+
+/* «Другие статьи» (1293:2326) */
+.other-articles {
+	display: grid;
+	/* 38 от заголовка до карточек */
+	row-gap: 38px;
+	/* 188 от текста статьи */
+	margin-top: 188px;
+}
+
+.other-articles__title {
+	margin: 0;
+}
+
+.other-articles__link {
+	display: inline-flex;
+	align-items: center;
+	/* 16 от текста до стрелки */
+	gap: 16px;
+	color: var(--color-text);
+	text-decoration: none;
+}
+
+.other-articles__arrow {
+	color: var(--color-accent-pink);
+}
+
+.other-articles__grid {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+}
+
+/* Розовая стрелка при наведении чернеет — как в прайс-листе */
+@media (hover: hover) and (min-width: 1200px) {
+	.other-articles__link:hover .other-articles__arrow {
+		color: var(--color-text);
+	}
+}
+
+/*
+ * Ниже 1200 макетов статьи нет. Чтобы страница не разъезжалась,
+ * колонки складываются: заголовок и описание идут друг под другом,
+ * текст занимает всю ширину, цитата встаёт в поток на своё место.
+ */
+@media (max-width: 1199px) {
+	.post-single__hero {
+		row-gap: 32px;
+	}
+
+	.post-single__title,
+	.post-single__summary {
+		grid-column: 1 / -1;
+	}
+
+	.post-single__summary {
+		row-gap: 32px;
+	}
+
+	.post-single__facts {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		column-gap: var(--grid-gap);
+		row-gap: 32px;
+	}
+
+	.post-single__body {
+		margin-top: 52px;
+	}
+
+	/* Полей слева нет — всё идёт одной колонкой, друг под другом */
+	.article-content {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.article-content > *,
+	.article-content > h1,
+	.article-content > .article-quote {
+		grid-column: 1 / -1;
+	}
+
+	.article-content > h1,
+	.article-content > .article-quote {
+		margin-top: 48px;
+	}
+
+	.other-articles {
+		margin-top: 78px;
+	}
+
+	.post-single {
+		padding-bottom: 78px;
+	}
+
+	.other-articles__grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 699px) {
+	.post-single__facts,
+	.other-articles__grid {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 32px;
+	}
+
+	.article-numbers,
+	.article-theses {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}

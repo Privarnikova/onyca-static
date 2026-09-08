@@ -1613,6 +1613,61 @@
 		} );
 	}
 
+	/**
+	 * «Посмотреть еще» на странице блога: подгружает следующую страницу
+	 * статей в ту же сетку, не перезагружая страницу (2093:14193).
+	 *
+	 * Берём готовую разметку следующей страницы и переносим из неё
+	 * карточки — так раскладка (обычная, высокая, широкая) остаётся
+	 * ровно такой, какой её посчитал шаблон. Без скрипта ссылка просто
+	 * ведёт на вторую страницу, поэтому кнопка работает всегда.
+	 */
+	function initLoadMore() {
+		var area = document.querySelector( '[data-load-more-area]' );
+		var grid = document.querySelector( '.blog-page__grid' );
+
+		if ( ! area || ! grid ) {
+			return;
+		}
+
+		area.addEventListener( 'click', function ( event ) {
+			var button = event.target.closest( '[data-load-more]' );
+
+			if ( ! button || button.classList.contains( 'is-loading' ) ) {
+				return;
+			}
+
+			event.preventDefault();
+			button.classList.add( 'is-loading' );
+
+			window.fetch( button.href, { credentials: 'same-origin' } )
+				.then( function ( response ) {
+					return response.ok ? response.text() : Promise.reject( response.status );
+				} )
+				.then( function ( html ) {
+					var next = new DOMParser().parseFromString( html, 'text/html' );
+
+					next.querySelectorAll( '.blog-page__grid .card-post' ).forEach( function ( card ) {
+						grid.appendChild( card );
+					} );
+
+					/* Пагинация и сама кнопка приезжают из ответа уже с новыми адресами */
+					var footer = next.querySelector( '[data-load-more-area]' );
+
+					if ( footer ) {
+						area.innerHTML = footer.innerHTML;
+					} else {
+						button.remove();
+					}
+				} )
+				.catch( function () {
+					/* Не смогли догрузить — оставляем кнопку обычной ссылкой */
+					button.classList.remove( 'is-loading' );
+					window.location.href = button.href;
+				} );
+		} );
+	}
+
 	function initShowreelWatch() {
 		var blocks = document.querySelectorAll( '[data-showreel-watch]' );
 
@@ -1828,6 +1883,7 @@
 		initServicesHover();
 		initHeaderDropdown();
 		initCounters();
+		initLoadMore();
 		initShowreelWatch();
 		initStackedProjects();
 		initClientLogos();

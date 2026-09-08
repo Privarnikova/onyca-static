@@ -1,0 +1,39 @@
+/**
+ * Крошки — Figma 2118:14820 (десктоп 1920): «Блог • Статья».
+ *
+ * Текущая страница серая и без ссылки, разделитель — точка 4px того же
+ * серого. Компонент общий: те же крошки пойдут в кейсы проектов.
+ */
+
+.breadcrumbs {
+	display: flex;
+	align-items: center;
+	/* 10px между текстом и точкой — макет 2118:14822 */
+	gap: 10px;
+	font-size: var(--font-size-body-sm);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+.breadcrumbs__link {
+	color: var(--color-text);
+	text-decoration: none;
+}
+
+.breadcrumbs__dot {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background-color: var(--color-text-disclaimer);
+}
+
+.breadcrumbs__current {
+	color: var(--color-text-disclaimer);
+}
+
+/* Наведение — только с 1200 и на устройствах с курсором */
+@media (hover: hover) and (min-width: 1200px) {
+	.breadcrumbs__link:hover {
+		color: var(--color-text-disclaimer);
+	}
+}

@@ -1,8 +1,8 @@
 /**
  * Снимает статическую копию сайта с локального WordPress в
- * ~/Desktop/onyca-static: главную (index.html), страницу Контактов
- * (contacts.html) и страницу 404 (404.html — GitHub Pages сам отдаёт её
- * на несуществующие адреса).
+ * ~/Desktop/onyca-static: главную (index.html), Контакты, прайс-лист,
+ * страницы направлений, блог со статьями и страницу 404 (404.html —
+ * GitHub Pages сам отдаёт её на несуществующие адреса).
  *
  * Скачивает стили, скрипты, картинки и шрифты в index_files/, переписывает
  * пути на относительные, убирает ссылки на localhost и служебные скрипты
@@ -52,6 +52,7 @@ const PAGES = [
   { url: 'http://localhost:8080/services/branding/', out: 'branding.html' },
   { url: 'http://localhost:8080/services/ux-ui/', out: 'ux-ui.html' },
   { url: 'http://localhost:8080/services/cg-motion/', out: 'cg-motion.html' },
+  { url: 'http://localhost:8080/blog/', out: 'blog.html' },
   { url: 'http://localhost:8080/no-such-page-for-404/', out: '404.html' },
 ];
 
@@ -66,13 +67,47 @@ const ROUTES = [
   ['/services/cg-motion/', 'cg-motion.html'],
   ['/services/', 'price-list.html'],
   ['/contacts/', 'contacts.html'],
+  ['/blog/', 'blog.html'],
 ];
 const OUT = path.join(process.env.HOME, 'Desktop/onyca-static');
 const FILES = path.join(OUT, 'index_files');
 
+/**
+ * Статьи блога в список страниц вручную не вписываем: их количество
+ * меняется. Открываем блог и берём адреса прямо с карточек — тогда в
+ * копию попадают все статьи, и ссылки между ними работают.
+ *
+ * @param {import('playwright').Browser} browser
+ */
+async function collectArticles( browser ) {
+  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+
+  await page.goto('http://localhost:8080/blog/', { waitUntil: 'load' });
+
+  const links = await page.evaluate(() => [...new Set(
+    [...document.querySelectorAll('.card-post__link')].map(a => a.href)
+  )]);
+
+  await page.close();
+
+  for (const link of links) {
+    const slug = new URL(link).pathname.replace(/\//g, '');
+    const out = 'article-' + slug + '.html';
+
+    PAGES.splice(PAGES.length - 1, 0, { url: link, out });
+    ROUTES.push(['/' + slug + '/', out]);
+  }
+
+  /* Длинные пути должны стоять раньше коротких — иначе короткий
+     подменит начало длинного */
+  ROUTES.sort((a, b) => b[0].length - a[0].length);
+}
+
 (async () => {
   const executablePath = findChromium();
   const browser = await chromium.launch(executablePath ? { executablePath } : {});
+
+  await collectArticles(browser);
   const assets = new Map();
   const pages = [];
 
@@ -166,6 +201,9 @@ const FILES = path.join(OUT, 'index_files');
     html = html.replace(/http:\/\/localhost:8080\/'/g, "index.html'");
     html = html.replace(/http:\\?\/\\?\/localhost:8080\\?\/[^"'\s>]*/g,
       'https://privarnikova.github.io/onyca-static/');
+    // Адрес без пути — так он записан в разметке Yoast (JSON-LD), где
+    // слэши экранированы: предыдущее правило его не ловит.
+    html = html.replace(/http:\\?\/\\?\/localhost:8080/g, 'https://privarnikova.github.io/onyca-static');
     html = html.replace(/href="https:\/\/privarnikova\.github\.io\/onyca-static\/"/g, 'href="index.html"');
     html = html.replace(/http:\/\/localhost:8080\/[^"'\s>]*/g, '#');
 
