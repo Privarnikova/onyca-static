@@ -1442,6 +1442,97 @@
 	}
 
 	/**
+	 * Шоурил: при наведении курсор заменяется круглой кнопкой
+	 * «Смотреть» — она встаёт ровно под указателем и движется вместе с
+	 * ним (макет 1768:3949, референс из ТЗ — celerart.com).
+	 *
+	 * Кнопку добавляем здесь, а не в шаблонах: так любой шоурил с
+	 * атрибутом data-showreel-watch получает её сам, и разметку
+	 * дублировать не нужно.
+	 */
+	function initShowreelWatch() {
+		var blocks = document.querySelectorAll( '[data-showreel-watch]' );
+
+		if ( ! blocks.length ) {
+			return;
+		}
+
+		/* Ниже 1200 и на тач-экранах эффектов наведения в проекте нет */
+		if ( ! window.matchMedia( '(hover: hover) and (min-width: 1200px)' ).matches ) {
+			return;
+		}
+
+		/*
+		 * Кнопка одна на все шоурилы и лежит в body, а не внутри блока:
+		 * шоурил на первом экране увеличивается при прокрутке, и кнопка
+		 * внутри него растягивалась бы вместе с видео и уезжала от
+		 * курсора. Снаружи она держится координат окна — размер
+		 * постоянный, положение точно под указателем.
+		 */
+		var button = document.createElement( 'span' );
+
+		button.className = 'showreel__watch';
+		button.setAttribute( 'aria-hidden', 'true' );
+		button.textContent = 'Смотреть';
+		document.body.appendChild( button );
+
+		var pointer = { x: 0, y: 0 };
+		var known = false;
+		var pending = false;
+
+		function apply() {
+			button.style.left = pointer.x + 'px';
+			button.style.top = pointer.y + 'px';
+		}
+
+		/*
+		 * Показывать кнопку по mouseenter/mouseleave нельзя: при прокрутке
+		 * курсор стоит на месте, а шоурил уезжает из-под него или, наоборот,
+		 * возвращается — событий браузер в этот момент не шлёт. Поэтому
+		 * состояние кнопки всегда считаем сами по тому, что лежит под
+		 * указателем, и пересчитываем и на движении мыши, и на прокрутке.
+		 */
+		function sync() {
+			pending = false;
+
+			if ( ! known ) {
+				return;
+			}
+
+			apply();
+
+			var under = document.elementFromPoint( pointer.x, pointer.y );
+
+			button.classList.toggle(
+				'is-visible',
+				!! ( under && under.closest( '[data-showreel-watch]' ) )
+			);
+		}
+
+		function schedule() {
+			if ( ! pending ) {
+				pending = true;
+				window.requestAnimationFrame( sync );
+			}
+		}
+
+		document.addEventListener( 'mousemove', function ( event ) {
+			pointer.x = event.clientX;
+			pointer.y = event.clientY;
+			known = true;
+			schedule();
+		}, { passive: true } );
+
+		window.addEventListener( 'scroll', schedule, { passive: true } );
+
+		/* Курсор ушёл за пределы окна — кнопке незачем оставаться */
+		document.addEventListener( 'mouseleave', function () {
+			known = false;
+			button.classList.remove( 'is-visible' );
+		} );
+	}
+
+	/**
 	 * «Проекты студии»: карточки складываются стопкой.
 	 *
 	 * Само наложение делает CSS (карточки липкие), а здесь — только
@@ -1572,6 +1663,7 @@
 		initDiscussButton();
 		initHeroShowreel();
 		initServicesHover();
+		initShowreelWatch();
 		initStackedProjects();
 		initClientLogos();
 	} );

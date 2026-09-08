@@ -22,3 +22,70 @@
 	border: none;
 	object-fit: cover;
 }
+
+/*
+ * Кнопка «Смотреть» — Figma 1768:3949 (десктоп 1920): белый круг 99px с
+ * подписью 14px, появляется при наведении и следует за курсором
+ * (референс из ТЗ — celerart.com).
+ *
+ * Разметку добавляет JS (initShowreelWatch), поэтому шаблоны знать о
+ * кнопке не обязаны: достаточно пометить шоурил атрибутом
+ * data-showreel-watch.
+ *
+ * Своего макета на других разрешениях нет — круг просто уменьшается
+ * вместе с шириной окна.
+ */
+.showreel__watch {
+	/*
+	 * Кнопка лежит в body и держится координат окна: шоурил первого
+	 * экрана растёт при прокрутке, и внутри него кнопка растягивалась бы
+	 * вместе с видео.
+	 */
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 250;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: clamp(64px, 5.156vw, 99px);
+	height: clamp(64px, 5.156vw, 99px);
+	border-radius: var(--radius-pill);
+	background-color: var(--color-white);
+	color: var(--color-text);
+	font-family: var(--font-family-base);
+	font-size: var(--font-size-button-sm);
+	font-weight: var(--font-weight-button);
+	line-height: var(--line-height-button);
+	white-space: nowrap;
+	opacity: 0;
+	/*
+	 * Кнопка вырастает из точки под курсором и так же схлопывается
+	 * обратно — центр круга и есть указатель.
+	 */
+	transform: translate(-50%, -50%) scale(0);
+	transition: opacity 0.25s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+	pointer-events: none;
+	will-change: transform;
+}
+
+.showreel__watch.is-visible {
+	opacity: 1;
+	transform: translate(-50%, -50%) scale(1);
+}
+
+/*
+ * Кнопка заменяет курсор, поэтому системный указатель на шоуриле
+ * прячем — иначе их видно два.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.showreel[data-showreel-watch] {
+		cursor: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.showreel__watch {
+		transition: opacity 0.2s ease;
+	}
+}
