@@ -58,15 +58,21 @@
 }
 
 .service-list__item {
+	position: relative;
+	border-bottom: 1px solid var(--color-divider);
+}
+
+.service-list__row {
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);
 	padding: 32px 0;
-	border-bottom: 1px solid var(--color-divider);
 	font-size: var(--font-size-h4);
 	font-weight: var(--font-weight-heading);
 	line-height: var(--line-height-heading);
 	color: var(--color-text);
+	text-decoration: none;
+	transition: color 0.3s ease;
 }
 
 .service-list__name {
@@ -75,6 +81,49 @@
 
 .service-list__price {
 	grid-column: 4 / 5;
+}
+
+/*
+ * Наведение на услугу (1789:4076): список уходит в серый, строка под
+ * курсором остаётся чёрной, справа в пятой–шестой колонках появляется
+ * визуал проекта. Всё как в блоке специализаций на главной — тот же
+ * приём, только баннер стоит по центру строки, а не над ней.
+ */
+.service-list__preview {
+	position: absolute;
+	top: 50%;
+	/* Пятая колонка: четыре колонки плюс четыре зазора от левого края */
+	left: calc(4 * (100% - 5 * var(--grid-gap)) / 6 + 4 * var(--grid-gap));
+	z-index: 2;
+	display: block;
+	/* Две колонки — 600px на 1920 */
+	width: calc(2 * (100% - 5 * var(--grid-gap)) / 6 + var(--grid-gap));
+	height: 294px;
+	overflow: hidden;
+	background-color: var(--color-surface-alt);
+	opacity: 0;
+	transform: translate(0, -50%) scale(0.98);
+	transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+	pointer-events: none;
+}
+
+.service-list__preview img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.service-list__items.is-hovered .service-list__row {
+	color: var(--color-text-disclaimer);
+}
+
+.service-list__items.is-hovered .service-list__item.is-active .service-list__row {
+	color: var(--color-text);
+}
+
+.service-list__item.is-active .service-list__preview {
+	opacity: 1;
+	transform: translate(0, -50%) scale(1);
 }
 
 /* Кейс направления (1161:1565): заголовок и ролик 1840×900 под ним */
@@ -91,14 +140,17 @@
 }
 
 /*
- * Этапы работы (2892:5443). Номер и название в левой половине,
- * описание — в правой; снизу линия, до неё 78px.
+ * Этапы работы (2892:5381). Номер и название идут одной строкой в
+ * колонках 1–2, описание — в колонках 4–6 (это ровно 910px макета при
+ * контейнере 1840 и зазоре 20). Между этапами 52 — зазор списка, а не
+ * маргин у соседа.
  */
 .work-stages__list {
+	display: grid;
+	row-gap: 52px;
 	margin: 0;
 	padding: 0;
 	list-style: none;
-	counter-reset: stage;
 }
 
 .work-stages__item {
@@ -109,13 +161,12 @@
 	border-bottom: 1px solid var(--color-divider);
 }
 
-.work-stages__item + .work-stages__item {
-	/* 52px от линии до следующего этапа */
-	margin-top: 52px;
-}
-
-.work-stages__number,
-.work-stages__title {
+.work-stages__heading {
+	grid-column: 1 / 3;
+	display: flex;
+	align-items: start;
+	/* 8px между номером и названием при кегле 32 — макет 2892:5353 */
+	gap: 0.25em;
 	margin: 0;
 	font-size: var(--font-size-h3);
 	font-weight: var(--font-weight-heading);
@@ -124,38 +175,56 @@
 }
 
 .work-stages__number {
-	grid-column: 1 / 2;
-	/* 52px под номер, дальше название с отступом 8 (макет: 0 и 60) */
-	max-width: 52px;
+	/*
+	 * Ширина колонки номера и зазор заданы в em, а не в пикселях: на
+	 * макете это 52 и 8 при кегле 32, и в долях кегля они останутся
+	 * верными на любой точке, когда --font-size-h3 уменьшится. Ширина
+	 * нужна фиксированная в пределах строки — иначе названия этапов
+	 * разъедутся: «01.» и «10.» разной длины.
+	 */
+	flex: 0 0 1.625em;
 }
 
 .work-stages__title {
-	grid-column: 1 / 3;
-	/* Название начинается за номером: 60px от левого края строки */
-	margin-left: 60px;
+	flex: 1;
 }
 
 .work-stages__text {
 	grid-column: 4 / -1;
-	margin: 0;
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
 	line-height: var(--line-height-b1);
 	color: var(--color-text);
 }
 
+.work-stages__text p {
+	margin: 0;
+}
+
+.work-stages__text p + p {
+	/* В макете абзацы разделены пустой строкой — это ровно интерлиньяж */
+	margin-top: calc(var(--line-height-b1) * 1em);
+}
+
 /*
  * Сотрудничество (2594:5313): заголовок и шесть тезисов в три колонки,
  * под каждым линия.
  */
+.collaboration {
+	display: grid;
+	/* 52px от заголовка до тезисов — зазор сетки, а не маргин заголовка */
+	row-gap: 52px;
+}
+
 .collaboration__title {
-	margin: 0 0 52px;
+	margin: 0;
 	font-size: var(--font-size-h2);
 }
 
 .collaboration__list {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	/* Общая сетка страницы: тезис занимает две колонки — 600px на 1920 */
+	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);
 	row-gap: 52px;
 	margin: 0;
@@ -164,6 +233,7 @@
 }
 
 .collaboration__item {
+	grid-column: span 2;
 	padding-bottom: 32px;
 	border-bottom: 1px solid var(--color-divider);
 	font-size: var(--font-size-b1);
@@ -180,12 +250,16 @@
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);
+	/* Заголовок и показатели выравниваются по верху, а не тянутся */
+	align-items: start;
 }
 
 .numbers__title {
 	grid-column: 1 / 3;
 	margin: 0;
 	font-size: var(--font-size-h2);
+	/* Перенос после «каждым» — как в макете 2366:3821 */
+	white-space: pre-line;
 }
 
 .numbers__list {
@@ -205,8 +279,7 @@
 
 .numbers__value {
 	margin: 0;
-	/* 78px высотой в макете — это H1 при line-height 1.2, кегль 65 */
-	font-size: 65px;
+	font-size: var(--font-size-number);
 	font-weight: var(--font-weight-heading);
 	line-height: var(--line-height-heading);
 	color: var(--color-text);

@@ -48,7 +48,24 @@ function findChromium() {
 const PAGES = [
   { url: 'http://localhost:8080/', out: 'index.html' },
   { url: 'http://localhost:8080/contacts/', out: 'contacts.html' },
+  { url: 'http://localhost:8080/services/', out: 'price-list.html' },
+  { url: 'http://localhost:8080/services/branding/', out: 'branding.html' },
+  { url: 'http://localhost:8080/services/ux-ui/', out: 'ux-ui.html' },
+  { url: 'http://localhost:8080/services/cg-motion/', out: 'cg-motion.html' },
   { url: 'http://localhost:8080/no-such-page-for-404/', out: '404.html' },
+];
+
+/*
+ * Внутренние адреса, которые в копии существуют. Порядок важен: сначала
+ * длинные пути (/services/branding/), иначе более короткий /services/
+ * подменил бы их начало.
+ */
+const ROUTES = [
+  ['/services/branding/', 'branding.html'],
+  ['/services/ux-ui/', 'ux-ui.html'],
+  ['/services/cg-motion/', 'cg-motion.html'],
+  ['/services/', 'price-list.html'],
+  ['/contacts/', 'contacts.html'],
 ];
 const OUT = path.join(process.env.HOME, 'Desktop/onyca-static');
 const FILES = path.join(OUT, 'index_files');
@@ -136,11 +153,15 @@ const FILES = path.join(OUT, 'index_files');
     html = html.replace(/<script[^>]*>(?:(?!<\/script>)[\s\S])*?_wpemojiSettings[\s\S]*?<\/script>\s*/g, '');
     html = html.replace(/<script[^>]*wp-emoji-release[^>]*><\/script>\s*/g, '');
 
-    // Внутренние адреса: Контакты и главная есть в копии, остальное
-    // (Проекты, Блог, страницы услуг) на статике не существует — такие
-    // ссылки гасим, чтобы они не вели на localhost.
-    html = html.replace(/http:\/\/localhost:8080\/contacts\/#/g, '#');
-    html = html.replace(/http:\/\/localhost:8080\/contacts\//g, 'contacts.html');
+    // Внутренние адреса: страницы из PAGES ведут на свои файлы,
+    // остальное (Проекты, Блог, отдельные услуги) на статике не
+    // существует — такие ссылки гасим, чтобы они не вели на localhost.
+    for (const [route, file] of ROUTES) {
+      const base = 'http://localhost:8080' + route;
+      html = html.split(base + '#').join('#');
+      html = html.split(base).join(file);
+    }
+
     html = html.replace(/http:\/\/localhost:8080\/"/g, 'index.html"');
     html = html.replace(/http:\/\/localhost:8080\/'/g, "index.html'");
     html = html.replace(/http:\\?\/\\?\/localhost:8080\\?\/[^"'\s>]*/g,

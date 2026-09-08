@@ -42,6 +42,9 @@
 	 * вместо 46.
 	 */
 	--font-size-h1: clamp(46px, calc(6px + 2.5vw), 54px);
+	/* Показатели блока «Цифры» (2368:3410) — 65 на 1920, своего размера
+	   в макетах других точек пока нет */
+	--font-size-number: 65px;
 	--font-size-h2: clamp(34px, calc(4px + 1.875vw), 40px);
 	--font-size-h3: clamp(26px, calc(-4px + 1.875vw), 32px);
 	--font-size-h4: clamp(21px, calc(6px + 0.9375vw), 24px);

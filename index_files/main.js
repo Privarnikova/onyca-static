@@ -291,10 +291,8 @@
 			setMenuHeight();
 		} );
 
-		menu.querySelectorAll( '.menu-item-has-children > a' ).forEach( function ( link ) {
-			link.addEventListener( 'click', function ( e ) {
-				e.preventDefault();
-
+		menu.querySelectorAll( '.menu-item-has-children > .menu-trigger' ).forEach( function ( link ) {
+			link.addEventListener( 'click', function () {
 				var item = link.closest( '.menu-item-has-children' );
 				var sub = item.querySelector( '.sub-menu' );
 
@@ -1408,10 +1406,19 @@
 	 * следует, поэтому здесь только переключение классов, вся геометрия
 	 * в components/front-page.css.
 	 */
-	function initServicesHover() {
-		var list = document.querySelector( '[data-services]' );
+	/**
+	 * Списки, где наведение гасит все строки, кроме выбранной, и
+	 * показывает её баннер: специализации на главной (1774:3970) и
+	 * услуги направления (1789:4076). Устроены одинаково, поэтому
+	 * обработчик общий.
+	 *
+	 * @param {string} listSelector Список.
+	 * @param {string} itemSelector Строки, которые реагируют на курсор.
+	 */
+	function initHoverList( listSelector, itemSelector ) {
+		var lists = document.querySelectorAll( listSelector );
 
-		if ( ! list ) {
+		if ( ! lists.length ) {
 			return;
 		}
 
@@ -1420,25 +1427,37 @@
 			return;
 		}
 
-		var items = list.querySelectorAll( '.home-services__item' );
+		lists.forEach( function ( list ) {
+			var items = list.querySelectorAll( itemSelector );
 
-		items.forEach( function ( item ) {
-			item.addEventListener( 'mouseenter', function () {
-				list.classList.add( 'is-hovered' );
+			items.forEach( function ( item ) {
+				item.addEventListener( 'mouseenter', function () {
+					list.classList.add( 'is-hovered' );
 
-				items.forEach( function ( other ) {
-					other.classList.toggle( 'is-active', other === item );
+					items.forEach( function ( other ) {
+						other.classList.toggle( 'is-active', other === item );
+					} );
+				} );
+
+				item.addEventListener( 'mouseleave', function () {
+					item.classList.remove( 'is-active' );
+
+					if ( ! list.querySelector( '.is-active' ) ) {
+						list.classList.remove( 'is-hovered' );
+					}
 				} );
 			} );
-
-			item.addEventListener( 'mouseleave', function () {
-				item.classList.remove( 'is-active' );
-
-				if ( ! list.querySelector( '.is-active' ) ) {
-					list.classList.remove( 'is-hovered' );
-				}
-			} );
 		} );
+	}
+
+	function initServicesHover() {
+		initHoverList( '[data-services]', '.home-services__item' );
+
+		/*
+		 * Только строки со страницей: у услуги без своего описания
+		 * перехода нет, а значит нет и подсветки (ТЗ).
+		 */
+		initHoverList( '[data-service-list]', '.service-list__item--linked' );
 	}
 
 	/**
@@ -1450,6 +1469,150 @@
 	 * атрибутом data-showreel-watch получает её сам, и разметку
 	 * дублировать не нужно.
 	 */
+	/*
+	 * «Услуги» в десктопной шапке: пункт никуда не ведёт (это <button>,
+	 * см. onyca_menu_parent_as_trigger), список раскрывается кликом.
+	 * Наведение по-прежнему открывает его на десктопе — правило :hover
+	 * в CSS остаётся, клик нужен для тач-экранов и для тех, кто просто
+	 * нажимает на пункт.
+	 */
+	function initHeaderDropdown() {
+		var menu = document.querySelector( '.site-header__menu' );
+
+		if ( ! menu ) {
+			return;
+		}
+
+		var items = menu.querySelectorAll( '.menu-item-has-children' );
+
+		function close( item ) {
+			item.classList.remove( 'is-open' );
+
+			var trigger = item.querySelector( '.menu-trigger' );
+
+			if ( trigger ) {
+				trigger.setAttribute( 'aria-expanded', 'false' );
+			}
+		}
+
+		items.forEach( function ( item ) {
+			var trigger = item.querySelector( '.menu-trigger' );
+
+			if ( ! trigger ) {
+				return;
+			}
+
+			trigger.addEventListener( 'click', function ( event ) {
+				event.stopPropagation();
+
+				var open = ! item.classList.contains( 'is-open' );
+
+				items.forEach( close );
+
+				if ( open ) {
+					item.classList.add( 'is-open' );
+					trigger.setAttribute( 'aria-expanded', 'true' );
+				}
+			} );
+		} );
+
+		document.addEventListener( 'click', function ( event ) {
+			items.forEach( function ( item ) {
+				if ( ! item.contains( event.target ) ) {
+					close( item );
+				}
+			} );
+		} );
+
+		document.addEventListener( 'keydown', function ( event ) {
+			if ( 'Escape' === event.key ) {
+				items.forEach( close );
+			}
+		} );
+	}
+
+	/**
+	 * Блок «Цифры»: показатели отсчитываются от нуля, когда блок
+	 * доезжает до экрана. Значение берём из разметки — там уже стоит
+	 * готовая цифра, скрипт только проигрывает рост.
+	 */
+	function initCounters() {
+		var blocks = document.querySelectorAll( '[data-counters]' );
+
+		if ( ! blocks.length ) {
+			return;
+		}
+
+		/*
+		 * Тем, кто просил уменьшить анимацию, ничего не крутим: цифры
+		 * уже стоят в разметке готовыми.
+		 */
+		if ( window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ) {
+			return;
+		}
+
+		var DURATION = 1600;
+
+		function parse( raw ) {
+			var match = String( raw ).match( /^(\D*)(\d+)(.*)$/ );
+
+			return match ? { before: match[1], value: parseInt( match[2], 10 ), after: match[3] } : null;
+		}
+
+		function run( item ) {
+			var parts = parse( item.getAttribute( 'data-counter' ) );
+
+			if ( ! parts ) {
+				return;
+			}
+
+			var start = null;
+
+			function step( time ) {
+				if ( null === start ) {
+					start = time;
+				}
+
+				var progress = Math.min( 1, ( time - start ) / DURATION );
+				/* Замедление к концу — цифра «доводится», а не обрывается */
+				var eased = 1 - Math.pow( 1 - progress, 3 );
+
+				item.textContent = parts.before + Math.round( parts.value * eased ) + parts.after;
+
+				if ( progress < 1 ) {
+					window.requestAnimationFrame( step );
+				}
+			}
+
+			window.requestAnimationFrame( step );
+		}
+
+		blocks.forEach( function ( block ) {
+			var items = block.querySelectorAll( '[data-counter]' );
+
+			if ( ! items.length ) {
+				return;
+			}
+
+			var observer = new IntersectionObserver(
+				function ( entries ) {
+					entries.forEach( function ( entry ) {
+						if ( ! entry.isIntersecting ) {
+							return;
+						}
+
+						observer.disconnect();
+						items.forEach( run );
+					} );
+				},
+				/* Считаем, когда блок зашёл в кадр примерно на четверть */
+				{ threshold: 0.25 }
+			);
+
+			observer.observe( block );
+		} );
+	}
+
 	function initShowreelWatch() {
 		var blocks = document.querySelectorAll( '[data-showreel-watch]' );
 
@@ -1663,6 +1826,8 @@
 		initDiscussButton();
 		initHeroShowreel();
 		initServicesHover();
+		initHeaderDropdown();
+		initCounters();
 		initShowreelWatch();
 		initStackedProjects();
 		initClientLogos();

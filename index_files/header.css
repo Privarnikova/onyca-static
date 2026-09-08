@@ -127,7 +127,8 @@ img.site-header__logo-icon {
 	margin-left: var(--header-group-gap-extra);
 }
 
-.site-header__menu a {
+.site-header__menu a,
+.site-header__menu .menu-trigger {
 	font-size: var(--header-font-size);
 	font-weight: var(--font-weight-body);
 	line-height: var(--line-height-body);
@@ -149,7 +150,7 @@ img.site-header__logo-icon {
 	   нужен */
 }
 
-.site-header__menu .menu-item-has-children > a {
+.site-header__menu .menu-item-has-children > .menu-trigger {
 	display: inline-flex;
 	justify-content: center;
 	align-items: center;
@@ -157,7 +158,7 @@ img.site-header__logo-icon {
 	gap: 4px; /* одинаково на обеих точках, не фluid */
 }
 
-.site-header__menu .menu-item-has-children > a::after {
+.site-header__menu .menu-item-has-children > .menu-trigger::after {
 	content: '';
 	width: var(--header-chevron-size);
 	height: var(--header-chevron-size);
@@ -169,6 +170,27 @@ img.site-header__logo-icon {
 	transition: transform 0.15s ease;
 }
 
+
+/*
+ * «Услуги» — кнопка, а не ссылка (см. onyca_menu_parent_as_trigger в
+ * inc/setup.php): снимаем всё, что браузер рисует у кнопки, чтобы пункт
+ * выглядел ровно как соседние.
+ */
+.menu-trigger {
+	appearance: none;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	font: inherit;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+	/* Кнопка сама по себе шире содержимого не становится даже при
+	   display:block — без этого стрелка в бургер-меню прижималась к
+	   слову «Услуги» вместо правого края строки */
+	width: 100%;
+}
 
 .site-header__menu .sub-menu {
 	display: flex;
@@ -199,6 +221,21 @@ img.site-header__logo-icon {
 
 .site-header__menu .sub-menu li:last-child {
 	margin-top: 26px; /* Figma: отступ перед «Все услуги» — 32px вместо обычных 6px между пунктами */
+}
+
+/*
+ * Список раскрыт кликом. Правило вне @media (hover) — на тач-экране
+ * навести нельзя, а нажать можно.
+ */
+.site-header__menu .menu-item-has-children.is-open > .menu-trigger::after {
+	transform: rotate(180deg);
+}
+
+.site-header__menu .menu-item-has-children.is-open > .sub-menu {
+	opacity: 1;
+	visibility: visible;
+	transform: translate3d(0, 0, 0);
+	transition: opacity 0.4s ease, transform 0.4s ease, visibility 0s linear 0s;
 }
 
 .site-header.is-hidden {
@@ -425,14 +462,13 @@ body.home.admin-bar .site-header.is-sticky {
 		flex-direction: column;
 		background-color: var(--color-white);
 		/*
-		 * Панель уезжает вверх, а не исчезает рывком. Показывает и
-		 * прячет её JS (initBurgerMenu) — атрибут hidden он снимает
-		 * сразу, а класс с состоянием ставит следующим кадром, чтобы
-		 * переход успел проиграться.
+		 * Панель выезжает справа и туда же уходит. Показывает и прячет
+		 * её JS (initBurgerMenu) — атрибут hidden он снимает сразу, а
+		 * класс с состоянием ставит следующим кадром, чтобы переход
+		 * успел проиграться.
 		 */
-		transform: translateY(-100%);
-		opacity: 0;
-		transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+		transform: translateX(100%);
+		transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 		/* 52px = 110 (отметка первого пункта в макете, отсчёт от верха
 		   экрана) − 58 (высота шапки). Панель начинается под шапкой,
 		   поэтому внутри неё остаётся именно 52. Одинаково на 1200, 700 и
@@ -442,8 +478,15 @@ body.home.admin-bar .site-header.is-sticky {
 	}
 
 	.burger-menu.is-open {
-		transform: translateY(0);
-		opacity: 1;
+		transform: translateX(0);
+	}
+
+	/*
+	 * Пока панель уезжает вправо, она на эти 0.4s выходит за правый край
+	 * экрана — без этого появлялась бы горизонтальная прокрутка.
+	 */
+	.site-header {
+		overflow-x: clip;
 	}
 
 	.burger-menu__list {
@@ -474,7 +517,8 @@ body.home.admin-bar .site-header.is-sticky {
 		padding-bottom: 16px;
 	}
 
-	.burger-menu__list a {
+	.burger-menu__list a,
+	.burger-menu__list .menu-trigger {
 		display: block;
 		font-size: 46px;
 		font-weight: var(--font-weight-heading);
@@ -483,14 +527,14 @@ body.home.admin-bar .site-header.is-sticky {
 		text-decoration: none;
 	}
 
-	.burger-menu__list .menu-item-has-children > a {
+	.burger-menu__list .menu-item-has-children > .menu-trigger {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px;
 	}
 
-	.burger-menu__list .menu-item-has-children > a::after {
+	.burger-menu__list .menu-item-has-children > .menu-trigger::after {
 		content: '';
 		flex-shrink: 0;
 		width: 32px;
@@ -499,7 +543,7 @@ body.home.admin-bar .site-header.is-sticky {
 		transition: transform 0.2s ease;
 	}
 
-	.burger-menu__list .menu-item-has-children.is-open > a::after {
+	.burger-menu__list .menu-item-has-children.is-open > .menu-trigger::after {
 		transform: rotate(180deg);
 	}
 
@@ -587,7 +631,8 @@ body.home.admin-bar .site-header.is-sticky {
 		padding: 52px 15px 25px;
 	}
 
-	.burger-menu__list a {
+	.burger-menu__list a,
+	.burger-menu__list .menu-trigger {
 		font-size: 32px;
 	}
 
@@ -652,7 +697,7 @@ body.home.admin-bar .site-header.is-sticky {
  * тапа и «залипают» до следующего касания.
  */
 @media (hover: hover) and (min-width: 1200px) {
-	.site-header__menu .menu-item-has-children:hover > a::after {
+	.site-header__menu .menu-item-has-children:hover > .menu-trigger::after {
 		transform: rotate(180deg);
 	}
 
