@@ -161,6 +161,7 @@
 	}
 
 	.card-project:hover {
-		border-radius: 24px;
+		/* 40px — значение из макета */
+		border-radius: 40px;
 	}
 }

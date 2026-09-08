@@ -35,10 +35,36 @@
 	text-align: center;
 }
 
-/* Карточки идут в столбик с зазором 32 (у макета шаг 932 при высоте 900) */
+/*
+ * Карточки идут в столбик с зазором 32 (у макета шаг 932 при высоте
+ * 900), но при прокрутке складываются стопкой: каждая прилипает под
+ * шапкой, следующая наезжает на неё сверху, а уходящая чуть уменьшается
+ * — как в референсе из ТЗ (blue-ant.ru), только без прозрачности:
+ * ушедшая карточка остаётся такой же плотной.
+ */
 .studio-projects__list {
 	display: grid;
 	gap: 32px;
+}
+
+.studio-projects__list .card-project {
+	position: sticky;
+	/* 90px — карточка 900 в окне 1080 встаёт по центру */
+	top: 90px;
+	/* Масштаб уходящей карточки считает JS (initStackedProjects) */
+	transform: scale(var(--card-scale, 1));
+	transform-origin: 50% 0;
+	transition: transform 0.15s linear;
+}
+
+/*
+ * Скругления по наведению здесь нет: у блока своя анимация — стопка.
+ * Правило из components/card-project.css отменяем именно тут.
+ */
+@media (hover: hover) and (min-width: 1200px) {
+	.studio-projects__list .card-project:hover {
+		border-radius: 0;
+	}
 }
 
 .studio-projects__all {

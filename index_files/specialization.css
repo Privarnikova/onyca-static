@@ -1,0 +1,227 @@
+/**
+ * Страницы специализаций (Брендинг, UX/UI, CG & Motion) и общие блоки
+ * этих страниц: список услуг, этапы работы, сотрудничество, цифры.
+ * Источник — Figma 1159:1348, 1236:3588, 1236:3821, эталон 1920.
+ *
+ * ВНИМАНИЕ: свёрстано только под 1920 — макетов остальных разрешений
+ * пока нет, значения плоские.
+ *
+ * Поля по краям и расстояния между блоками задаёт страница целиком —
+ * как на главной: .specialization это и контейнер, и сетка с зазором 188.
+ */
+
+.specialization {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	row-gap: 188px;
+	padding-bottom: 188px;
+}
+
+/* Первый экран (1159:1354): заголовок слева, ролик в правой половине */
+.specialization-hero {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	align-items: start;
+}
+
+.specialization-hero__title {
+	/* 765px в макете — колонки 1–3 без последнего зазора */
+	grid-column: 1 / 4;
+	max-width: 765px;
+	margin: 0;
+	font-size: var(--font-size-h1);
+}
+
+.specialization-hero__media {
+	grid-column: 4 / -1;
+	/* 909×445 в макете */
+	aspect-ratio: 909 / 445;
+	overflow: hidden;
+}
+
+.specialization-hero__media video,
+.specialization-case__media video {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/*
+ * Список услуг (2595:5381). Строка: название в левой половине,
+ * стоимость — в четвёртой колонке; сверху отступ 32, снизу линия.
+ */
+.service-list__items {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.service-list__item {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	padding: 32px 0;
+	border-bottom: 1px solid var(--color-divider);
+	font-size: var(--font-size-h4);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.service-list__name {
+	grid-column: 1 / 4;
+}
+
+.service-list__price {
+	grid-column: 4 / 5;
+}
+
+/* Кейс направления (1161:1565): заголовок и ролик 1840×900 под ним */
+.specialization-case__title {
+	/* 1220px в макете — колонки 1–4 */
+	max-width: 1220px;
+	margin: 0 0 78px;
+	font-size: var(--font-size-h2);
+}
+
+.specialization-case__media {
+	aspect-ratio: 1840 / 900;
+	overflow: hidden;
+}
+
+/*
+ * Этапы работы (2892:5443). Номер и название в левой половине,
+ * описание — в правой; снизу линия, до неё 78px.
+ */
+.work-stages__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: stage;
+}
+
+.work-stages__item {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	padding-bottom: 78px;
+	border-bottom: 1px solid var(--color-divider);
+}
+
+.work-stages__item + .work-stages__item {
+	/* 52px от линии до следующего этапа */
+	margin-top: 52px;
+}
+
+.work-stages__number,
+.work-stages__title {
+	margin: 0;
+	font-size: var(--font-size-h3);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.work-stages__number {
+	grid-column: 1 / 2;
+	/* 52px под номер, дальше название с отступом 8 (макет: 0 и 60) */
+	max-width: 52px;
+}
+
+.work-stages__title {
+	grid-column: 1 / 3;
+	/* Название начинается за номером: 60px от левого края строки */
+	margin-left: 60px;
+}
+
+.work-stages__text {
+	grid-column: 4 / -1;
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+/*
+ * Сотрудничество (2594:5313): заголовок и шесть тезисов в три колонки,
+ * под каждым линия.
+ */
+.collaboration__title {
+	margin: 0 0 52px;
+	font-size: var(--font-size-h2);
+}
+
+.collaboration__list {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	row-gap: 52px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.collaboration__item {
+	padding-bottom: 32px;
+	border-bottom: 1px solid var(--color-divider);
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+/*
+ * Цифры (2368:3410): заголовок в первой колонке, показатели — по одной
+ * колонке каждый, начиная с третьей.
+ */
+.numbers {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+}
+
+.numbers__title {
+	grid-column: 1 / 3;
+	margin: 0;
+	font-size: var(--font-size-h2);
+}
+
+.numbers__list {
+	grid-column: 3 / -1;
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	margin: 0;
+}
+
+.numbers__item {
+	display: flex;
+	flex-direction: column;
+	/* 94 − 78 = 16px от числа до подписи */
+	gap: 16px;
+}
+
+.numbers__value {
+	margin: 0;
+	/* 78px высотой в макете — это H1 при line-height 1.2, кегль 65 */
+	font-size: 65px;
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.numbers__label {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+/* Форма на этих страницах стоит без внешних отступов — их даёт сетка */
+.specialization .contact-form-section {
+	margin-block: 0;
+	padding-inline: 0;
+}

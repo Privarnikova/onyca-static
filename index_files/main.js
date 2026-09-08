@@ -46,38 +46,97 @@
 			return firstScreen.offsetTop + firstScreen.offsetHeight + overflow;
 		}
 
-		var wasStatic = null;
+		var wasFirstScreen = null;
+		var stickyTimer = null;
+		/* Идёт ли сейчас уход шапки вверх — прерывать его нельзя */
+		var hiding = false;
+		/* Столько же длится переход шапки в CSS */
+		var HEADER_HIDE_DELAY = 400;
+
+		/* Убрать переход на один кадр — чтобы шапка не «проехала» на виду */
+		function withoutTransition( change ) {
+			header.classList.add( 'is-instant' );
+			change();
+
+			window.requestAnimationFrame( function () {
+				header.classList.remove( 'is-instant' );
+			} );
+		}
 
 		function update() {
 			var currentScrollY = window.scrollY;
-			var isStatic = currentScrollY < staticUntil();
+			var onFirstScreen = currentScrollY < staticUntil();
 
-			/*
-			 * На самом переходе шапка меняет способ позиционирования и
-			 * оказывается вверху экрана — с плавным переходом это
-			 * выглядело как «моргание»: шапка выпрыгивала и тут же
-			 * уезжала. Поэтому на этот кадр переход отключаем.
-			 */
-			if ( wasStatic !== null && wasStatic !== isStatic ) {
-				header.classList.add( 'is-instant' );
-				window.requestAnimationFrame( function () {
-					header.classList.remove( 'is-instant' );
-				} );
+			if ( onFirstScreen ) {
+				/*
+				 * Первый экран: шапка стоит в потоке и уезжает вместе со
+				 * страницей — при прокрутке вниз с ней не происходит
+				 * ничего.
+				 *
+				 * Придя снизу вверх, сначала даём ей уехать переходом и
+				 * только потом отпускаем в поток. Пока уход идёт, классы
+				 * не трогаем: иначе следующий кадр прокрутки обрывает
+				 * анимацию и шапка пропадает скачком.
+				 */
+				if ( hiding ) {
+					wasFirstScreen = onFirstScreen;
+					lastScrollY = currentScrollY;
+					return;
+				}
+
+				if ( wasFirstScreen === false ) {
+					hiding = true;
+					header.classList.add( 'is-hidden' );
+					window.clearTimeout( stickyTimer );
+					stickyTimer = window.setTimeout( function () {
+						withoutTransition( function () {
+							header.classList.remove( 'is-sticky' );
+							header.classList.remove( 'is-hidden' );
+						} );
+						hiding = false;
+					}, HEADER_HIDE_DELAY );
+				} else {
+					window.clearTimeout( stickyTimer );
+					header.classList.remove( 'is-sticky' );
+					header.classList.remove( 'is-hidden' );
+				}
+			} else {
+				window.clearTimeout( stickyTimer );
+				hiding = false;
+
+				if ( wasFirstScreen ) {
+					/*
+					 * Первый экран только что закончился: шапка становится
+					 * липкой сразу спрятанной и без перехода — появляться
+					 * ей здесь незачем, ждём прокрутки вверх.
+					 */
+					withoutTransition( function () {
+						header.classList.add( 'is-sticky' );
+						header.classList.add( 'is-hidden' );
+					} );
+				} else if ( wasFirstScreen === null ) {
+					/*
+					 * Самая первая проверка. Страницу могли открыть уже
+					 * прокрученной — тогда шапки быть не должно. Открытую
+					 * с начала не трогаем: иначе она пряталась бы и там,
+					 * где первого экрана нет вовсе.
+					 */
+					withoutTransition( function () {
+						header.classList.add( 'is-sticky' );
+						header.classList.toggle( 'is-hidden', currentScrollY > headerHeight );
+					} );
+				} else {
+					header.classList.add( 'is-sticky' );
+
+					if ( currentScrollY > lastScrollY ) {
+						header.classList.add( 'is-hidden' );
+					} else if ( currentScrollY < lastScrollY ) {
+						header.classList.remove( 'is-hidden' );
+					}
+				}
 			}
 
-			wasStatic = isStatic;
-			header.classList.toggle( 'is-static', isStatic );
-
-			if ( isStatic ) {
-				header.classList.remove( 'is-hidden' );
-			} else if ( currentScrollY <= headerHeight ) {
-				header.classList.remove( 'is-hidden' );
-			} else if ( currentScrollY > lastScrollY ) {
-				header.classList.add( 'is-hidden' );
-			} else if ( currentScrollY < lastScrollY ) {
-				header.classList.remove( 'is-hidden' );
-			}
-
+			wasFirstScreen = onFirstScreen;
 			lastScrollY = currentScrollY;
 		}
 
@@ -160,11 +219,35 @@
 			banner.hidden = menuOpen;
 		}
 
-		function closeMenu() {
+		/* Длительность ухода панели — столько же, сколько в CSS */
+		var MENU_HIDE_DELAY = 400;
+		var hideTimer = null;
+
+		/*
+		 * immediate — закрыть без анимации. Так закрывается переход на
+		 * десктоп: там панели нет по стилям, ждать её ухода незачем.
+		 */
+		function closeMenu( immediate ) {
 			toggle.setAttribute( 'aria-expanded', 'false' );
-			menu.hidden = true;
+			menu.classList.remove( 'is-open' );
 			unlockScroll();
 			toggleCookieBanner( false );
+			window.clearTimeout( hideTimer );
+
+			if ( immediate ) {
+				menu.hidden = true;
+				return;
+			}
+
+			/*
+			 * hidden ставим не сразу, а когда панель доедет наверх: иначе
+			 * она пропадала рывком и перехода не было видно.
+			 */
+			hideTimer = window.setTimeout( function () {
+				if ( toggle.getAttribute( 'aria-expanded' ) !== 'true' ) {
+					menu.hidden = true;
+				}
+			}, MENU_HIDE_DELAY );
 		}
 
 		toggle.addEventListener( 'click', function () {
@@ -176,10 +259,16 @@
 			}
 
 			toggle.setAttribute( 'aria-expanded', 'true' );
+			window.clearTimeout( hideTimer );
 			menu.hidden = false;
 			lockScroll();
 			setMenuHeight();
 			toggleCookieBanner( true );
+
+			/* Класс — следующим кадром, чтобы переход проиграл выезд */
+			window.requestAnimationFrame( function () {
+				menu.classList.add( 'is-open' );
+			} );
 		} );
 
 		window.addEventListener( 'resize', function () {
@@ -195,7 +284,7 @@
 			 * Поэтому на выходе из планшетного диапазона меню закрываем.
 			 */
 			if ( window.matchMedia( '(min-width: 1201px)' ).matches ) {
-				closeMenu();
+				closeMenu( true );
 				return;
 			}
 
@@ -497,13 +586,20 @@
 	 * Сила притяжения: сама кнопка тянется на 25px, текст внутри — на 15,
 	 * из-за разницы кнопка выглядит «тянущейся», а не едущей целиком.
 	 *
-	 * Зона притяжения — ореол ровно в 32px вокруг кнопки, одинаковый у
+	 * Зона притяжения — ореол ровно в 21px вокруг кнопки, одинаковый у
 	 * всех ЦД-кнопок и одинаковой толщины по всему периметру. Раньше она
 	 * считалась кругом по большей стороне (половина плюс 60px), и у
 	 * широкой кнопки «Отправить» радиус доходил до 360px: она начинала
 	 * тянуться, когда курсор был ещё у поля «Расскажите о проекте».
 	 */
-	var MAGNET_REACH = 32;
+	var MAGNET_REACH = 21;
+
+	/*
+	 * Какая часть высоты первого экрана уходит на разворот видео. Ею
+	 * пользуются и сама анимация (initHeroShowreel), и кнопка
+	 * «Обсудить проект»: она выезжает, как только видео выросло.
+	 */
+	var HERO_GROW_PART = 0.35;
 
 	/**
 	 * Сдвиг, который сейчас реально применён к элементу. В matrix(...)
@@ -944,17 +1040,35 @@
 			}
 		}
 
+		/* Столько же, сколько уход в CSS: 0.45s выезд, закрытие вдвое быстрее */
+		var POPUP_HIDE_DELAY = 220;
+		var hideTimer = null;
+
 		function open( name ) {
 			show( name );
+			window.clearTimeout( hideTimer );
 			popup.hidden = false;
 			lockScroll();
 			popup.scrollTop = 0;
 			notify( name );
+
+			/* Класс — следующим кадром, иначе переход не проиграется */
+			window.requestAnimationFrame( function () {
+				popup.classList.add( 'is-open' );
+			} );
 		}
 
 		function close() {
-			popup.hidden = true;
+			popup.classList.remove( 'is-open' );
 			unlockScroll();
+
+			/* Прячем, когда содержимое уехало вниз */
+			window.clearTimeout( hideTimer );
+			hideTimer = window.setTimeout( function () {
+				if ( ! popup.classList.contains( 'is-open' ) ) {
+					popup.hidden = true;
+				}
+			}, POPUP_HIDE_DELAY );
 		}
 
 		document.addEventListener( 'click', function ( event ) {
@@ -1046,23 +1160,27 @@
 		var footer = document.querySelector( '.site-footer' );
 		var pending = false;
 
-		function threshold() {
+		/*
+		 * На главной кнопка ждёт, пока уедет первый экран, и отсчёт идёт
+		 * от самого видео: как только оно ушло за верхнюю кромку окна,
+		 * кнопка выезжает. На остальных страницах она видна сразу.
+		 */
+		function shouldShow() {
 			if ( ! document.body.classList.contains( 'home' ) ) {
-				return 0;
+				return true;
 			}
 
 			var firstScreen = document.querySelector( '[data-first-screen]' );
 
 			if ( ! firstScreen ) {
-				return window.innerHeight;
+				return window.scrollY > 0;
 			}
 
 			/*
-			 * Кнопка выезжает, когда первый экран ушёл целиком, а не как
-			 * только начали крутить: отсчитываем от НИЗА блока, иначе она
-			 * появлялась ещё на разворачивающемся шоуриле.
+			 * Кнопка выезжает, как только видео закончило расти — то есть
+			 * в конце блока с видео, а не когда оно уехало за экран.
 			 */
-			return firstScreen.offsetTop + firstScreen.offsetHeight;
+			return window.scrollY >= firstScreen.offsetHeight * HERO_GROW_PART;
 		}
 
 		function bottomOffset() {
@@ -1096,7 +1214,7 @@
 
 			var scrolled = window.scrollY;
 
-			wrap.classList.toggle( 'is-visible', scrolled >= threshold() );
+			wrap.classList.toggle( 'is-visible', shouldShow() );
 
 			if ( ! footer ) {
 				return;
@@ -1174,16 +1292,11 @@
 		}
 
 		var MAX_SCALE = 1840 / 910;
-		/*
-		 * Доля высоты первого экрана, за которую видео успевает
-		 * раскрыться. Берём меньше половины: к этому моменту оно ещё не
-		 * дошло до шапки, и дальше уже можно показывать его целиком.
-		 */
-		var GROW_PART = 0.35;
+		var GROW_PART = HERO_GROW_PART;
 		/* Отступ под шапкой, на котором держится раскрытое видео */
 		var GAP_UNDER_HEADER = 16;
 		/* Сколько пикселей прокрутки видео едет вместе с окном */
-		var HOLD_LENGTH = 150;
+		var HOLD_LENGTH = 10;
 
 		/*
 		 * Отсчёт идёт от верхней кромки ЭКРАНА: она не двигается, в
@@ -1215,7 +1328,15 @@
 			/* Считаем от первого пикселя прокрутки страницы */
 			var scrolled = window.scrollY;
 
-			targetScale = 1 + ( Math.min( scrolled, growth ) / growth ) * ( MAX_SCALE - 1 );
+			var grown = Math.min( scrolled, growth ) / growth;
+
+			targetScale = 1 + grown * ( MAX_SCALE - 1 );
+
+			/*
+			 * Отступ первого экрана снизу тает вместе с ростом видео:
+			 * когда оно раскрылось, полосы пустоты под ним быть не должно.
+			 */
+			hero.style.setProperty( '--hero-bottom', ( 1 - grown ) * 40 + 'px' );
 
 			/*
 			 * Где окажется верх раскрытого видео в документе: растёт оно
@@ -1321,6 +1442,63 @@
 	}
 
 	/**
+	 * «Проекты студии»: карточки складываются стопкой.
+	 *
+	 * Само наложение делает CSS (карточки липкие), а здесь — только
+	 * глубина: чем сильнее следующая карточка перекрыла текущую, тем
+	 * заметнее та уменьшается, будто уходит назад. Прозрачность не
+	 * трогаем — в отличие от референса, ушедшая карточка остаётся
+	 * плотной.
+	 */
+	function initStackedProjects() {
+		var lists = document.querySelectorAll( '.studio-projects__list' );
+
+		if ( ! lists.length || window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ) {
+			return;
+		}
+
+		/* На сколько уменьшается карточка, полностью ушедшая под следующую */
+		var MAX_DEPTH = 0.06;
+		var pending = false;
+
+		function update() {
+			pending = false;
+
+			lists.forEach( function ( list ) {
+				var cards = list.querySelectorAll( '.card-project' );
+
+				cards.forEach( function ( card, index ) {
+					var next = cards[ index + 1 ];
+
+					if ( ! next ) {
+						card.style.setProperty( '--card-scale', 1 );
+						return;
+					}
+
+					var box = card.getBoundingClientRect();
+					var overlap = box.bottom - next.getBoundingClientRect().top;
+					var progress = Math.min( Math.max( overlap / box.height, 0 ), 1 );
+
+					card.style.setProperty( '--card-scale', 1 - progress * MAX_DEPTH );
+				} );
+			} );
+		}
+
+		function schedule() {
+			if ( pending ) {
+				return;
+			}
+
+			pending = true;
+			window.requestAnimationFrame( update );
+		}
+
+		update();
+		window.addEventListener( 'scroll', schedule, { passive: true } );
+		window.addEventListener( 'resize', schedule );
+	}
+
+	/**
 	 * Лента логотипов клиентов: едет сама по себе, а направление задаёт
 	 * прокрутка страницы — вниз двигает влево, вверх вправо (референс из
 	 * ТЗ). Лента продублирована в разметке, поэтому сдвиг зациклен по
@@ -1394,6 +1572,7 @@
 		initDiscussButton();
 		initHeroShowreel();
 		initServicesHover();
+		initStackedProjects();
 		initClientLogos();
 	} );
 } )();

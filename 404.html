@@ -91,6 +91,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <link rel="stylesheet" id="onyca-discuss-button-css" href="./index_files/discuss-button.css" media="all">
 <link rel="stylesheet" id="onyca-popup-css" href="./index_files/popup.css" media="all">
 <link rel="stylesheet" id="onyca-front-page-css" href="./index_files/front-page.css" media="all">
+<link rel="stylesheet" id="onyca-specialization-css" href="./index_files/specialization.css" media="all">
 <link rel="stylesheet" id="onyca-cookie-banner-css" href="./index_files/cookie-banner.css" media="all">
 <link rel="stylesheet" id="onyca-page-404-css" href="./index_files/page-404.css" media="all">
 <link rel="stylesheet" id="onyca-page-contacts-css" href="./index_files/page-contacts.css" media="all">
@@ -124,6 +125,207 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<a class="btn btn--cta btn--cta--inverse page-404__button" href="index.html"><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">На главную</span></a>
 	</div>
 </main>
+
+<div class="popup" data-popup="" hidden="">
+	<div class="popup__bar container">
+		<a class="popup__logo" href="index.html">
+			<img src="./index_files/logo.svg" width="115" height="24" alt="onyca-digital">
+		</a>
+
+		<button type="button" class="popup__close" data-popup-close="" aria-label="Закрыть">
+			<svg class="icon icon--x" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+  <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+</svg>
+		</button>
+	</div>
+
+	<div class="popup__body">
+		<div class="popup__pane" data-popup-pane="project" hidden="">
+			
+<section class="contact-form-section container popup__form">
+	<div class="contact-form-intro">
+		<h2 class="contact-form-intro__title">Создаем дизайн, который растет вместе с бизнесом</h2>
+		<p class="contact-form-intro__text">От первой идеи до ежедневного развития — помогаем компаниям строить целостное цифровое присутствие, которое работает сегодня и может развиваться завтра.</p>
+	</div>
+
+		<form class="contact-form" method="post" novalidate="">
+		<div class="contact-form__group" data-required-group="tags">
+			<p class="contact-form__label">Ваш проект</p>
+			<div class="contact-form__tabs">
+															<button type="button" class="tab-pill">UX/UI</button>
+											<button type="button" class="tab-pill">Брендинг</button>
+											<button type="button" class="tab-pill">Дизайн-поддержка</button>
+											<button type="button" class="tab-pill">CG &amp; Motion</button>
+											<button type="button" class="tab-pill">Корпоративный сайт</button>
+											<button type="button" class="tab-pill">Интернет-магазин</button>
+																				<button type="button" class="tab-pill">Лендинг</button>
+											<button type="button" class="tab-pill">Айдентика</button>
+											<button type="button" class="tab-pill">3D Motion</button>
+											<button type="button" class="tab-pill">3D-моделирование</button>
+											<button type="button" class="tab-pill">2D-Motion</button>
+											<button type="button" class="tab-pill">VFX</button>
+												</div>
+		</div>
+
+		<div class="contact-form__fields">
+			<div class="field contact-form__field">
+				<input type="text" id="popup-project-name" name="contact_name" placeholder=" ">
+				<label for="popup-project-name">Ваше имя</label>
+			</div>
+			<div class="field contact-form__field">
+				<input type="text" id="popup-project-company" name="contact_company" placeholder=" ">
+				<label for="popup-project-company">Название компании</label>
+			</div>
+			<div class="field contact-form__field" data-required-group="email">
+				<input type="email" id="popup-project-email" name="contact_email" placeholder=" ">
+				<label for="popup-project-email">Ваш email</label>
+			</div>
+			<div class="field contact-form__field">
+				<input type="text" id="popup-project-telegram" name="contact_telegram" placeholder=" ">
+				<label for="popup-project-telegram">Ваш Telegram</label>
+			</div>
+						<div class="field contact-form__field contact-form__field--full">
+				<textarea id="popup-project-message" name="contact_message" rows="1" placeholder=" " style=""></textarea>
+				<label for="popup-project-message">Расскажите о проекте</label>
+			</div>
+		</div>
+
+		<fieldset class="contact-form__budget" data-required-group="budget">
+			<legend class="contact-form__label">Бюджет</legend>
+			<div class="contact-form__budget-grid">
+									<label class="contact-form__budget-option">
+						<input class="radio-control" type="radio" name="contact_budget" value="menee-200">
+						<span>менее 200 тыс. руб</span>
+					</label>
+									<label class="contact-form__budget-option">
+						<input class="radio-control" type="radio" name="contact_budget" value="200-500">
+						<span>200-500 тыс. руб</span>
+					</label>
+									<label class="contact-form__budget-option">
+						<input class="radio-control" type="radio" name="contact_budget" value="500-1000">
+						<span>500-1 млн. руб</span>
+					</label>
+									<label class="contact-form__budget-option">
+						<input class="radio-control" type="radio" name="contact_budget" value="1000-2000">
+						<span>1-2 млн. руб</span>
+					</label>
+									<label class="contact-form__budget-option">
+						<input class="radio-control" type="radio" name="contact_budget" value="2000-3000">
+						<span>2-3 млн. руб</span>
+					</label>
+									<label class="contact-form__budget-option">
+						<input class="radio-control" type="radio" name="contact_budget" value="bolee-3000">
+						<span>более 3 млн. руб</span>
+					</label>
+							</div>
+		</fieldset>
+
+		<div class="contact-form__actions">
+			<button type="button" class="btn btn--secondary contact-form__attach">Прикрепить файл</button>
+			<button type="submit" class="btn btn--cta contact-form__submit"><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Отправить</span></button>
+		</div>
+
+		<div class="consent contact-form__consent" data-required-group="consent">
+						<input class="radio-control" type="checkbox" name="contact_consent" id="popup-project-consent">
+			<span class="consent__text">
+					Нажимая на кнопку «Отправить», вы даете <a href="index.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="index.html">политикой обработки персональных данных</a>.
+			</span>
+			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
+		</div>
+	</form>
+</section>
+		</div>
+
+		<div class="popup__pane" data-popup-pane="career" hidden="">
+			
+<section class="contact-form-section container popup__form">
+	<div class="contact-form-intro">
+		<h2 class="contact-form-intro__title">Давай познакомимся</h2>
+		<p class="contact-form-intro__text">Если тебе близок наш подход к работе и ты хочешь развиваться вместе со студией — расскажи о себе.</p>
+		<p class="contact-form-intro__text">Даже если подходящей вакансии сейчас нет, мы сохраним контакт и вернемся к нему, когда появится подходящая задача.</p>
+	</div>
+
+	<form class="contact-form contact-form--career" method="post" novalidate="">
+		<div class="contact-form__fields">
+			<div class="field contact-form__field">
+				<input type="text" id="popup-career-name" name="career_name" placeholder=" ">
+				<label for="popup-career-name">Твое имя</label>
+			</div>
+			<div class="field contact-form__field">
+				<input type="tel" id="popup-career-phone" name="career_phone" placeholder=" ">
+				<label for="popup-career-phone">Твой телефон</label>
+			</div>
+			<div class="field contact-form__field" data-required-group="email">
+				<input type="email" id="popup-career-email" name="career_email" placeholder=" ">
+				<label for="popup-career-email">Твой email</label>
+			</div>
+			<div class="field contact-form__field">
+				<input type="text" id="popup-career-telegram" name="career_telegram" placeholder=" ">
+				<label for="popup-career-telegram">Твой Telegram</label>
+			</div>
+			<div class="field contact-form__field contact-form__field--full">
+				<textarea id="popup-career-message" name="career_message" rows="1" placeholder=" " style=""></textarea>
+				<label for="popup-career-message">Расскажи о себе</label>
+			</div>
+		</div>
+
+		<div class="contact-form__actions">
+			<button type="button" class="btn btn--secondary contact-form__attach">Прикрепить файл</button>
+			<button type="submit" class="btn btn--cta contact-form__submit"><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Отправить</span></button>
+		</div>
+
+		<div class="consent contact-form__consent" data-required-group="consent">
+			<input class="radio-control" type="checkbox" name="career_consent" id="popup-career-consent">
+			<span class="consent__text">
+					Нажимая на кнопку «Отправить», вы даете <a href="index.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="index.html">политикой обработки персональных данных</a>.
+			</span>
+			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
+		</div>
+	</form>
+</section>
+		</div>
+
+				<div class="popup__pane popup__pane--result" data-popup-pane="success" hidden="">
+			<div class="form-result">
+				<span class="form-result__icon form-result__icon--success">
+					<svg class="icon icon--check" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+</svg>
+				</span>
+				<h2 class="form-result__title">Заявка отправлена</h2>
+				<p class="form-result__text">Спасибо! Мы получили вашу заявку<br>и свяжемся с вами в ближайшее время.</p>
+				<button type="button" class="btn btn--cta form-result__action" data-popup-close=""><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Готово</span></button>
+			</div>
+		</div>
+
+		<div class="popup__pane popup__pane--result" data-popup-pane="error" hidden="">
+			<div class="form-result">
+				<span class="form-result__icon form-result__icon--error">
+					<svg class="icon icon--x" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <path d="M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+  <path d="M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+</svg>
+				</span>
+				<h2 class="form-result__title">Что-то пошло не так</h2>
+				<p class="form-result__text">Не удалось отправить заявку.<br>Попробуйте еще раз или обновите страницу.</p>
+				<button type="button" class="btn btn--cta form-result__action" data-popup-retry=""><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Попробовать снова</span></button>
+			</div>
+		</div>
+	</div>
+
+		<div class="popup__note container" data-popup-note="">
+		<p class="popup__note-text">
+			Не любите заполнять формы?<br>
+			Пишите нам сразу на <a href="mailto:hello@onyca.digital">почту</a> или в <a href="http://t.me/hello_onycadigital" target="_blank" rel="noopener">Telegram</a>
+		</p>
+	</div>
+</div>
+<div class="discuss-button is-visible" data-discuss-button="">
+	<a class="btn btn--cta btn--cta--primary discuss-button__btn" href="contacts.html" data-popup-open="project"><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">
+		<span class="btn__text">Обсудить проект</span>
+	</span></a>
+</div>
 
 <script type="speculationrules">
 {"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/onyca-digital/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}

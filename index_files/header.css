@@ -221,25 +221,39 @@ body.admin-bar .site-header {
 }
 
 /*
- * Первый экран главной: шапка не липнет, а уезжает вместе со страницей
- * и не выпадает при прокрутке вверх. Класс ставит JS (initHeaderScroll)
- * и снимает его, когда первый экран пройден. top сбрасываем: иначе
- * правило админ-панели сдвинуло бы шапку вниз в обычном потоке.
+ * Главная: пока идёт первый экран, шапка не липнет, а уезжает вместе со
+ * страницей. Это состояние по умолчанию — задано стилями, а не скриптом:
+ * иначе при загрузке шапка успевала мигнуть липкой, пока не отработает
+ * JS. Липкой её делает класс .is-sticky (initHeaderScroll), когда
+ * первый экран пройден.
+ *
+ * top сбрасываем: отступ от админ-панели в обычном потоке превращается
+ * в пустую полосу над шапкой.
  */
-/* На кадре смены поведения переход не нужен — см. initHeaderScroll */
-.site-header.is-instant {
-	transition: none;
+body.home .site-header,
+body.home.admin-bar .site-header {
+	position: relative;
+	top: auto;
 }
 
-.site-header.is-static,
-body.admin-bar .site-header.is-static {
-	position: relative;
-	/*
-	 * Сбрасываем отступ, который шапке даёт админ-панель: в обычном
-	 * потоке он превращается в пустую полосу над шапкой. Селектор с
-	 * body.admin-bar нужен, чтобы перебить то правило по весу.
-	 */
-	top: auto;
+body.home .site-header.is-sticky {
+	position: sticky;
+	top: 0;
+}
+
+body.home.admin-bar .site-header.is-sticky {
+	top: 32px;
+}
+
+@media (max-width: 782px) {
+	body.home.admin-bar .site-header.is-sticky {
+		top: 46px;
+	}
+}
+
+/* На кадре, когда шапка становится липкой, уход анимировать не нужно */
+.site-header.is-instant {
+	transition: none;
 }
 
 /* Панель WP admin bar (32px, фиксирована, z-index 99999) иначе перекрывает
@@ -410,12 +424,26 @@ body.admin-bar .site-header.is-static {
 		display: flex;
 		flex-direction: column;
 		background-color: var(--color-white);
+		/*
+		 * Панель уезжает вверх, а не исчезает рывком. Показывает и
+		 * прячет её JS (initBurgerMenu) — атрибут hidden он снимает
+		 * сразу, а класс с состоянием ставит следующим кадром, чтобы
+		 * переход успел проиграться.
+		 */
+		transform: translateY(-100%);
+		opacity: 0;
+		transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
 		/* 52px = 110 (отметка первого пункта в макете, отсчёт от верха
 		   экрана) − 58 (высота шапки). Панель начинается под шапкой,
 		   поэтому внутри неё остаётся именно 52. Одинаково на 1200, 700 и
 		   360 — высота шапки на всех трёх точках 58px, интерполировать
 		   нечего. Раньше тут стояли все 110, и «Проекты» падали на 192. */
 		padding: 52px 25px 25px;
+	}
+
+	.burger-menu.is-open {
+		transform: translateY(0);
+		opacity: 1;
 	}
 
 	.burger-menu__list {

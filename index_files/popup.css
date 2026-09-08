@@ -9,6 +9,50 @@
  * блоков — тогда дописать медиазапросы сюда.
  */
 
+/*
+ * Появление: подложка проявляется, а содержимое выезжает снизу на 40px.
+ * Классы ставит JS (initPopup): .is-open — открытое состояние. Сверху
+ * поп-ап не «падает» — он во весь экран, и падение читается тяжело.
+ */
+.popup {
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.popup.is-open {
+	opacity: 1;
+}
+
+.popup__bar,
+.popup__body,
+.popup__note {
+	transform: translateY(40px);
+	transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.popup.is-open .popup__bar,
+.popup.is-open .popup__body,
+.popup.is-open .popup__note {
+	transform: translateY(0);
+}
+
+/* Закрытие вдвое быстрее открытия */
+.popup:not(.is-open) .popup__bar,
+.popup:not(.is-open) .popup__body,
+.popup:not(.is-open) .popup__note {
+	transition-duration: 0.22s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.popup,
+	.popup__bar,
+	.popup__body,
+	.popup__note {
+		transition: none;
+		transform: none;
+	}
+}
+
 .popup {
 	position: fixed;
 	inset: 0;
@@ -188,6 +232,7 @@ body.admin-bar .popup {
 	}
 
 	.popup__close:hover {
-		color: var(--color-accent-blue);
+		/* Пиктограмма сереет, а не синеет */
+		color: var(--color-text-muted);
 	}
 }
