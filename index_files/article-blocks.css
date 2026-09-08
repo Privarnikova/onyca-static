@@ -170,17 +170,12 @@
  */
 .article-content {
 	/*
-	 * Тело статьи — сетка страницы целиком: текст стоит в колонках 3–5,
-	 * а заголовок раздела и цитата выносятся на поля, в колонки 1–2.
-	 * Раскладка именно сеткой, а не выносом из потока: так вынесенные
-	 * элементы занимают своё место и не наезжают друг на друга, какой бы
-	 * длины ни было содержимое.
+	 * Текст разбит на разделы: заголовок раздела стоит слева, на полях,
+	 * а весь текст раздела — справа, одним потоком (в макете это
+	 * отдельный фрейм «Тело статьи»). Так высоту строки задаёт текст:
+	 * заголовок в две строки не отодвигает первый абзац вниз.
 	 */
 	display: grid;
-	grid-template-columns: repeat(6, minmax(0, 1fr));
-	column-gap: var(--grid-gap);
-	/* Блоки в строке держатся верха, а не растягиваются по её высоте */
-	align-items: start;
 	/*
 	 * Слово, которое не влезает в свою колонку, переносится по буквам
 	 * (в макете у всех текстов статьи стоит word-break: break-word).
@@ -192,35 +187,55 @@
 	line-height: var(--line-height-b1);
 }
 
-.article-content > * {
+/* Раздел: заголовок в колонках 1–2, текст — в 3–5 */
+.article-section {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	align-items: start;
+}
+
+/* Раздел отбивается от предыдущего на 118 — как первый экран от шоурила */
+.article-content > .article-section + .article-section {
+	margin-top: 118px;
+}
+
+.article-section__body {
 	grid-column: 3 / 6;
+	/* Цитата выносится влево относительно текста раздела */
+	position: relative;
+	/* Колонка сетки внутри текста: он занимает три колонки из шести */
+	--article-column: calc((100% - 2 * var(--grid-gap)) / 3);
+}
+
+.article-section__body > * {
 	/* Текст, буллеты, подписи — 16 от предыдущего блока */
 	margin-top: 16px;
 }
 
-.article-content > :first-child {
+.article-section__body > :first-child {
 	margin-top: 0;
 }
 
-.article-content > h2 {
+.article-section__body > h2 {
 	margin-top: 64px;
 }
 
-.article-content > h3 {
+.article-section__body > h3 {
 	margin-top: 32px;
 }
 
 /* Крупные блоки отбиваются сильнее — 48 (легенды у таблицы, этапов,
    цифр, тезисов и фото) */
-.article-content > .wp-block-table,
-.article-content > .article-stages,
-.article-content > .article-numbers,
-.article-content > .article-theses,
-.article-content > .article-media {
+.article-section__body > .wp-block-table,
+.article-section__body > .article-stages,
+.article-section__body > .article-numbers,
+.article-section__body > .article-theses,
+.article-section__body > .article-media {
 	margin-top: 48px;
 }
 
-.article-content > p {
+.article-section__body > p {
 	margin-bottom: 0;
 }
 
@@ -231,67 +246,61 @@
  * не задаём числа заново: на 1600 и ниже размеры уедут вместе со всей
  * типографикой сайта.
  */
-.article-content > h1 {
+.article-section > h1 {
+	grid-column: 1 / 3;
+	margin: 0;
 	font-size: var(--font-size-h4);
 }
 
-.article-content > h2 {
+.article-section__body > h2 {
 	font-size: var(--font-size-h5);
 }
 
-.article-content > h3 {
+.article-section__body > h3 {
 	font-size: var(--font-size-h6);
 }
 
 /*
- * Поля слева. Два элемента стоят не в колонке текста, а в колонках 1–2:
- * заголовок раздела H1 (1257:4845 и 1865:4161 — оба на x 40) и цитата
- * (1257:4739).
- *
- * Блок, который идёт следом, встаёт в ту же строку сетки — справа от
- * них. А два вынесенных элемента подряд идут друг под другом, каждый со
- * своим отступом.
+ * Поля слева. Заголовок раздела (1257:4845 и 1865:4161 — оба на x 40) и
+ * цитата (1257:4739) стоят в колонках 1–2, но текст занимает там не всю
+ * ширину, а полторы колонки — 455 при колонке 290. От этой ширины
+ * зависят переносы строк, поэтому она задана долей сетки, а не числом.
  */
-.article-content > h1,
-.article-content > .article-quote {
-	grid-column: 1 / 3;
+.article-section > h1,
+.article-section__body > .article-quote {
+	max-width: calc((100% - var(--grid-gap)) / 2 * 1.5 + var(--grid-gap));
 }
 
 /*
- * Заголовок раздела и блок, который идёт за ним, — это одна строка
- * статьи: слева заголовок, справа текст. Поэтому оба отбиваются от
- * предыдущего блока одинаково — на 118, как первый экран отбивается от
- * шоурила, — и их верхние границы совпадают.
+ * Цитата стоит слева от колонки текста и встаёт вровень с блоком, рядом
+ * с которым её поставил редактор (в макете — вровень с верхом второго
+ * шоурила). В потоке она не участвует, иначе текст разъезжался бы
+ * вокруг неё, а отступ сверху берёт такой же, как у следующего блока.
  */
-.article-content > h1,
-.article-content > h1 + :is(h2, h3, p, ul, .wp-block-table, .article-stages, .article-numbers, .article-theses, .article-media) {
-	margin-top: 118px;
+.article-section__body > .article-quote {
+	position: absolute;
+	/*
+	 * Левый край цитаты — левый край сетки: две колонки с зазорами
+	 * левее колонки текста. Ширина, как у заголовка раздела, — полторы
+	 * колонки (455 при колонке 290).
+	 */
+	left: calc(-2 * (var(--article-column) + var(--grid-gap)));
+	width: calc(1.5 * var(--article-column) + var(--grid-gap));
 }
 
-/* Первая строка тела своего отступа не имеет: его задаёт первый экран */
-.article-content > h1:first-child,
-.article-content > h1:first-child + :is(h2, h3, p, ul, .wp-block-table, .article-stages, .article-numbers, .article-theses, .article-media) {
-	margin-top: 0;
-}
-
-/*
- * Цитата так же встаёт вровень с блоком, рядом с которым её поставил
- * редактор (в макете — вровень с верхом второго шоурила), поэтому
- * отступ сверху берёт такой же, какой у следующего блока.
- */
-.article-content > .article-quote:has(+ h2) {
+.article-section__body > .article-quote:has(+ h2) {
 	margin-top: 64px;
 }
 
-.article-content > .article-quote:has(+ h3) {
+.article-section__body > .article-quote:has(+ h3) {
 	margin-top: 32px;
 }
 
-.article-content > .article-quote:has(+ .wp-block-table),
-.article-content > .article-quote:has(+ .article-stages),
-.article-content > .article-quote:has(+ .article-numbers),
-.article-content > .article-quote:has(+ .article-theses),
-.article-content > .article-quote:has(+ .article-media) {
+.article-section__body > .article-quote:has(+ .wp-block-table),
+.article-section__body > .article-quote:has(+ .article-stages),
+.article-section__body > .article-quote:has(+ .article-numbers),
+.article-section__body > .article-quote:has(+ .article-theses),
+.article-section__body > .article-quote:has(+ .article-media) {
 	margin-top: 48px;
 }
 
@@ -300,7 +309,7 @@
  * Селектор именно по классу блока списка: тезисы и этапы — тоже списки,
  * но со своей раскладкой.
  */
-.article-content ul.wp-block-list {
+.article-section__body ul.wp-block-list {
 	display: grid;
 	row-gap: 4px;
 	/* Отступ сверху общий для всех блоков — здесь только низ */
@@ -309,13 +318,13 @@
 	list-style: none;
 }
 
-.article-content ul.wp-block-list > li {
+.article-section__body ul.wp-block-list > li {
 	position: relative;
 	/* 36px при кегле 16 — 2.25em, дальше растёт вместе с текстом */
 	padding-left: 2.25em;
 }
 
-.article-content ul.wp-block-list > li::before {
+.article-section__body ul.wp-block-list > li::before {
 	content: "";
 	position: absolute;
 	/* Центр точки на 18px от края: 1.125em минус её радиус */
@@ -346,11 +355,11 @@
  * Сколько в таблице колонок, видно только из разметки — :has() читает
  * это по последней ячейке строки.
  */
-.article-content .wp-block-table {
+.article-section__body .wp-block-table {
 	--table-columns: 3;
 }
 
-.article-content .wp-block-table:has(tr > :nth-child(2):last-child) {
+.article-section__body .wp-block-table:has(tr > :nth-child(2):last-child) {
 	--table-columns: 2;
 }
 
@@ -359,15 +368,15 @@
  * две (290 и 600, вариант «4 пункта 2 столбца»). Поэтому строка делится
  * на три доли, а вторая ячейка занимает две.
  */
-.article-content .wp-block-table:has(tr > :nth-child(2):last-child) tr {
+.article-section__body .wp-block-table:has(tr > :nth-child(2):last-child) tr {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.article-content .wp-block-table:has(tr > :nth-child(2):last-child) tr > :last-child {
+.article-section__body .wp-block-table:has(tr > :nth-child(2):last-child) tr > :last-child {
 	grid-column: span 2;
 }
 
-.article-content .wp-block-table:has(tr > :nth-child(4):last-child) {
+.article-section__body .wp-block-table:has(tr > :nth-child(4):last-child) {
 	--table-columns: 4;
 }
 
@@ -375,14 +384,14 @@
  * Обёртка таблицы: боковые отступы у figure браузерные, снизу — от
  * стилей блоков WordPress, нам они не нужны.
  */
-.article-content .wp-block-table {
+.article-section__body .wp-block-table {
 	margin-inline: 0;
 	margin-bottom: 0;
 }
 
-.article-content .wp-block-table table,
-.article-content .wp-block-table thead,
-.article-content .wp-block-table tbody {
+.article-section__body .wp-block-table table,
+.article-section__body .wp-block-table thead,
+.article-section__body .wp-block-table tbody {
 	display: block;
 	width: 100%;
 	/* Своей линии под шапкой в макете нет — у блока таблицы WordPress
@@ -397,7 +406,7 @@
 	line-height: 0;
 }
 
-.article-content .wp-block-table tr {
+.article-section__body .wp-block-table tr {
 	display: grid;
 	grid-template-columns: repeat(var(--table-columns), minmax(0, 1fr));
 	column-gap: var(--grid-gap);
@@ -405,17 +414,17 @@
 	padding-bottom: 24px;
 }
 
-.article-content .wp-block-table tbody tr {
+.article-section__body .wp-block-table tbody tr {
 	border-bottom: 1px solid var(--color-divider);
 }
 
 /* Каждая следующая строка отбивается от линии предыдущей */
-.article-content .wp-block-table tbody tr + tr {
+.article-section__body .wp-block-table tbody tr + tr {
 	padding-top: 24px;
 }
 
-.article-content .wp-block-table th,
-.article-content .wp-block-table td {
+.article-section__body .wp-block-table th,
+.article-section__body .wp-block-table td {
 	padding: 0;
 	border: none;
 	font-size: var(--font-size-b1);
@@ -424,10 +433,10 @@
 	text-align: left;
 }
 
-.article-content .wp-block-table th {
+.article-section__body .wp-block-table th {
 	color: var(--color-text-disclaimer);
 }
 
-.article-content .wp-block-table td {
+.article-section__body .wp-block-table td {
 	color: var(--color-text);
 }

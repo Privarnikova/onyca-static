@@ -100,19 +100,28 @@
 		margin-top: 52px;
 	}
 
-	/* Полей слева нет — всё идёт одной колонкой, друг под другом */
-	.article-content {
+	/* Полей слева нет — заголовок раздела и цитата идут в общем потоке */
+	.article-section {
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	.article-content > *,
-	.article-content > h1,
-	.article-content > .article-quote {
+	.article-section > h1,
+	.article-section__body {
 		grid-column: 1 / -1;
+		max-width: none;
 	}
 
-	.article-content > h1,
-	.article-content > .article-quote {
+	.article-section > h1 {
+		margin-bottom: 32px;
+	}
+
+	.article-content > .article-section + .article-section {
+		margin-top: 52px;
+	}
+
+	.article-section__body > .article-quote {
+		position: static;
+		width: auto;
 		margin-top: 48px;
 	}
 

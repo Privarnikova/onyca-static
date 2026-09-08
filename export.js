@@ -1,7 +1,8 @@
 /**
  * Снимает статическую копию сайта с локального WordPress в
  * ~/Desktop/onyca-static: главную (index.html), Контакты, прайс-лист,
- * страницы направлений, блог со статьями и страницу 404 (404.html —
+ * страницы направлений, блог со статьями, правовые документы и
+ * страницу 404 (404.html —
  * GitHub Pages сам отдаёт её на несуществующие адреса).
  *
  * Скачивает стили, скрипты, картинки и шрифты в index_files/, переписывает
@@ -54,6 +55,8 @@ const PAGES = [
   { url: 'http://localhost:8080/services/cg-motion/', out: 'cg-motion.html' },
   { url: 'http://localhost:8080/services/design-support/', out: 'design-support.html' },
   { url: 'http://localhost:8080/blog/', out: 'blog.html' },
+  { url: 'http://localhost:8080/policy/', out: 'policy.html' },
+  { url: 'http://localhost:8080/cookie/', out: 'cookie.html' },
   { url: 'http://localhost:8080/no-such-page-for-404/', out: '404.html' },
 ];
 
@@ -70,6 +73,8 @@ const ROUTES = [
   ['/services/', 'price-list.html'],
   ['/contacts/', 'contacts.html'],
   ['/blog/', 'blog.html'],
+  ['/policy/', 'policy.html'],
+  ['/cookie/', 'cookie.html'],
 ];
 const OUT = path.join(process.env.HOME, 'Desktop/onyca-static');
 const FILES = path.join(OUT, 'index_files');
@@ -98,6 +103,11 @@ async function collectFromSitemap( browser, sitemap, prefix ) {
   const links = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
 
   for (const link of links) {
+    /* Карта записей включает и саму страницу блога — она уже в списке */
+    if (PAGES.some(page => page.url === link)) {
+      continue;
+    }
+
     const pathname = new URL(link).pathname;
     /* Имя файла — последний кусок адреса: у услуг перед ним ещё лежит
        направление, и оно в имени не нужно */

@@ -149,3 +149,25 @@
 .blog-page__filters .tab-pill {
 	text-decoration: none;
 }
+
+/*
+ * Ниже 1200 макетов блога нет. Чтобы страница не разъезжалась, сетка
+ * складывается: три карточки в ряд на планшете и одна на телефоне —
+ * иначе карточка в две колонки шире самого экрана и появляется
+ * горизонтальная прокрутка.
+ */
+@media (max-width: 1199px) {
+	.blog-page__grid {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.card-post {
+		grid-column: span 1;
+	}
+}
+
+@media (max-width: 699px) {
+	.blog-page__grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}

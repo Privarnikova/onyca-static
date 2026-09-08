@@ -279,7 +279,12 @@
 
 .numbers__value {
 	margin: 0;
-	font-size: var(--font-size-number);
+	/*
+	 * Ниже 1920 макета нет, а число в четырёх колонках перестаёт
+	 * помещаться и растягивает страницу. Поэтому кегль едет вместе с
+	 * шириной окна и на узких экранах доходит до 32.
+	 */
+	font-size: clamp(32px, calc(-1.8px + 3.385vw), var(--font-size-number));
 	font-weight: var(--font-weight-heading);
 	line-height: var(--line-height-heading);
 	color: var(--color-text);
@@ -297,4 +302,50 @@
 .specialization .contact-form-section {
 	margin-block: 0;
 	padding-inline: 0;
+}
+
+/*
+ * Тезисы «Сотрудничества» ниже 1200 идут по три в ряд, а на телефоне —
+ * по одному: две колонки из шести там уже уже экрана и растягивают
+ * страницу. Своего макета у блока на этих ширинах нет.
+ */
+@media (max-width: 1199px) {
+	.collaboration__list {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.collaboration__item {
+		grid-column: span 1;
+	}
+}
+
+@media (max-width: 699px) {
+	.collaboration__list {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+/*
+ * Ниже 1200 показатели встают в две колонки: четыре в ряд там уже не
+ * читаются, а на телефоне остаётся одна колонка. Своих макетов у блока
+ * на этих ширинах нет — задача правила только в том, чтобы блок не
+ * разъезжался.
+ */
+@media (max-width: 1199px) {
+	.numbers__list {
+		grid-column: 1 / -1;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		row-gap: 32px;
+	}
+
+	.numbers__title {
+		grid-column: 1 / -1;
+		margin-bottom: 32px;
+	}
+}
+
+@media (max-width: 699px) {
+	.numbers__list {
+		grid-template-columns: minmax(0, 1fr);
+	}
 }
