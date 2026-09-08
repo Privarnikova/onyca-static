@@ -52,6 +52,7 @@ const PAGES = [
   { url: 'http://localhost:8080/services/branding/', out: 'branding.html' },
   { url: 'http://localhost:8080/services/ux-ui/', out: 'ux-ui.html' },
   { url: 'http://localhost:8080/services/cg-motion/', out: 'cg-motion.html' },
+  { url: 'http://localhost:8080/services/design-support/', out: 'design-support.html' },
   { url: 'http://localhost:8080/blog/', out: 'blog.html' },
   { url: 'http://localhost:8080/no-such-page-for-404/', out: '404.html' },
 ];
@@ -65,6 +66,7 @@ const ROUTES = [
   ['/services/branding/', 'branding.html'],
   ['/services/ux-ui/', 'ux-ui.html'],
   ['/services/cg-motion/', 'cg-motion.html'],
+  ['/services/design-support/', 'design-support.html'],
   ['/services/', 'price-list.html'],
   ['/contacts/', 'contacts.html'],
   ['/blog/', 'blog.html'],
@@ -73,29 +75,37 @@ const OUT = path.join(process.env.HOME, 'Desktop/onyca-static');
 const FILES = path.join(OUT, 'index_files');
 
 /**
- * Статьи блога в список страниц вручную не вписываем: их количество
- * меняется. Открываем блог и берём адреса прямо с карточек — тогда в
- * копию попадают все статьи, и ссылки между ними работают.
+ * Статьи и услуги в список страниц вручную не вписываем: их количество
+ * меняется. Берём адреса из карт сайта — там перечислены все записи
+ * нужного типа, включая те, на которые нет ссылок в меню и списках.
  *
  * @param {import('playwright').Browser} browser
+ * @param {string} sitemap Имя карты, например 'post-sitemap.xml'.
+ * @param {string} prefix  Начало имени файла в копии.
  */
-async function collectArticles( browser ) {
+async function collectFromSitemap( browser, sitemap, prefix ) {
   const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
 
-  await page.goto('http://localhost:8080/blog/', { waitUntil: 'load' });
+  await page.goto('http://localhost:8080/', { waitUntil: 'load' });
 
-  const links = await page.evaluate(() => [...new Set(
-    [...document.querySelectorAll('.card-post__link')].map(a => a.href)
-  )]);
+  const xml = await page.evaluate(
+    async url => ( await fetch( url ) ).text(),
+    'http://localhost:8080/' + sitemap
+  );
 
   await page.close();
 
+  const links = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
+
   for (const link of links) {
-    const slug = new URL(link).pathname.replace(/\//g, '');
-    const out = 'article-' + slug + '.html';
+    const pathname = new URL(link).pathname;
+    /* Имя файла — последний кусок адреса: у услуг перед ним ещё лежит
+       направление, и оно в имени не нужно */
+    const slug = pathname.replace(/\/$/, '').split('/').pop();
+    const out = prefix + slug + '.html';
 
     PAGES.splice(PAGES.length - 1, 0, { url: link, out });
-    ROUTES.push(['/' + slug + '/', out]);
+    ROUTES.push([pathname, out]);
   }
 
   /* Длинные пути должны стоять раньше коротких — иначе короткий
@@ -107,7 +117,8 @@ async function collectArticles( browser ) {
   const executablePath = findChromium();
   const browser = await chromium.launch(executablePath ? { executablePath } : {});
 
-  await collectArticles(browser);
+  await collectFromSitemap(browser, 'post-sitemap.xml', 'article-');
+  await collectFromSitemap(browser, 'service-sitemap.xml', 'service-');
   const assets = new Map();
   const pages = [];
 

@@ -1,0 +1,112 @@
+/**
+ * Первый экран статьи и услуги — Figma 1257:4539 и 1789:4203 (десктоп
+ * 1920): заголовок слева, описание справа, под ними полотно во всю
+ * ширину сетки.
+ *
+ * У статьи под описанием стоят тема и дата, у услуги их нет — разметку
+ * даёт общий шаблон template-parts/blocks/article-hero.php.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов других разрешений пока нет.
+ */
+
+.article-hero {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 52 от заголовка с описанием до обложки */
+	row-gap: 52px;
+	/* 18 от крошек */
+	margin-top: 18px;
+}
+
+.article-hero__title {
+	grid-column: 1 / 4;
+	margin: 0;
+}
+
+.article-hero__summary {
+	grid-column: 4 / 6;
+	display: grid;
+	align-content: start;
+	/* 42 от описания до «Темы статьи» */
+	row-gap: 42px;
+}
+
+.article-hero__lead {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+.article-hero__facts {
+	display: grid;
+	/* 42 между парами «подпись — значение» */
+	row-gap: 42px;
+	margin: 0;
+}
+
+.article-hero__fact {
+	display: grid;
+	/* 12 от подписи до значения */
+	row-gap: 12px;
+}
+
+.article-hero__fact-label {
+	margin: 0;
+	font-size: var(--font-size-h6);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+}
+
+.article-hero__fact-value {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-secondary);
+}
+
+.article-hero__cover {
+	/* Обложка идёт во всю ширину сетки, под заголовком и описанием */
+	grid-column: 1 / -1;
+	aspect-ratio: 1840 / 900;
+}
+
+/*
+ * У услуги описание короче, а до полотна отступ больше — 98 против 52
+ * (1789:4203 против 1257:4539).
+ */
+.article-hero--service {
+	row-gap: 98px;
+}
+
+/* Ниже 1200 макетов нет: заголовок и описание идут друг под другом */
+@media (max-width: 1199px) {
+	.article-hero,
+	.article-hero--service {
+		row-gap: 32px;
+	}
+
+	.article-hero__title,
+	.article-hero__summary {
+		grid-column: 1 / -1;
+	}
+
+	.article-hero__summary {
+		row-gap: 32px;
+	}
+
+	.article-hero__facts {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		column-gap: var(--grid-gap);
+		row-gap: 32px;
+	}
+}
+
+@media (max-width: 699px) {
+	.article-hero__facts {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 32px;
+	}
+}

@@ -1,10 +1,12 @@
 /**
- * Страница статьи — Figma 1257:4539 (десктоп 1920), fileKey
- * 93JlTAOwjlBO4naQ7ReAFF.
+ * Страница материала — статья (Figma 1257:4539) и услуга (1789:4203),
+ * десктоп 1920, fileKey 93JlTAOwjlBO4naQ7ReAFF.
  *
- * Первый экран: крошки, заголовок и описание, обложка во всю ширину.
- * Ниже — тело статьи в колонках 3–5 сетки; его содержимое описано в
- * components/article-blocks.css.
+ * Обе страницы устроены одинаково: крошки, первый экран с заголовком и
+ * описанием, обложка во всю ширину, тело в колонках 3–5 сетки. Отличие
+ * только в том, что идёт после текста: у статьи «Другие статьи», у
+ * услуги — проекты студии и форма. Содержимое тела описано в
+ * components/article-blocks.css, первый экран — в article-hero.css.
  *
  * Отступы по вертикали разные (18 от крошек, 118 от обложки до текста,
  * 188 до «Других статей»), поэтому это не общий row-gap, а отступ у
@@ -13,7 +15,7 @@
  * ВНИМАНИЕ: свёрстано под 1920, макетов других разрешений пока нет.
  */
 
-.post-single {
+.article-page {
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);
@@ -21,75 +23,11 @@
 	padding-bottom: 188px;
 }
 
-.post-single > * {
+.article-page > * {
 	grid-column: 1 / -1;
 }
 
-.post-single__hero {
-	display: grid;
-	grid-template-columns: repeat(6, minmax(0, 1fr));
-	column-gap: var(--grid-gap);
-	/* 52 от заголовка с описанием до обложки */
-	row-gap: 52px;
-	/* 18 от крошек */
-	margin-top: 18px;
-}
-
-.post-single__title {
-	grid-column: 1 / 4;
-	margin: 0;
-}
-
-.post-single__summary {
-	grid-column: 4 / 6;
-	display: grid;
-	align-content: start;
-	/* 42 от описания до «Темы статьи» */
-	row-gap: 42px;
-}
-
-.post-single__lead {
-	margin: 0;
-	font-size: var(--font-size-b1);
-	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-b1);
-}
-
-.post-single__facts {
-	display: grid;
-	/* 42 между парами «подпись — значение» */
-	row-gap: 42px;
-	margin: 0;
-}
-
-.post-single__fact {
-	display: grid;
-	/* 12 от подписи до значения */
-	row-gap: 12px;
-}
-
-.post-single__fact-label {
-	margin: 0;
-	font-size: var(--font-size-h6);
-	font-weight: var(--font-weight-heading);
-	line-height: var(--line-height-heading);
-}
-
-.post-single__fact-value {
-	margin: 0;
-	font-size: var(--font-size-b1);
-	font-weight: var(--font-weight-body);
-	line-height: var(--line-height-b1);
-	color: var(--color-text-secondary);
-}
-
-.post-single__cover {
-	/* Обложка идёт во всю ширину сетки, под заголовком и описанием */
-	grid-column: 1 / -1;
-	aspect-ratio: 1840 / 900;
-}
-
-.post-single__body {
+.article-page__body {
 	/* Тело занимает всю сетку: колонки внутри распределяет само —
 	   текст в 3–5, поля с цитатой и заголовком раздела в 1–2 */
 	grid-column: 1 / -1;
@@ -137,31 +75,28 @@
 }
 
 /*
+ * Страница услуги (1789:4203): после текста идут проекты студии и
+ * форма, и все три блока разделены тем же отступом 188, что и «Другие
+ * статьи» у статьи.
+ */
+.article-page--service .studio-projects,
+.article-page--service .contact-form-section {
+	margin-top: 188px;
+}
+
+/* Свои поля и внешние отступы формы здесь не нужны — их даёт страница */
+.article-page--service .contact-form-section {
+	margin-bottom: 0;
+	padding-inline: 0;
+}
+
+/*
  * Ниже 1200 макетов статьи нет. Чтобы страница не разъезжалась,
  * колонки складываются: заголовок и описание идут друг под другом,
  * текст занимает всю ширину, цитата встаёт в поток на своё место.
  */
 @media (max-width: 1199px) {
-	.post-single__hero {
-		row-gap: 32px;
-	}
-
-	.post-single__title,
-	.post-single__summary {
-		grid-column: 1 / -1;
-	}
-
-	.post-single__summary {
-		row-gap: 32px;
-	}
-
-	.post-single__facts {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		column-gap: var(--grid-gap);
-		row-gap: 32px;
-	}
-
-	.post-single__body {
+	.article-page__body {
 		margin-top: 52px;
 	}
 
@@ -181,11 +116,13 @@
 		margin-top: 48px;
 	}
 
-	.other-articles {
+	.other-articles,
+	.article-page--service .studio-projects,
+	.article-page--service .contact-form-section {
 		margin-top: 78px;
 	}
 
-	.post-single {
+	.article-page {
 		padding-bottom: 78px;
 	}
 
@@ -195,7 +132,6 @@
 }
 
 @media (max-width: 699px) {
-	.post-single__facts,
 	.other-articles__grid {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 32px;
