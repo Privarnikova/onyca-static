@@ -228,27 +228,27 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="blog-page__head">
 		<h1 class="blog-page__title">Блог</h1>
 
-					<nav class="blog-page__filters" aria-label="Фильтр статей по темам">
-			<a class="tab-pill is-selected" href="blog.html">
+					<nav class="blog-page__filters" aria-label="Фильтр статей по темам" data-blog-filters="">
+			<a class="tab-pill is-selected" href="blog.html" data-topic="">
 				Все			</a>
 
-							<a class="tab-pill" href="blog-topic-animation.html">
+							<a class="tab-pill" href="blog-topic-animation.html" data-topic="animation">
 					Анимация				</a>
-							<a class="tab-pill" href="blog-topic-branding.html">
+							<a class="tab-pill" href="blog-topic-branding.html" data-topic="branding">
 					Брендинг				</a>
-							<a class="tab-pill" href="blog-topic-design.html">
+							<a class="tab-pill" href="blog-topic-design.html" data-topic="design">
 					Дизайн				</a>
-							<a class="tab-pill" href="blog-topic-interfaces.html">
+							<a class="tab-pill" href="blog-topic-interfaces.html" data-topic="interfaces">
 					Интерфейсы				</a>
-							<a class="tab-pill" href="blog-topic-novosti.html">
+							<a class="tab-pill" href="blog-topic-novosti.html" data-topic="novosti">
 					Новости				</a>
-							<a class="tab-pill" href="blog-topic-processes.html">
+							<a class="tab-pill" href="blog-topic-processes.html" data-topic="processes">
 					Процессы				</a>
 					</nav>
 		</div>
 
-			<div class="blog-page__grid">
-			<article class="card-post card-post--regular post-192 post type-post status-publish format-standard hentry category-bez-rubriki topic-novosti">
+			<div class="blog-page__grid" data-blog-grid="">
+			<article class="card-post card-post--regular post-192 post type-post status-publish format-standard hentry category-bez-rubriki topic-novosti" data-topics="novosti">
 	<a class="card-post__link" href="article-lorem-ipsum-dolor-sit-amet-consectetur-lorem.html">
 		<span class="card-post__cover">
 					</span>
@@ -261,7 +261,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--tall post-157 post type-post status-publish format-standard hentry category-bez-rubriki topic-design">
+<article class="card-post card-post--tall post-157 post type-post status-publish format-standard hentry category-bez-rubriki topic-design" data-topics="design">
 	<a class="card-post__link" href="article-kak-my-sobiraem-aydentiku-za-chetyre-nedeli.html">
 		<span class="card-post__cover">
 					</span>
@@ -274,7 +274,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--regular post-158 post type-post status-publish format-standard hentry category-bez-rubriki topic-branding">
+<article class="card-post card-post--regular post-158 post type-post status-publish format-standard hentry category-bez-rubriki topic-branding" data-topics="branding">
 	<a class="card-post__link" href="article-chto-delat-esli-brend-perestal-uznavatsya.html">
 		<span class="card-post__cover">
 					</span>
@@ -287,7 +287,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--regular post-159 post type-post status-publish format-standard hentry category-bez-rubriki topic-interfaces">
+<article class="card-post card-post--regular post-159 post type-post status-publish format-standard hentry category-bez-rubriki topic-interfaces" data-topics="interfaces">
 	<a class="card-post__link" href="article-dizayn-sistema-kogda-ona-nuzhna-a-kogda-meshaet.html">
 		<span class="card-post__cover">
 					</span>
@@ -300,7 +300,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--regular post-160 post type-post status-publish format-standard hentry category-bez-rubriki topic-animation">
+<article class="card-post card-post--regular post-160 post type-post status-publish format-standard hentry category-bez-rubriki topic-animation" data-topics="animation">
 	<a class="card-post__link" href="article-pyat-oshibok-v-interfeyse-internet-magazina.html">
 		<span class="card-post__cover">
 					</span>
@@ -313,7 +313,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--tall post-161 post type-post status-publish format-standard hentry category-bez-rubriki topic-processes">
+<article class="card-post card-post--tall post-161 post type-post status-publish format-standard hentry category-bez-rubriki topic-processes" data-topics="processes">
 	<a class="card-post__link" href="article-animaciya-v-interfeyse-gde-ona-pomogaet.html">
 		<span class="card-post__cover">
 					</span>
@@ -326,7 +326,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--wide post-93 post type-post status-publish format-standard hentry category-bez-rubriki">
+<article class="card-post card-post--wide post-93 post type-post status-publish format-standard hentry category-bez-rubriki" data-topics="">
 	<a class="card-post__link" href="article-kak-aydentika-pomogaet-biznesu-rasti.html">
 		<span class="card-post__cover">
 					</span>
@@ -339,7 +339,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--regular post-162 post type-post status-publish format-standard hentry category-bez-rubriki topic-design">
+<article class="card-post card-post--regular post-162 post type-post status-publish format-standard hentry category-bez-rubriki topic-design" data-topics="design">
 	<a class="card-post__link" href="article-kak-my-schitaem-smetu-na-proekt.html">
 		<span class="card-post__cover">
 					</span>
@@ -352,7 +352,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--tall post-163 post type-post status-publish format-standard hentry category-bez-rubriki topic-branding">
+<article class="card-post card-post--tall post-163 post type-post status-publish format-standard hentry category-bez-rubriki topic-branding" data-topics="branding">
 	<a class="card-post__link" href="article-pochemu-my-ne-nachinaem-rabotu-bez-brifa.html">
 		<span class="card-post__cover">
 					</span>
@@ -365,7 +365,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--regular post-164 post type-post status-publish format-standard hentry category-bez-rubriki topic-interfaces">
+<article class="card-post card-post--regular post-164 post type-post status-publish format-standard hentry category-bez-rubriki topic-interfaces" data-topics="interfaces">
 	<a class="card-post__link" href="article-3d-v-reklame-primer-iz-praktiki.html">
 		<span class="card-post__cover">
 					</span>
@@ -378,7 +378,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--tall post-165 post type-post status-publish format-standard hentry category-bez-rubriki topic-animation">
+<article class="card-post card-post--tall post-165 post type-post status-publish format-standard hentry category-bez-rubriki topic-animation" data-topics="animation">
 	<a class="card-post__link" href="article-kak-prohodit-prezentaciya-proekta.html">
 		<span class="card-post__cover">
 					</span>
@@ -391,7 +391,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--regular post-166 post type-post status-publish format-standard hentry category-bez-rubriki topic-processes">
+<article class="card-post card-post--regular post-166 post type-post status-publish format-standard hentry category-bez-rubriki topic-processes" data-topics="processes">
 	<a class="card-post__link" href="article-obnovlenie-sayta-bez-poteri-poziciy.html">
 		<span class="card-post__cover">
 					</span>
@@ -404,7 +404,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--regular post-167 post type-post status-publish format-standard hentry category-bez-rubriki topic-design">
+<article class="card-post card-post--regular post-167 post type-post status-publish format-standard hentry category-bez-rubriki topic-design" data-topics="design">
 	<a class="card-post__link" href="article-chto-vhodit-v-dizayn-podderzhku.html">
 		<span class="card-post__cover">
 					</span>
@@ -417,7 +417,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--wide post-168 post type-post status-publish format-standard hentry category-bez-rubriki topic-branding">
+<article class="card-post card-post--wide post-168 post type-post status-publish format-standard hentry category-bez-rubriki topic-branding" data-topics="branding">
 	<a class="card-post__link" href="article-kak-vybrat-podryadchika-na-brending.html">
 		<span class="card-post__cover">
 					</span>

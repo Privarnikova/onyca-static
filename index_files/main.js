@@ -1766,6 +1766,170 @@
 	}
 
 	/**
+	 * Фильтр статей по темам.
+	 *
+	 * Сами ссылки табов рабочие: без скрипта страница перезагружается и
+	 * выборку делает сервер. Скрипт берёт эту работу на себя — отбирает
+	 * карточки прямо на странице. Так фильтр отзывается сразу и, что
+	 * важнее, работает в статической копии сайта, где сервера нет и
+	 * несколько выбранных тем в адресе некому обработать.
+	 *
+	 * Тем можно отметить несколько: между ними ИЛИ (ТЗ, п. 05-01).
+	 */
+	function initBlogFilter() {
+		var filters = document.querySelector( '[data-blog-filters]' );
+		var grid = document.querySelector( '[data-blog-grid]' );
+
+		if ( ! filters || ! grid ) {
+			return;
+		}
+
+		var selected = [];
+
+		/*
+		 * Что выбрано сейчас: сначала смотрим адрес — по нему страница
+		 * открывается с готовым фильтром. Если параметра нет, берём
+		 * отмеченные табы из разметки: в статической копии фильтр по
+		 * одной теме — это отдельная страница, и адрес там обычный.
+		 */
+		var current = new URLSearchParams( window.location.search ).get( 'topic' );
+
+		if ( current ) {
+			selected = current.split( ',' ).filter( Boolean );
+		} else {
+			filters.querySelectorAll( '[data-topic].is-selected' ).forEach( function ( tab ) {
+				var topic = tab.getAttribute( 'data-topic' );
+
+				if ( topic ) {
+					selected.push( topic );
+				}
+			} );
+		}
+
+		function cards() {
+			return grid.querySelectorAll( '.card-post' );
+		}
+
+		function apply() {
+			cards().forEach( function ( card ) {
+				var topics = ( card.getAttribute( 'data-topics' ) || '' ).split( ' ' );
+				var visible = ! selected.length || selected.some( function ( topic ) {
+					return topics.indexOf( topic ) !== -1;
+				} );
+
+				card.hidden = ! visible;
+			} );
+
+			filters.querySelectorAll( '[data-topic]' ).forEach( function ( tab ) {
+				var topic = tab.getAttribute( 'data-topic' );
+
+				tab.classList.toggle(
+					'is-selected',
+					topic ? selected.indexOf( topic ) !== -1 : ! selected.length
+				);
+			} );
+
+			/*
+			 * Пока фильтр включён, пагинация и догрузка не нужны: на
+			 * странице уже все статьи, которые скрипт успел собрать.
+			 */
+			var footer = document.querySelector( '[data-load-more-area]' );
+
+			if ( footer ) {
+				footer.hidden = selected.length > 0;
+			}
+		}
+
+		/*
+		 * Отбор идёт по карточкам на странице, поэтому перед первым
+		 * фильтром дотягиваем остальные страницы блога — иначе статья со
+		 * второй страницы в выборку не попадёт.
+		 */
+		var loading = null;
+
+		function loadRest() {
+			if ( loading ) {
+				return loading;
+			}
+
+			loading = new Promise( function ( resolve ) {
+				function next() {
+					var link = document.querySelector( '[data-load-more]' );
+
+					if ( ! link ) {
+						resolve();
+						return;
+					}
+
+					window.fetch( link.href )
+						.then( function ( response ) {
+							return response.text();
+						} )
+						.then( function ( html ) {
+							var page = new DOMParser().parseFromString( html, 'text/html' );
+
+							page.querySelectorAll( '[data-blog-grid] .card-post' ).forEach( function ( card ) {
+								grid.appendChild( card );
+							} );
+
+							var area = document.querySelector( '[data-load-more-area]' );
+							var fresh = page.querySelector( '[data-load-more-area]' );
+
+							if ( area && fresh ) {
+								area.innerHTML = fresh.innerHTML;
+							}
+
+							next();
+						} )
+						.catch( resolve );
+				}
+
+				next();
+			} );
+
+			return loading;
+		}
+
+		filters.addEventListener( 'click', function ( event ) {
+			var tab = event.target.closest( '[data-topic]' );
+
+			if ( ! tab ) {
+				return;
+			}
+
+			event.preventDefault();
+
+			var topic = tab.getAttribute( 'data-topic' );
+
+			if ( ! topic ) {
+				selected = [];
+			} else if ( selected.indexOf( topic ) === -1 ) {
+				selected = selected.concat( topic );
+			} else {
+				selected = selected.filter( function ( item ) {
+					return item !== topic;
+				} );
+			}
+
+			/* Адрес остаётся понятным: по нему страница откроется с тем же фильтром */
+			var url = selected.length
+				? window.location.pathname + '?topic=' + selected.join( ',' )
+				: window.location.pathname;
+
+			window.history.replaceState( null, '', url );
+
+			loadRest().then( apply );
+			apply();
+		} );
+
+		if ( selected.length ) {
+			loadRest().then( apply );
+		}
+
+		apply();
+	}
+
+	/**
 	 * «Проекты студии»: карточки складываются стопкой.
 	 *
 	 * Само наложение делает CSS (карточки липкие), а здесь — глубина:
@@ -1900,6 +2064,7 @@
 		initHeaderDropdown();
 		initCounters();
 		initLoadMore();
+		initBlogFilter();
 		initShowreelWatch();
 		initStackedProjects();
 		initClientLogos();

@@ -228,27 +228,27 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="blog-page__head">
 		<h1 class="blog-page__title">Блог</h1>
 
-					<nav class="blog-page__filters" aria-label="Фильтр статей по темам">
-			<a class="tab-pill" href="blog.html">
+					<nav class="blog-page__filters" aria-label="Фильтр статей по темам" data-blog-filters="">
+			<a class="tab-pill" href="blog.html" data-topic="">
 				Все			</a>
 
-							<a class="tab-pill" href="blog-topic-design.html,animation">
+							<a class="tab-pill" href="blog.html" data-topic="animation">
 					Анимация				</a>
-							<a class="tab-pill" href="blog-topic-design.html,branding">
+							<a class="tab-pill" href="blog.html" data-topic="branding">
 					Брендинг				</a>
-							<a class="tab-pill is-selected" href="blog.html">
+							<a class="tab-pill is-selected" href="blog.html" data-topic="design">
 					Дизайн				</a>
-							<a class="tab-pill" href="blog-topic-design.html,interfaces">
+							<a class="tab-pill" href="blog.html" data-topic="interfaces">
 					Интерфейсы				</a>
-							<a class="tab-pill" href="blog-topic-design.html,novosti">
+							<a class="tab-pill" href="blog.html" data-topic="novosti">
 					Новости				</a>
-							<a class="tab-pill" href="blog-topic-design.html,processes">
+							<a class="tab-pill" href="blog.html" data-topic="processes">
 					Процессы				</a>
 					</nav>
 		</div>
 
-			<div class="blog-page__grid">
-			<article class="card-post card-post--regular post-157 post type-post status-publish format-standard hentry category-bez-rubriki topic-design">
+			<div class="blog-page__grid" data-blog-grid="">
+			<article class="card-post card-post--regular post-157 post type-post status-publish format-standard hentry category-bez-rubriki topic-design" data-topics="design">
 	<a class="card-post__link" href="article-kak-my-sobiraem-aydentiku-za-chetyre-nedeli.html">
 		<span class="card-post__cover">
 					</span>
@@ -261,7 +261,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--tall post-162 post type-post status-publish format-standard hentry category-bez-rubriki topic-design">
+<article class="card-post card-post--tall post-162 post type-post status-publish format-standard hentry category-bez-rubriki topic-design" data-topics="design">
 	<a class="card-post__link" href="article-kak-my-schitaem-smetu-na-proekt.html">
 		<span class="card-post__cover">
 					</span>
@@ -274,7 +274,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</span>
 	</a>
 </article>
-<article class="card-post card-post--regular post-167 post type-post status-publish format-standard hentry category-bez-rubriki topic-design">
+<article class="card-post card-post--regular post-167 post type-post status-publish format-standard hentry category-bez-rubriki topic-design" data-topics="design">
 	<a class="card-post__link" href="article-chto-vhodit-v-dizayn-podderzhku.html">
 		<span class="card-post__cover">
 					</span>
@@ -289,7 +289,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 </article>
 		</div>
 
-				<div class="blog-page__footer" data-load-more-area="">
+				<div class="blog-page__footer" data-load-more-area="" hidden="">
 			<div class="blog-page__pagination" data-load-more-pagination="">
 							</div>
 
@@ -539,7 +539,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	</div>
 </div>
 
-<div class="discuss-button is-visible" data-discuss-button="" style="">
+<div class="discuss-button is-visible is-docked" data-discuss-button="" style="top: 941.703px;">
 	<a class="btn btn--cta btn--cta--primary discuss-button__btn" href="contacts.html" data-popup-open="project"><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">
 		<span class="btn__text">Обсудить проект</span>
 	</span></a>
