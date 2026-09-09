@@ -31,9 +31,7 @@
 	color: var(--color-text-disclaimer);
 }
 
-/* Наведение — только с 1200 и на устройствах с курсором */
-@media (hover: hover) and (min-width: 1200px) {
-	.breadcrumbs__link:hover {
-		color: var(--color-text-disclaimer);
-	}
-}
+/*
+ * Наведение — обычная анимация чёрной кнопки к15: подчёркивание из
+ * .link-underline, цвет текста не меняется.
+ */

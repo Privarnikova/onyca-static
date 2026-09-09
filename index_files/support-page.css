@@ -1,0 +1,419 @@
+/**
+ * Страница «Дизайн-поддержка» — Figma 2042:5158 (десктоп 1920),
+ * fileKey 93JlTAOwjlBO4naQ7ReAFF.
+ *
+ * Поля по краям и расстояния между блоками задаёт страница целиком —
+ * как на главной и на специализациях: .support-page это и контейнер, и
+ * сетка с зазором 186.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов других разрешений пока нет.
+ */
+
+.support-page {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	/* 186 между всеми блоками страницы — ритм один на всю полосу */
+	row-gap: 186px;
+	padding-bottom: 186px;
+}
+
+/*
+ * Первый экран (2508:11655): заголовок в колонках 1–3, описание в
+ * 4–5, под ними ролик во всю ширину.
+ */
+.support-hero {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 224 от верха заголовка до ролика при высоте заголовка 130 */
+	row-gap: 94px;
+	align-items: start;
+}
+
+.support-hero__title {
+	grid-column: 1 / 4;
+	/* 765px в макете */
+	max-width: 765px;
+	margin: 0;
+	font-size: var(--font-size-h1);
+}
+
+.support-hero__lead {
+	grid-column: 4 / 6;
+}
+
+.support-hero__lead p {
+	margin: 0;
+}
+
+/* Абзацы описания разделены пустой строкой — как в макете */
+.support-hero__lead p + p {
+	margin-top: calc(var(--font-size-b1) * var(--line-height-b1));
+}
+
+.support-hero__media {
+	grid-column: 1 / -1;
+	/* 1840×900 в макете */
+	aspect-ratio: 1840 / 900;
+}
+
+/*
+ * «Ваша внешняя дизайн-команда» (2034:8272): заголовок в колонках 1–2,
+ * два тезиса в 3–4 и 5–6. Линии под тезисами на одном уровне, поэтому
+ * карточки стоят в одном ряду сетки и растягиваются до общей высоты.
+ */
+.support-team,
+.support-advantages,
+.support-process,
+.support-system {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	align-items: start;
+}
+
+.support-team__title,
+.support-advantages__title,
+.support-process__title,
+.support-system__title {
+	grid-column: 1 / 3;
+	margin: 0;
+	font-size: var(--font-size-h2);
+}
+
+/*
+ * Ширина текста заголовка — из макета: она и решает, где строка
+ * переносится. Колонка шире, поэтому без этих значений перенос встаёт
+ * в другом месте.
+ */
+.support-team__title {
+	max-width: 361px;
+}
+
+.support-system__title {
+	max-width: 603px;
+}
+
+.support-process__title {
+	max-width: 352px;
+}
+
+/*
+ * Списки раскрываются в общую сетку страницы: так первая карточка
+ * встаёт справа от заголовка, а не под ним.
+ */
+.support-team__list,
+.support-advantages__list,
+.support-process__list {
+	display: contents;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.support-team__item,
+.support-advantages__item {
+	grid-column: span 2;
+	/* Тянемся до линии соседа: обе карточки ряда одной высоты */
+	align-self: stretch;
+	border-bottom: 1px solid var(--color-divider);
+}
+
+.support-team__item {
+	/* 78 от текста до линии */
+	padding-bottom: 78px;
+}
+
+.support-team__name,
+.support-advantages__name {
+	margin: 0 0 16px;
+	font-size: var(--font-size-h3);
+}
+
+.support-team__text,
+.support-advantages__text {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+/*
+ * «Почему мы» (2034:8328): шесть тезисов по две колонки в три ряда,
+ * первый — справа от заголовка. Между рядами 52.
+ */
+.support-advantages {
+	row-gap: 52px;
+}
+
+.support-advantages__item {
+	/* 56 от текста до линии */
+	padding-bottom: 56px;
+}
+
+/*
+ * Тезисы стоят в колонках 3–4 и 5–6 во всех трёх рядах: место слева
+ * занято заголовком только в первом ряду, но колонка держится пустой и
+ * дальше.
+ */
+.support-advantages__item:nth-child(odd) {
+	grid-column: 3 / 5;
+}
+
+.support-advantages__item:nth-child(even) {
+	grid-column: 5 / -1;
+}
+
+.support-advantages__name {
+	/* Заголовок тезиса мельче, чем в блоке о команде */
+	font-size: var(--font-size-h3);
+}
+
+/*
+ * «Развиваем визуальную систему» (2042:5325): заголовок в колонках
+ * 1–2, список вопросов в 4–6.
+ */
+.support-system__list {
+	grid-column: 4 / -1;
+	display: grid;
+	/* 24 от линии до следующего пункта */
+	row-gap: 24px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.support-system__item {
+	border-bottom: 1px solid var(--color-divider);
+	/* 24 от текста до линии */
+	padding-bottom: 24px;
+}
+
+.support-system__heading {
+	display: flex;
+	margin: 0;
+	font-size: var(--font-size-h5);
+}
+
+.support-system__number {
+	/* Номер и вопрос стоят на своих местах: 47 от номера до текста */
+	flex: none;
+	width: 47px;
+}
+
+.support-system__text {
+	/* Ответ выровнен по вопросу, а не по номеру */
+	margin: 16px 0 0 47px;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-secondary);
+}
+
+/*
+ * «Каждая задача под контролем» (2042:5364): пять карточек по две
+ * колонки, первая — справа от заголовка. Между рядами 52.
+ */
+.support-process {
+	row-gap: 52px;
+}
+
+.support-process__item {
+	grid-column: span 2;
+}
+
+.support-process__media {
+	/* 600×500 в макете */
+	aspect-ratio: 600 / 500;
+	/* 16 от визуала до подписи */
+	margin-bottom: 16px;
+}
+
+.support-process__row {
+	display: grid;
+	/* Подпись и описание — по колонке сетки каждая */
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+}
+
+.support-process__name {
+	margin: 0;
+	font-size: var(--font-size-h6);
+}
+
+.support-process__text {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-muted);
+}
+
+/*
+ * Направления (2034:8393, 2034:8420): крупная строка с названием,
+ * справа описание, снизу линия. Нечётная строка начинается от первой
+ * колонки, чётная — от второй.
+ */
+.support-profiles__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.support-profiles__item {
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	align-items: center;
+	/* 238 — высота строки в макете */
+	min-height: 238px;
+	border-bottom: 1px solid var(--color-divider);
+}
+
+.support-profiles__name {
+	grid-column: 1 / 5;
+	margin: 0;
+	font-size: var(--font-size-support-name);
+	/* Название стоит одной строкой — так в макете */
+	white-space: nowrap;
+	transition: color 0.3s ease;
+}
+
+/* Чётная строка сдвинута на колонку (2034:8420) */
+.support-profiles__item:nth-child(even) .support-profiles__name {
+	grid-column: 2 / 5;
+}
+
+.support-profiles__text {
+	grid-column: 5 / -1;
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+/*
+ * Наведение: список уходит в серый, строка под курсором остаётся
+ * чёрной, а поверх описания встаёт визуал направления. Тот же приём,
+ * что в списке услуг специализации, только визуал выше строки и
+ * выходит за её края.
+ */
+.support-profiles__preview {
+	position: absolute;
+	top: 50%;
+	/* Пятая колонка: четыре колонки плюс четыре зазора от левого края */
+	left: calc(4 * (100% - 5 * var(--grid-gap)) / 6 + 4 * var(--grid-gap));
+	z-index: 2;
+	display: block;
+	/* Две колонки — 600px на 1920 */
+	width: calc(2 * (100% - 5 * var(--grid-gap)) / 6 + var(--grid-gap));
+	height: 294px;
+	overflow: hidden;
+	background-color: var(--color-surface-alt);
+	opacity: 0;
+	transform: translate(0, -50%) scale(0.98);
+	transition: opacity 0.3s ease, transform 0.3s ease;
+	pointer-events: none;
+}
+
+.support-profiles__preview img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.support-profiles__list.is-hovered .support-profiles__name {
+	color: var(--color-border);
+}
+
+.support-profiles__list.is-hovered .support-profiles__item.is-active .support-profiles__name {
+	color: var(--color-text);
+}
+
+.support-profiles__item.is-active .support-profiles__preview {
+	opacity: 1;
+	transform: translate(0, -50%) scale(1);
+}
+
+/*
+ * Форма приходит со своими внешними отступами — на этой странице
+ * расстояния до соседей задаёт сетка страницы.
+ */
+.support-page .support-page__form {
+	margin-block: 0;
+}
+
+/*
+ * Ниже 1200 макетов страницы нет. Чтобы она не разъезжалась, колонки
+ * складываются: заголовки встают над своими списками, направления
+ * переносятся по словам, а между блоками остаётся тот же отступ 78,
+ * что на статье и специализации.
+ */
+@media (max-width: 1199px) {
+	.support-page {
+		row-gap: 78px;
+		padding-bottom: 78px;
+	}
+
+	.support-hero {
+		row-gap: 52px;
+	}
+
+	.support-hero__title,
+	.support-hero__lead {
+		grid-column: 1 / -1;
+		max-width: none;
+	}
+
+	.support-team,
+	.support-advantages,
+	.support-process,
+	.support-system {
+		row-gap: 52px;
+	}
+
+	.support-team__title,
+	.support-advantages__title,
+	.support-process__title,
+	.support-system__title,
+	.support-system__list,
+	.support-team__item,
+	.support-process__item,
+	.support-advantages__item:nth-child(odd),
+	.support-advantages__item:nth-child(even) {
+		grid-column: 1 / -1;
+	}
+
+	.support-team__item {
+		padding-bottom: 32px;
+	}
+
+	.support-advantages__item {
+		padding-bottom: 32px;
+	}
+
+	/* Строка направления: название переносится, описание идёт под ним */
+	.support-profiles__item {
+		min-height: 0;
+		row-gap: 16px;
+		padding-block: 32px;
+	}
+
+	.support-profiles__name,
+	.support-profiles__item:nth-child(even) .support-profiles__name,
+	.support-profiles__text {
+		grid-column: 1 / -1;
+		white-space: normal;
+	}
+
+	/* Визуал показывается только при наведении, которого здесь нет */
+	.support-profiles__preview {
+		display: none;
+	}
+
+	.support-process__row {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 8px;
+	}
+}

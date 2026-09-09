@@ -44,4 +44,19 @@
 	.link-underline:focus-visible::after {
 		transform: scaleX(1);
 	}
+
+	/*
+	 * Выбранная кнопка к15 под курсором не анимируется: она уже
+	 * обозначает, где читатель находится (пункт меню открытой страницы,
+	 * название текущей статьи или услуги), и наводить её некуда.
+	 * Правило общее для всех к15 — новые места подхватывают его сами,
+	 * достаточно пометить выбранное как current или aria-current.
+	 */
+	.current-menu-item > .link-underline::after,
+	.current_page_item > .link-underline::after,
+	.current-menu-ancestor > .link-underline::after,
+	.link-underline[aria-current]:not([aria-current="false"])::after,
+	.link-underline.is-selected::after {
+		transform: scaleX(0);
+	}
 }

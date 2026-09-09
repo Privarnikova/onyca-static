@@ -1,0 +1,116 @@
+/**
+ * «Частые вопросы» — Figma 2034:8601 (компонент «Ответы на вопросы»,
+ * десктоп 1920) и 2508:11747 (список на странице дизайн-поддержки).
+ *
+ * Строка: вопрос в колонках 1–3, стрелка у правого края, снизу линия.
+ * Открытый вопрос показывает ответ в той же ширине, что и вопрос.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов других разрешений пока нет.
+ */
+
+.faq {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 38 от заголовка до первого вопроса */
+	row-gap: 38px;
+}
+
+.faq__title {
+	grid-column: 1 / -1;
+	margin: 0;
+	font-size: var(--font-size-h2);
+}
+
+.faq__list {
+	grid-column: 1 / -1;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+}
+
+.faq__item {
+	border-bottom: 1px solid var(--color-divider);
+}
+
+/*
+ * Раскрытие держит <details>: список работает и без JS, а клавиатура
+ * получает поведение браузера. Свой маркер убираем — стрелка справа
+ * рисуется иконкой.
+ */
+.faq__question {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--grid-gap);
+	list-style: none;
+	cursor: pointer;
+	color: var(--color-text);
+	transition: color 0.3s ease;
+	/*
+	 * Отступы вокруг вопроса входят в саму строку, а не в её обёртку:
+	 * тогда вопрос открывается и по клику рядом с текстом, а не только
+	 * по буквам. 32 сверху и снизу — расстояния из макета.
+	 */
+	padding-block: 32px;
+}
+
+/* Первый вопрос отбит от заголовка блока, своего отступа сверху не берёт */
+.faq__item:first-child .faq__question {
+	padding-top: 0;
+}
+
+/* У открытого вопроса до ответа 16, а 32 отсчитываются уже от ответа */
+.faq__details[open] .faq__question {
+	padding-bottom: 16px;
+}
+
+.faq__question::-webkit-details-marker {
+	display: none;
+}
+
+.faq__text {
+	/* Вопрос занимает колонки 1–3 — 910px в макете */
+	flex: 0 1 calc(3 * (100% - 5 * var(--grid-gap)) / 6 + 2 * var(--grid-gap));
+	font-size: var(--font-size-h4);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+}
+
+.faq__icon {
+	flex: none;
+	transition: transform 0.3s ease;
+}
+
+/* Открытый вопрос: стрелка смотрит вверх */
+.faq__details[open] .faq__icon {
+	transform: rotate(180deg);
+}
+
+.faq__answer {
+	/* 32 от ответа до линии */
+	padding-bottom: 32px;
+	/* Ответ идёт в той же ширине, что и вопрос */
+	max-width: calc(3 * (100% - 5 * var(--grid-gap)) / 6 + 2 * var(--grid-gap));
+	color: var(--color-text-footer);
+}
+
+.faq__answer p {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+/* Абзацы длинного ответа идут строка за строкой, без пустых строк */
+.faq__answer p + p {
+	margin-top: 0;
+}
+
+/* Наведение (2034:9768): вопрос темнеет до Grey-700 */
+@media (hover: hover) and (min-width: 1200px) {
+	.faq__question:hover {
+		color: var(--color-text-hover);
+	}
+}

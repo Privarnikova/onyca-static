@@ -213,9 +213,15 @@
 	align-items: start;
 }
 
-/* Раздел отбивается от предыдущего на 118 — как первый экран от шоурила */
+/*
+ * Раздел отбивается от предыдущего на 80 — столько же берёт его
+ * заголовок H1. Отступ стоит на всём разделе, поэтому первый блок
+ * правой колонки встаёт вровень с заголовком и получает те же 80.
+ * От первого экрана статьи (заголовок, абзац, главное видео) текст
+ * отбивается сильнее — 118, это задано в article-page.css.
+ */
 .article-content > .article-section + .article-section {
-	margin-top: 118px;
+	margin-top: 80px;
 }
 
 .article-section__body {
@@ -231,9 +237,6 @@
 	margin-top: 16px;
 }
 
-.article-section__body > :first-child {
-	margin-top: 0;
-}
 
 .article-section__body > h2 {
 	margin-top: 64px;
@@ -243,14 +246,18 @@
 	margin-top: 32px;
 }
 
-/* Крупные блоки отбиваются сильнее — 48 (легенды у таблицы, этапов,
-   цифр, тезисов и фото) */
+/* Крупные блоки отбиваются сильнее — 48 (легенды у таблицы, цифр,
+   тезисов, шоурила и фото) */
 .article-section__body > .wp-block-table,
-.article-section__body > .article-stages,
 .article-section__body > .article-numbers,
 .article-section__body > .article-theses,
 .article-section__body > .article-media {
 	margin-top: 48px;
+}
+
+/* Этапы стоят ближе — 38 */
+.article-section__body > .article-stages {
+	margin-top: 38px;
 }
 
 .article-section__body > p {
@@ -315,11 +322,23 @@
 }
 
 .article-section__body > .article-quote:has(+ .wp-block-table),
-.article-section__body > .article-quote:has(+ .article-stages),
 .article-section__body > .article-quote:has(+ .article-numbers),
 .article-section__body > .article-quote:has(+ .article-theses),
 .article-section__body > .article-quote:has(+ .article-media) {
 	margin-top: 48px;
+}
+
+.article-section__body > .article-quote:has(+ .article-stages) {
+	margin-top: 38px;
+}
+
+/*
+ * Первый блок раздела своего отступа не добавляет: раздел уже отбит от
+ * предыдущего. Правило стоит последним, чтобы перебить типовые отступы
+ * крупных блоков — они той же силы.
+ */
+.article-section__body > :first-child {
+	margin-top: 0;
 }
 
 /*

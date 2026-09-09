@@ -1464,6 +1464,9 @@
 
 		/* Прайс-лист: те же правила, только строки таблицы */
 		initHoverList( '[data-service-list]', '.price-table__row--linked' );
+
+		/* Направления дизайн-поддержки (2034:8393): визуал вместо описания */
+		initHoverList( '[data-support-profiles]', '.support-profiles__item' );
 	}
 
 	/**
@@ -1810,7 +1813,12 @@
 			return grid.querySelectorAll( '.card-post' );
 		}
 
+		/* Порядок размеров карточек из макета — тот же, что на сервере */
+		var layout = ( grid.getAttribute( 'data-blog-layout' ) || '' ).split( ',' ).filter( Boolean );
+
 		function apply() {
+			var shown = 0;
+
 			cards().forEach( function ( card ) {
 				var topics = ( card.getAttribute( 'data-topics' ) || '' ).split( ' ' );
 				var visible = ! selected.length || selected.some( function ( topic ) {
@@ -1818,6 +1826,21 @@
 				} );
 
 				card.hidden = ! visible;
+
+				/*
+				 * Размер карточки зависит от её места в сетке, а не от
+				 * самой статьи: после фильтра места сдвигаются, поэтому
+				 * размеры назначаем заново — по порядку видимых.
+				 */
+				if ( visible && layout.length ) {
+					var size = layout[ shown % layout.length ];
+
+					layout.forEach( function ( name ) {
+						card.classList.toggle( 'card-post--' + name, name === size );
+					} );
+
+					shown++;
+				}
 			} );
 
 			filters.querySelectorAll( '[data-topic]' ).forEach( function ( tab ) {
@@ -1838,6 +1861,34 @@
 			if ( footer ) {
 				footer.hidden = selected.length > 0;
 			}
+		}
+
+		/*
+		 * Статьи, которые скрипт дотянул ради фильтра, остаются служебными:
+		 * когда фильтр снимают, блог должен вернуться к первой странице, а
+		 * не показать разом весь архив. Карточки, которые читатель открыл
+		 * сам кнопкой «Посмотреть ещё», сюда не попадают и остаются на месте.
+		 */
+		var area = document.querySelector( '[data-load-more-area]' );
+		var areaHtml = area ? area.innerHTML : '';
+
+		function dropLoaded() {
+			var loaded = grid.querySelectorAll( '[data-filter-loaded]' );
+
+			if ( ! loaded.length ) {
+				return;
+			}
+
+			loaded.forEach( function ( card ) {
+				card.remove();
+			} );
+
+			if ( area ) {
+				area.innerHTML = areaHtml;
+			}
+
+			/* Страницы удалены — при следующем фильтре тянем их заново */
+			loading = null;
 		}
 
 		/*
@@ -1869,6 +1920,7 @@
 							var page = new DOMParser().parseFromString( html, 'text/html' );
 
 							page.querySelectorAll( '[data-blog-grid] .card-post' ).forEach( function ( card ) {
+								card.setAttribute( 'data-filter-loaded', '' );
 								grid.appendChild( card );
 							} );
 
@@ -1918,7 +1970,12 @@
 
 			window.history.replaceState( null, '', url );
 
-			loadRest().then( apply );
+			if ( selected.length ) {
+				loadRest().then( apply );
+			} else {
+				dropLoaded();
+			}
+
 			apply();
 		} );
 
