@@ -1,0 +1,72 @@
+/**
+ * Страница «Проекты» — Figma 860:2408 (десктоп 1920).
+ *
+ * Устроена как блог: заголовок, табы, сетка карточек и низ с
+ * пагинацией. Сетка и карточки — общий компонент
+ * (components/card-tile.css), здесь только своё: два блока табов рядом.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов остальных разрешений пока нет.
+ */
+
+.projects-page {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	/* 48 от табов до сетки (макет: 381 − 333) */
+	row-gap: 48px;
+	padding-bottom: 118px;
+}
+
+.projects-page__head {
+	display: grid;
+	/* 32 от заголовка до табов (макет: 229 − 197) */
+	row-gap: 32px;
+}
+
+.projects-page__title {
+	margin: 0;
+	font-size: var(--font-size-h1);
+}
+
+/*
+ * Фильтров два: отрасли в колонках 1–3, услуги — в 4–6. Каждый блок
+ * переносит свои кнопки на новую строку внутри своей половины.
+ */
+.projects-page__filters {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+}
+
+.projects-page__filter {
+	display: flex;
+	flex-wrap: wrap;
+	align-content: start;
+	gap: 12px 12px;
+	grid-column: span 3;
+}
+
+/* Табы — тот же компонент, что в форме: ссылка, но без подчёркивания */
+.projects-page__filter .tab-pill {
+	text-decoration: none;
+}
+
+.projects-page__empty {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	color: var(--color-text-muted);
+}
+
+/*
+ * Ниже 1200 макетов нет: блоки фильтров встают друг под друга, иначе
+ * кнопки не помещаются в свою половину.
+ */
+@media (max-width: 1199px) {
+	.projects-page__filters {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 12px;
+	}
+
+	.projects-page__filter {
+		grid-column: 1 / -1;
+	}
+}

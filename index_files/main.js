@@ -1632,8 +1632,9 @@
 	}
 
 	/**
-	 * «Посмотреть еще» на странице блога: подгружает следующую страницу
-	 * статей в ту же сетку, не перезагружая страницу (2093:14193).
+	 * «Посмотреть еще» в блоге и на странице проектов: подгружает
+	 * следующую страницу в ту же сетку, не перезагружая страницу
+	 * (2093:14193 и 2109:14481).
 	 *
 	 * Берём готовую разметку следующей страницы и переносим из неё
 	 * карточки — так раскладка (обычная, высокая, широкая) остаётся
@@ -1642,7 +1643,7 @@
 	 */
 	function initLoadMore() {
 		var area = document.querySelector( '[data-load-more-area]' );
-		var grid = document.querySelector( '.blog-page__grid' );
+		var grid = document.querySelector( '[data-card-grid]' );
 
 		if ( ! area || ! grid ) {
 			return;
@@ -1665,7 +1666,7 @@
 				.then( function ( html ) {
 					var next = new DOMParser().parseFromString( html, 'text/html' );
 
-					next.querySelectorAll( '.blog-page__grid .card-post' ).forEach( function ( card ) {
+					next.querySelectorAll( '[data-card-grid] > *' ).forEach( function ( card ) {
 						grid.appendChild( card );
 					} );
 

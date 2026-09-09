@@ -54,6 +54,7 @@ const PAGES = [
   { url: 'http://localhost:8080/services/ux-ui/', out: 'ux-ui.html' },
   { url: 'http://localhost:8080/services/cg-motion/', out: 'cg-motion.html' },
   { url: 'http://localhost:8080/services/design-support/', out: 'design-support.html' },
+  { url: 'http://localhost:8080/projects/', out: 'projects.html' },
   { url: 'http://localhost:8080/blog/', out: 'blog.html' },
   { url: 'http://localhost:8080/policy/', out: 'policy.html' },
   { url: 'http://localhost:8080/cookie/', out: 'cookie.html' },
@@ -72,6 +73,7 @@ const ROUTES = [
   ['/services/design-support/', 'design-support.html'],
   ['/services/', 'price-list.html'],
   ['/contacts/', 'contacts.html'],
+  ['/projects/', 'projects.html'],
   ['/blog/', 'blog.html'],
   ['/policy/', 'policy.html'],
   ['/cookie/', 'cookie.html'],
@@ -143,6 +145,8 @@ async function collectFromSitemap( browser, sitemap, prefix ) {
 async function collectBlogViews( browser ) {
   const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
 
+  await collectPagination( page, 'http://localhost:8080/projects/', 'projects-page-' );
+
   await page.goto('http://localhost:8080/blog/', { waitUntil: 'load' });
 
   const topics = await page.evaluate(() =>
@@ -159,14 +163,29 @@ async function collectBlogViews( browser ) {
     EXACT.push([url, out]);
   }
 
-  /* Страницы пагинации: идём по кнопке «Посмотреть еще», пока она есть */
+  await collectPagination( page, 'http://localhost:8080/blog/', 'blog-page-' );
+
+  await page.close();
+}
+
+/**
+ * Страницы пагинации: идём по кнопке «Посмотреть еще», пока она есть.
+ * Так собираются и блог, и проекты — низ страницы у них общий.
+ *
+ * @param {import('playwright').Page} page
+ * @param {string} url    Адрес первой страницы.
+ * @param {string} prefix Начало имени файла, например 'blog-page-'.
+ */
+async function collectPagination( page, url, prefix ) {
+  await page.goto(url, { waitUntil: 'load' });
+
   let next = await page.evaluate(() => {
     const link = document.querySelector('[data-load-more]');
     return link ? link.href : '';
   });
 
   for (let number = 2; next; number++) {
-    const out = 'blog-page-' + number + '.html';
+    const out = prefix + number + '.html';
 
     PAGES.splice(PAGES.length - 1, 0, { url: next, out });
     EXACT.push([next, out]);
@@ -178,8 +197,6 @@ async function collectBlogViews( browser ) {
       return link ? link.href : '';
     });
   }
-
-  await page.close();
 }
 
 (async () => {
@@ -287,6 +304,14 @@ async function collectBlogViews( browser ) {
      * странице (initBlogFilter).
      */
     html = html.replace(/http:\/\/localhost:8080\/blog\/\?topic=[^"']*/g, 'blog.html');
+
+    /*
+     * Страницы отдельных проектов в копию не снимаем, а список проектов
+     * снимаем. Поэтому ссылки на кейсы гасим до общего правила по пути:
+     * иначе от /projects/severnyy-port/ осталось бы имя файла со
+     * склеенным хвостом.
+     */
+    html = html.replace(/http:\/\/localhost:8080\/projects\/(?!page\/)[^"'\s>]+/g, '#');
 
     // Внутренние адреса: страницы из PAGES ведут на свои файлы,
     // остальное (Проекты, Блог, отдельные услуги) на статике не
