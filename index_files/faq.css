@@ -80,6 +80,8 @@
 
 .faq__icon {
 	flex: none;
+	/* В макете стрелка чёрная в обоих состояниях — серым становится текст */
+	color: var(--color-black);
 	transition: transform 0.3s ease;
 }
 
