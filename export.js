@@ -76,6 +76,12 @@ const ROUTES = [
   ['/policy/', 'policy.html'],
   ['/cookie/', 'cookie.html'],
 ];
+/*
+ * Адреса с параметрами и страницы пагинации: заменяются целиком, а не по
+ * пути. Заполняется в collectBlogViews().
+ */
+const EXACT = [];
+
 const OUT = path.join(process.env.HOME, 'Desktop/onyca-static');
 const FILES = path.join(OUT, 'index_files');
 
@@ -123,12 +129,66 @@ async function collectFromSitemap( browser, sitemap, prefix ) {
   ROUTES.sort((a, b) => b[0].length - a[0].length);
 }
 
+/**
+ * Виды страницы блога: фильтры по темам и страницы пагинации.
+ *
+ * На живом сайте это адреса с параметром (?topic=…) и /page/2/ — в копии
+ * их нет, поэтому каждый вид снимается отдельным файлом, а ссылки на них
+ * переписываются на эти файлы. Так в статике работают и табы, и
+ * пагинация, и кнопка «Посмотреть еще» (она догружает следующую
+ * страницу тем же адресом).
+ *
+ * @param {import('playwright').Browser} browser
+ */
+async function collectBlogViews( browser ) {
+  const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+
+  await page.goto('http://localhost:8080/blog/', { waitUntil: 'load' });
+
+  const topics = await page.evaluate(() =>
+    [...document.querySelectorAll('.blog-page__filters .tab-pill')]
+      .map(link => link.href)
+      .filter(href => href.includes('topic='))
+  );
+
+  for (const url of topics) {
+    const slug = new URL(url).searchParams.get('topic');
+    const out = 'blog-topic-' + slug + '.html';
+
+    PAGES.splice(PAGES.length - 1, 0, { url, out });
+    EXACT.push([url, out]);
+  }
+
+  /* Страницы пагинации: идём по кнопке «Посмотреть еще», пока она есть */
+  let next = await page.evaluate(() => {
+    const link = document.querySelector('[data-load-more]');
+    return link ? link.href : '';
+  });
+
+  for (let number = 2; next; number++) {
+    const out = 'blog-page-' + number + '.html';
+
+    PAGES.splice(PAGES.length - 1, 0, { url: next, out });
+    EXACT.push([next, out]);
+
+    await page.goto(next, { waitUntil: 'load' });
+
+    next = await page.evaluate(() => {
+      const link = document.querySelector('[data-load-more]');
+      return link ? link.href : '';
+    });
+  }
+
+  await page.close();
+}
+
 (async () => {
   const executablePath = findChromium();
   const browser = await chromium.launch(executablePath ? { executablePath } : {});
 
   await collectFromSitemap(browser, 'post-sitemap.xml', 'article-');
   await collectFromSitemap(browser, 'service-sitemap.xml', 'service-');
+  await collectBlogViews(browser);
   const assets = new Map();
   const pages = [];
 
@@ -208,6 +268,15 @@ async function collectFromSitemap( browser, sitemap, prefix ) {
     html = html.replace(/<script id="wp-emoji-settings"[^>]*>[\s\S]*?<\/script>\s*/g, '');
     html = html.replace(/<script[^>]*>(?:(?!<\/script>)[\s\S])*?_wpemojiSettings[\s\S]*?<\/script>\s*/g, '');
     html = html.replace(/<script[^>]*wp-emoji-release[^>]*><\/script>\s*/g, '');
+
+    /*
+     * Точные адреса — первыми: у фильтров и страниц пагинации путь
+     * начинается с /blog/, и правило по пути отрезало бы у них хвост
+     * («?topic=…», «page/2/»).
+     */
+    for (const [url, file] of EXACT) {
+      html = html.split(url).join(file);
+    }
 
     // Внутренние адреса: страницы из PAGES ведут на свои файлы,
     // остальное (Проекты, Блог, отдельные услуги) на статике не

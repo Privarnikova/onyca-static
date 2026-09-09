@@ -14,9 +14,12 @@
 	 * Хедер: при скролле вниз скрывается, при скролле вверх появляется
 	 * (ТЗ, п. 03-01).
 	 *
-	 * На первом экране шапка не закреплена: она уезжает вместе со
-	 * страницей и при прокрутке вверх не выпадает. Липкой — и, значит,
-	 * выпадающей — она становится после первого экрана.
+	 * Поведение одинаковое на всём сайте, кроме главной: там на первом
+	 * экране шапка не закреплена — уезжает вместе со страницей и при
+	 * прокрутке вверх не выпадает, а липкой становится после него.
+	 * Первый экран главной размечен атрибутом data-home-hero; на
+	 * остальных страницах его нет, и шапка ведёт себя обычно с самого
+	 * верха — как на Контактах.
 	 */
 	function initHeaderScroll() {
 		var header = document.querySelector( '[data-site-header]' );
@@ -24,7 +27,7 @@
 			return;
 		}
 
-		var firstScreen = document.querySelector( '[data-first-screen]' );
+		var firstScreen = document.querySelector( '[data-home-hero]' );
 		var lastScrollY = window.scrollY;
 		var headerHeight = header.offsetHeight;
 
@@ -1458,6 +1461,9 @@
 		 * перехода нет, а значит нет и подсветки (ТЗ).
 		 */
 		initHoverList( '[data-service-list]', '.service-list__item--linked' );
+
+		/* Прайс-лист: те же правила, только строки таблицы */
+		initHoverList( '[data-service-list]', '.price-table__row--linked' );
 	}
 
 	/**
@@ -1551,7 +1557,14 @@
 			return;
 		}
 
-		var DURATION = 1600;
+		/*
+		 * Счётчики останавливаются по очереди: у первого отсчёт короче,
+		 * у следующего длиннее — так меньшее число замирает раньше, а
+		 * взгляд идёт слева направо. Очередь задаёт разметка
+		 * (data-counter-order).
+		 */
+		var DURATION = 1200;
+		var STEP = 400;
 
 		function parse( raw ) {
 			var match = String( raw ).match( /^(\D*)(\d+)(.*)$/ );
@@ -1566,6 +1579,8 @@
 				return;
 			}
 
+			var order = parseInt( item.getAttribute( 'data-counter-order' ), 10 ) || 0;
+			var duration = DURATION + order * STEP;
 			var start = null;
 
 			function step( time ) {
@@ -1573,7 +1588,7 @@
 					start = time;
 				}
 
-				var progress = Math.min( 1, ( time - start ) / DURATION );
+				var progress = Math.min( 1, ( time - start ) / duration );
 				/* Замедление к концу — цифра «доводится», а не обрывается */
 				var eased = 1 - Math.pow( 1 - progress, 3 );
 

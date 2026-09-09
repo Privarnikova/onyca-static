@@ -149,6 +149,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <link rel="stylesheet" id="onyca-price-list-css" href="./index_files/price-list.css" media="all">
 <link rel="stylesheet" id="onyca-blog-css" href="./index_files/blog.css" media="all">
 <link rel="stylesheet" id="onyca-breadcrumbs-css" href="./index_files/breadcrumbs.css" media="all">
+<link rel="stylesheet" id="onyca-link-arrow-css" href="./index_files/link-arrow.css" media="all">
 <link rel="stylesheet" id="onyca-article-blocks-css" href="./index_files/article-blocks.css" media="all">
 <link rel="stylesheet" id="onyca-article-hero-css" href="./index_files/article-hero.css" media="all">
 <link rel="stylesheet" id="onyca-article-page-css" href="./index_files/article-page.css" media="all">
@@ -173,7 +174,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 <a class="skip-link screen-reader-text" href="#main">Перейти к содержимому</a>
 
-<header class="site-header" data-site-header="">
+<header class="site-header is-sticky" data-site-header="">
 	<div class="site-header__inner container">
 		<a class="site-header__logo" href="index.html">
 			<img class="site-header__logo-full" src="./index_files/logo.svg" width="115" height="24" alt="onyca-digital">
@@ -301,7 +302,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 					<li class="work-stages__item">
 				<h3 class="work-stages__heading">
 					<span class="work-stages__number">01.</span>
-					<span class="work-stages__title">Погружение в бизнес</span>
+										<span class="work-stages__title">Погружение в бизнес</span>
 				</h3>
 
 				<div class="work-stages__text">
@@ -312,7 +313,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 					<li class="work-stages__item">
 				<h3 class="work-stages__heading">
 					<span class="work-stages__number">02.</span>
-					<span class="work-stages__title">Формирование идей и концепций</span>
+										<span class="work-stages__title">Формирование<br class="work-stages__break"> идей и концепций</span>
 				</h3>
 
 				<div class="work-stages__text">
@@ -324,7 +325,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 					<li class="work-stages__item">
 				<h3 class="work-stages__heading">
 					<span class="work-stages__number">03.</span>
-					<span class="work-stages__title">Разработка проекта</span>
+										<span class="work-stages__title">Разработка проекта</span>
 				</h3>
 
 				<div class="work-stages__text">
@@ -336,7 +337,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 					<li class="work-stages__item">
 				<h3 class="work-stages__heading">
 					<span class="work-stages__number">04.</span>
-					<span class="work-stages__title">Презентация проекта</span>
+										<span class="work-stages__title">Презентация проекта</span>
 				</h3>
 
 				<div class="work-stages__text">
@@ -423,21 +424,25 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 	<dl class="numbers__list">
 					<div class="numbers__item">
-								<dt class="numbers__value" data-counter="30+">30+</dt>
-				<dd class="numbers__label">Проектов выполнено</dd>
-			</div>
+		<dt class="numbers__value" data-counter="30+" data-counter-order="0">30+</dt>
+
+		<dd class="numbers__label">Проектов выполнено</dd>
+</div>
 					<div class="numbers__item">
-								<dt class="numbers__value" data-counter="3000+">3000+</dt>
-				<dd class="numbers__label">Выполнено бизнес-задач</dd>
-			</div>
+		<dt class="numbers__value" data-counter="3000+" data-counter-order="1">3000+</dt>
+
+		<dd class="numbers__label">Выполнено бизнес-задач</dd>
+</div>
 					<div class="numbers__item">
-								<dt class="numbers__value" data-counter="2022">2022</dt>
-				<dd class="numbers__label">Год основания</dd>
-			</div>
+		<dt class="numbers__value">2022</dt>
+
+		<dd class="numbers__label">Год основания</dd>
+</div>
 					<div class="numbers__item">
-								<dt class="numbers__value" data-counter="15000+">15000+</dt>
-				<dd class="numbers__label">Количество часов работы на поддержке</dd>
-			</div>
+		<dt class="numbers__value" data-counter="15000+" data-counter-order="2">14930+</dt>
+
+		<dd class="numbers__label">Количество часов работы<br class="numbers__break"> на поддержке</dd>
+</div>
 			</dl>
 </section>
 
@@ -528,7 +533,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="consent contact-form__consent" data-required-group="consent">
 						<input class="radio-control" type="checkbox" name="contact_consent" id="specialization-consent">
 			<span class="consent__text">
-					Нажимая на кнопку «Отправить», вы даете <a href="policy.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html">политикой обработки персональных данных</a>.
+					Нажимая на кнопку «Отправить», вы даете <a href="policy.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html" target="_blank" rel="noopener">политикой обработки персональных данных</a>.
 			</span>
 			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
@@ -573,8 +578,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 				<div class="site-footer__legal">
 					<p class="site-footer__policy">
-						<a href="policy.html">Политика обработки персональных данных</a>
-						<a href="cookie.html">Политика Cookie</a>
+												<a href="policy.html" target="_blank" rel="noopener">Политика обработки персональных данных</a>
+						<a href="cookie.html" target="_blank" rel="noopener">Политика Cookie</a>
 					</p>
 					<p class="site-footer__disclaimer">*принадлежит запрещенной в РФ Meta</p>
 				</div>
@@ -686,7 +691,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="consent contact-form__consent" data-required-group="consent">
 						<input class="radio-control" type="checkbox" name="contact_consent" id="popup-project-consent">
 			<span class="consent__text">
-					Нажимая на кнопку «Отправить», вы даете <a href="policy.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html">политикой обработки персональных данных</a>.
+					Нажимая на кнопку «Отправить», вы даете <a href="policy.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html" target="_blank" rel="noopener">политикой обработки персональных данных</a>.
 			</span>
 			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
@@ -735,7 +740,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="consent contact-form__consent" data-required-group="consent">
 			<input class="radio-control" type="checkbox" name="career_consent" id="popup-career-consent">
 			<span class="consent__text">
-					Нажимая на кнопку «Отправить», вы даете <a href="policy.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html">политикой обработки персональных данных</a>.
+					Нажимая на кнопку «Отправить», вы даете <a href="policy.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html" target="_blank" rel="noopener">политикой обработки персональных данных</a>.
 			</span>
 			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
@@ -791,7 +796,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 		<p class="cookie-banner__text">
 			Они помогают обеспечивать работу сайта. Оставаясь на сайте, вы соглашаетесь
-			с <a href="cookie.html">политикой использования файлов cookie</a>.
+			с <a href="cookie.html" target="_blank" rel="noopener">политикой использования файлов cookie</a>.
 		</p>
 
 		<button type="button" class="btn btn--cookie cookie-banner__accept" data-cookie-accept="">Принять</button>

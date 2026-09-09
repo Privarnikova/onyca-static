@@ -182,6 +182,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <link rel="stylesheet" id="onyca-price-list-css" href="./index_files/price-list.css" media="all">
 <link rel="stylesheet" id="onyca-blog-css" href="./index_files/blog.css" media="all">
 <link rel="stylesheet" id="onyca-breadcrumbs-css" href="./index_files/breadcrumbs.css" media="all">
+<link rel="stylesheet" id="onyca-link-arrow-css" href="./index_files/link-arrow.css" media="all">
 <link rel="stylesheet" id="onyca-article-blocks-css" href="./index_files/article-blocks.css" media="all">
 <link rel="stylesheet" id="onyca-article-hero-css" href="./index_files/article-hero.css" media="all">
 <link rel="stylesheet" id="onyca-article-page-css" href="./index_files/article-page.css" media="all">
@@ -279,7 +280,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		
 				<span class="breadcrumbs__dot" aria-hidden="true"></span>
 	
-			<span class="breadcrumbs__current" aria-current="page">Статья</span>
+			<span class="breadcrumbs__current" aria-current="page">Почему мы не начинаем работу без брифа</span>
 	</nav>
 <header class="article-hero">
 	<h1 class="article-hero__title">Почему мы не начинаем работу без брифа</h1>
@@ -307,8 +308,9 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 		<section class="other-articles">
 	<h2 class="other-articles__title">
-		<a class="other-articles__link" href="blog.html">
-			Другие статьи			<svg class="icon icon--arrow-right icon--lg other-articles__arrow" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+		<a class="link-arrow other-articles__link" href="blog.html">
+			<span class="link-arrow__text">Другие статьи</span>
+			<svg class="icon icon--arrow-right icon--lg link-arrow__icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
   <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
   <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
 </svg>
@@ -395,8 +397,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 				<div class="site-footer__legal">
 					<p class="site-footer__policy">
-						<a href="policy.html">Политика обработки персональных данных</a>
-						<a href="cookie.html">Политика Cookie</a>
+												<a href="policy.html" target="_blank" rel="noopener">Политика обработки персональных данных</a>
+						<a href="cookie.html" target="_blank" rel="noopener">Политика Cookie</a>
 					</p>
 					<p class="site-footer__disclaimer">*принадлежит запрещенной в РФ Meta</p>
 				</div>
@@ -508,7 +510,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="consent contact-form__consent" data-required-group="consent">
 						<input class="radio-control" type="checkbox" name="contact_consent" id="popup-project-consent">
 			<span class="consent__text">
-					Нажимая на кнопку «Отправить», вы даете <a href="policy.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html">политикой обработки персональных данных</a>.
+					Нажимая на кнопку «Отправить», вы даете <a href="policy.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html" target="_blank" rel="noopener">политикой обработки персональных данных</a>.
 			</span>
 			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
@@ -557,7 +559,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="consent contact-form__consent" data-required-group="consent">
 			<input class="radio-control" type="checkbox" name="career_consent" id="popup-career-consent">
 			<span class="consent__text">
-					Нажимая на кнопку «Отправить», вы даете <a href="policy.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html">политикой обработки персональных данных</a>.
+					Нажимая на кнопку «Отправить», вы даете <a href="policy.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html" target="_blank" rel="noopener">политикой обработки персональных данных</a>.
 			</span>
 			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
@@ -613,7 +615,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 		<p class="cookie-banner__text">
 			Они помогают обеспечивать работу сайта. Оставаясь на сайте, вы соглашаетесь
-			с <a href="cookie.html">политикой использования файлов cookie</a>.
+			с <a href="cookie.html" target="_blank" rel="noopener">политикой использования файлов cookie</a>.
 		</p>
 
 		<button type="button" class="btn btn--cookie cookie-banner__accept" data-cookie-accept="">Принять</button>

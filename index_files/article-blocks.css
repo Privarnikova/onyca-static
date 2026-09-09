@@ -73,6 +73,12 @@
 
 .article-stages__item {
 	display: grid;
+	/*
+	 * Номер стоит в своей колонке, а описание — под заголовком, вровень
+	 * с ним (1545:3168: заголовок и текст начинаются на 47, номер — на
+	 * 0). 47px при кегле заголовка 20 — это 2.35em.
+	 */
+	grid-template-columns: calc(2.35 * var(--font-size-h5)) minmax(0, 1fr);
 	/* 16 от заголовка до описания, 24 от описания до линии */
 	row-gap: 16px;
 	padding-bottom: 24px;
@@ -80,18 +86,30 @@
 }
 
 .article-stages__heading {
-	display: flex;
-	/* Номер занимает свою долю строки: 47px при кегле 20 — 2.35em */
-	gap: 0;
+	display: contents;
 	margin: 0;
 	font-size: var(--font-size-h5);
 }
 
 .article-stages__number {
-	flex: 0 0 2.35em;
+	grid-column: 1;
+	grid-row: 1;
+	font-size: var(--font-size-h5);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+}
+
+.article-stages__title {
+	grid-column: 2;
+	grid-row: 1;
+	font-size: var(--font-size-h5);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
 }
 
 .article-stages__text {
+	grid-column: 2;
+	grid-row: 2;
 	margin: 0;
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);

@@ -70,34 +70,21 @@
 	font-size: var(--font-size-h2);
 }
 
-.price-section__link {
-	display: inline-flex;
-	align-items: center;
-	/* 16px до стрелки (1293:3787) */
-	gap: 16px;
-	color: var(--color-text);
-	text-decoration: none;
-}
-
-/* Стрелка розовая — фирменный акцент из макета */
-.price-section__arrow {
-	flex-shrink: 0;
-	color: var(--color-accent-pink);
-	transition: color 0.3s ease;
-}
-
-/* Наведение — только с 1200 и там, где есть курсор (общее правило темы) */
-@media (hover: hover) and (min-width: 1200px) {
-	.price-section__link:hover .price-section__arrow {
-		color: var(--color-text);
-	}
-}
+/* Вид и наведение — общий компонент components/link-arrow.css */
 
 .price-table__head,
-.price-table__row {
+.price-table__link {
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);
+}
+
+/*
+ * Сама строка — только рамка и отступы: сетку держит ссылка внутри,
+ * иначе она сжимается в первую колонку вместе со всем содержимым.
+ */
+.price-table__row {
+	position: relative;
 }
 
 /*
@@ -129,4 +116,57 @@
 	font-weight: var(--font-weight-heading);
 	line-height: var(--line-height-heading);
 	color: var(--color-text);
+}
+
+/*
+ * Наведение на услугу — тот же приём, что в списке услуг на странице
+ * направления: список уходит в серый, строка под курсором остаётся
+ * чёрной и ведёт на страницу услуги. Строки без своей страницы (профили
+ * дизайн-поддержки) в этом не участвуют.
+ */
+.price-table__link {
+	color: inherit;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+/*
+ * Визуал услуги — как в списке на странице направления (1789:4076):
+ * появляется справа по центру строки, в пятой и шестой колонках.
+ */
+.price-table__preview {
+	position: absolute;
+	top: 50%;
+	left: calc(4 * (100% - 5 * var(--grid-gap)) / 6 + 4 * var(--grid-gap));
+	z-index: 2;
+	display: block;
+	width: calc(2 * (100% - 5 * var(--grid-gap)) / 6 + var(--grid-gap));
+	height: 294px;
+	overflow: hidden;
+	background-color: var(--color-surface-alt);
+	opacity: 0;
+	transform: translate(0, -50%) scale(0.98);
+	transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+	pointer-events: none;
+}
+
+.price-table__preview img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+@media (hover: hover) and (min-width: 1200px) {
+	.price-table.is-hovered .price-table__row {
+		color: var(--color-text-disclaimer);
+	}
+
+	.price-table.is-hovered .price-table__row.is-active {
+		color: var(--color-text);
+	}
+
+	.price-table__row.is-active .price-table__preview {
+		opacity: 1;
+		transform: translate(0, -50%) scale(1);
+	}
 }

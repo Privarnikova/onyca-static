@@ -48,29 +48,16 @@
 	margin: 0;
 }
 
-.other-articles__link {
-	display: inline-flex;
-	align-items: center;
-	/* 16 от текста до стрелки */
-	gap: 16px;
-	color: var(--color-text);
-	text-decoration: none;
-}
-
-.other-articles__arrow {
-	color: var(--color-accent-pink);
-}
-
 .other-articles__grid {
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);
 }
 
-/* Розовая стрелка при наведении чернеет — как в прайс-листе */
+/* В «Других статьях» карточки скругляются на 35 — как маленькие в блоге */
 @media (hover: hover) and (min-width: 1200px) {
-	.other-articles__link:hover .other-articles__arrow {
-		color: var(--color-text);
+	.other-articles .card-post__link:hover .card-post__cover {
+		border-radius: 35px;
 	}
 }
 

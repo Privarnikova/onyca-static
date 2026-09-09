@@ -141,6 +141,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <link rel="stylesheet" id="onyca-price-list-css" href="./index_files/price-list.css" media="all">
 <link rel="stylesheet" id="onyca-blog-css" href="./index_files/blog.css" media="all">
 <link rel="stylesheet" id="onyca-breadcrumbs-css" href="./index_files/breadcrumbs.css" media="all">
+<link rel="stylesheet" id="onyca-link-arrow-css" href="./index_files/link-arrow.css" media="all">
 <link rel="stylesheet" id="onyca-article-blocks-css" href="./index_files/article-blocks.css" media="all">
 <link rel="stylesheet" id="onyca-article-hero-css" href="./index_files/article-hero.css" media="all">
 <link rel="stylesheet" id="onyca-article-page-css" href="./index_files/article-page.css" media="all">
@@ -246,85 +247,118 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 					<section class="price-section">
 								<h2 class="price-section__title">
-											<a class="price-section__link" href="branding.html">
-							Брендинг							<svg class="icon icon--arrow-right icon--lg price-section__arrow" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+											<a class="link-arrow price-section__link" href="branding.html">
+							<span class="link-arrow__text">Брендинг</span>
+							<svg class="icon icon--arrow-right icon--lg link-arrow__icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
   <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
   <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
 </svg>
 						</a>
 									</h2>
 
-				<div class="price-table">
+				<div class="price-table" data-service-list="">
 					<div class="price-table__head">
 													<span class="price-table__cell">Услуга</span>
 							<span class="price-table__cell">Стоимость</span>
 											</div>
 
 					<ul class="price-table__rows">
-													<li class="price-table__row">
-								<span class="price-table__name">Айдентика</span>
-								<span class="price-table__price">от 200 000 ₽</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="service-aydentika.html">
+									<span class="price-table__name">Айдентика</span>
+									<span class="price-table__price">от 200 000 ₽</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">Дизайн-поддержка</span>
-								<span class="price-table__price">от 2 300 ₽</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="design-support.html">
+									<span class="price-table__name">Дизайн-поддержка</span>
+									<span class="price-table__price">от 2 300 ₽</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
 											</ul>
 				</div>
 			</section>
 					<section class="price-section">
 								<h2 class="price-section__title">
-											<a class="price-section__link" href="ux-ui.html">
-							UX/UI							<svg class="icon icon--arrow-right icon--lg price-section__arrow" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+											<a class="link-arrow price-section__link" href="ux-ui.html">
+							<span class="link-arrow__text">UX/UI</span>
+							<svg class="icon icon--arrow-right icon--lg link-arrow__icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
   <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
   <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
 </svg>
 						</a>
 									</h2>
 
-				<div class="price-table">
+				<div class="price-table" data-service-list="">
 					<div class="price-table__head">
 													<span class="price-table__cell">Услуга</span>
 							<span class="price-table__cell">Стоимость</span>
 											</div>
 
 					<ul class="price-table__rows">
-													<li class="price-table__row">
-								<span class="price-table__name">Лендинг</span>
-								<span class="price-table__price">от 75 000 ₽</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="service-lending.html">
+									<span class="price-table__name">Лендинг</span>
+									<span class="price-table__price">от 75 000 ₽</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">Корпоративный сайт</span>
-								<span class="price-table__price">от 155 000 ₽</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="service-korporativnyy-sayt.html">
+									<span class="price-table__name">Корпоративный сайт</span>
+									<span class="price-table__price">от 155 000 ₽</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">Интернет-магазин</span>
-								<span class="price-table__price">от 220 000 ₽</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="service-internet-magazin.html">
+									<span class="price-table__name">Интернет-магазин</span>
+									<span class="price-table__price">от 220 000 ₽</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">Дизайн-поддержка</span>
-								<span class="price-table__price">от 2 800 ₽</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="design-support.html">
+									<span class="price-table__name">Дизайн-поддержка</span>
+									<span class="price-table__price">от 2 800 ₽</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
 											</ul>
 				</div>
 			</section>
 					<section class="price-section">
 								<h2 class="price-section__title">
-											<a class="price-section__link" href="design-support.html">
-							Дизайн-поддержка							<svg class="icon icon--arrow-right icon--lg price-section__arrow" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+											<a class="link-arrow price-section__link" href="design-support.html">
+							<span class="link-arrow__text">Дизайн-поддержка</span>
+							<svg class="icon icon--arrow-right icon--lg link-arrow__icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
   <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
   <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
 </svg>
 						</a>
 									</h2>
 
-				<div class="price-table price-table--monthly">
+				<div class="price-table price-table--monthly" data-service-list="">
 					<div class="price-table__head">
 													<span class="price-table__cell">Профиль</span>
 							<span class="price-table__cell">Час</span>
@@ -332,69 +366,102 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 											</div>
 
 					<ul class="price-table__rows">
-													<li class="price-table__row">
-								<span class="price-table__name">Руководитель проекта</span>
-								<span class="price-table__price">3 300 ₽</span>
+																				<li class="price-table__row">
+								<span class="price-table__link">
+									<span class="price-table__name">Руководитель проекта</span>
+									<span class="price-table__price">3 300 ₽</span>
 
-																	<span class="price-table__price">от 75 000 ₽</span>
+																			<span class="price-table__price">от 75 000 ₽</span>
+																	</span>
+
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">Графический дизайн</span>
-								<span class="price-table__price">2 300 ₽</span>
+																				<li class="price-table__row">
+								<span class="price-table__link">
+									<span class="price-table__name">Графический дизайн</span>
+									<span class="price-table__price">2 300 ₽</span>
 
-																	<span class="price-table__price">200 000 ₽</span>
+																			<span class="price-table__price">200 000 ₽</span>
+																	</span>
+
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">UX/UI-дизайн</span>
-								<span class="price-table__price">2 800 ₽</span>
+																				<li class="price-table__row">
+								<span class="price-table__link">
+									<span class="price-table__name">UX/UI-дизайн</span>
+									<span class="price-table__price">2 800 ₽</span>
 
-																	<span class="price-table__price">250 000 ₽</span>
+																			<span class="price-table__price">250 000 ₽</span>
+																	</span>
+
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">3D</span>
-								<span class="price-table__price">2 300 ₽</span>
+																				<li class="price-table__row">
+								<span class="price-table__link">
+									<span class="price-table__name">3D</span>
+									<span class="price-table__price">2 300 ₽</span>
 
-																	<span class="price-table__price">200 000 ₽</span>
+																			<span class="price-table__price">200 000 ₽</span>
+																	</span>
+
 															</li>
 											</ul>
 				</div>
 			</section>
 					<section class="price-section">
 								<h2 class="price-section__title">
-											<a class="price-section__link" href="cg-motion.html">
-							CG &amp; Motion							<svg class="icon icon--arrow-right icon--lg price-section__arrow" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+											<a class="link-arrow price-section__link" href="cg-motion.html">
+							<span class="link-arrow__text">CG &amp; Motion</span>
+							<svg class="icon icon--arrow-right icon--lg link-arrow__icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
   <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
   <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
 </svg>
 						</a>
 									</h2>
 
-				<div class="price-table">
+				<div class="price-table" data-service-list="">
 					<div class="price-table__head">
 													<span class="price-table__cell">Услуга</span>
 							<span class="price-table__cell">Стоимость</span>
 											</div>
 
 					<ul class="price-table__rows">
-													<li class="price-table__row">
-								<span class="price-table__name">3D Motion</span>
-								<span class="price-table__price">индивидуально</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="service-3d-motion.html">
+									<span class="price-table__name">3D Motion</span>
+									<span class="price-table__price">индивидуально</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">3D-моделирование</span>
-								<span class="price-table__price">индивидуально</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="service-3d-modelirovanie.html">
+									<span class="price-table__name">3D-моделирование</span>
+									<span class="price-table__price">индивидуально</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">2D Motion</span>
-								<span class="price-table__price">индивидуально</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="service-2d-motion.html">
+									<span class="price-table__name">2D Motion</span>
+									<span class="price-table__price">индивидуально</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
-													<li class="price-table__row">
-								<span class="price-table__name">VFX</span>
-								<span class="price-table__price">индивидуально</span>
+																				<li class="price-table__row price-table__row--linked">
+								<a class="price-table__link" href="service-vfx.html">
+									<span class="price-table__name">VFX</span>
+									<span class="price-table__price">индивидуально</span>
 
+																	</a>
+
+																										<span class="price-table__preview" aria-hidden="true">
+																			</span>
 															</li>
 											</ul>
 				</div>
@@ -438,8 +505,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 				<div class="site-footer__legal">
 					<p class="site-footer__policy">
-						<a href="policy.html">Политика обработки персональных данных</a>
-						<a href="cookie.html">Политика Cookie</a>
+												<a href="policy.html" target="_blank" rel="noopener">Политика обработки персональных данных</a>
+						<a href="cookie.html" target="_blank" rel="noopener">Политика Cookie</a>
 					</p>
 					<p class="site-footer__disclaimer">*принадлежит запрещенной в РФ Meta</p>
 				</div>
@@ -551,7 +618,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="consent contact-form__consent" data-required-group="consent">
 						<input class="radio-control" type="checkbox" name="contact_consent" id="popup-project-consent">
 			<span class="consent__text">
-					Нажимая на кнопку «Отправить», вы даете <a href="policy.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html">политикой обработки персональных данных</a>.
+					Нажимая на кнопку «Отправить», вы даете <a href="policy.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html" target="_blank" rel="noopener">политикой обработки персональных данных</a>.
 			</span>
 			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
@@ -600,7 +667,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="consent contact-form__consent" data-required-group="consent">
 			<input class="radio-control" type="checkbox" name="career_consent" id="popup-career-consent">
 			<span class="consent__text">
-					Нажимая на кнопку «Отправить», вы даете <a href="policy.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html">политикой обработки персональных данных</a>.
+					Нажимая на кнопку «Отправить», вы даете <a href="policy.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html" target="_blank" rel="noopener">политикой обработки персональных данных</a>.
 			</span>
 			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
@@ -656,7 +723,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 		<p class="cookie-banner__text">
 			Они помогают обеспечивать работу сайта. Оставаясь на сайте, вы соглашаетесь
-			с <a href="cookie.html">политикой использования файлов cookie</a>.
+			с <a href="cookie.html" target="_blank" rel="noopener">политикой использования файлов cookie</a>.
 		</p>
 
 		<button type="button" class="btn btn--cookie cookie-banner__accept" data-cookie-accept="">Принять</button>

@@ -133,6 +133,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <link rel="stylesheet" id="onyca-price-list-css" href="./index_files/price-list.css" media="all">
 <link rel="stylesheet" id="onyca-blog-css" href="./index_files/blog.css" media="all">
 <link rel="stylesheet" id="onyca-breadcrumbs-css" href="./index_files/breadcrumbs.css" media="all">
+<link rel="stylesheet" id="onyca-link-arrow-css" href="./index_files/link-arrow.css" media="all">
 <link rel="stylesheet" id="onyca-article-blocks-css" href="./index_files/article-blocks.css" media="all">
 <link rel="stylesheet" id="onyca-article-hero-css" href="./index_files/article-hero.css" media="all">
 <link rel="stylesheet" id="onyca-article-page-css" href="./index_files/article-page.css" media="all">
@@ -231,17 +232,17 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 			<a class="tab-pill is-selected" href="blog.html">
 				Все			</a>
 
-							<a class="tab-pill" href="blog.html?topic=animation">
+							<a class="tab-pill" href="blog-topic-animation.html">
 					Анимация				</a>
-							<a class="tab-pill" href="blog.html?topic=branding">
+							<a class="tab-pill" href="blog-topic-branding.html">
 					Брендинг				</a>
-							<a class="tab-pill" href="blog.html?topic=design">
+							<a class="tab-pill" href="blog-topic-design.html">
 					Дизайн				</a>
-							<a class="tab-pill" href="blog.html?topic=interfaces">
+							<a class="tab-pill" href="blog-topic-interfaces.html">
 					Интерфейсы				</a>
-							<a class="tab-pill" href="blog.html?topic=novosti">
+							<a class="tab-pill" href="blog-topic-novosti.html">
 					Новости				</a>
-							<a class="tab-pill" href="blog.html?topic=processes">
+							<a class="tab-pill" href="blog-topic-processes.html">
 					Процессы				</a>
 					</nav>
 		</div>
@@ -439,14 +440,14 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	<div class="pagination__pages">
 									<span class="pagination__page is-current" aria-current="page">
 					1				</span>
-												<a class="pagination__page" href="blog.htmlpage/2/" aria-label="Страница 2">
+												<a class="pagination__page" href="blog-page-2.html" aria-label="Страница 2">
 					2				</a>
 						</div>
 
 	</nav>
 			</div>
 
-							<a class="btn btn--cta blog-page__more" href="blog.htmlpage/2/" data-load-more=""><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">
+							<a class="btn btn--cta blog-page__more" href="blog-page-2.html" data-load-more=""><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">
 					<span class="btn__text">Посмотреть еще</span>
 				</span></a>
 					</div>
@@ -489,8 +490,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 				<div class="site-footer__legal">
 					<p class="site-footer__policy">
-						<a href="policy.html">Политика обработки персональных данных</a>
-						<a href="cookie.html">Политика Cookie</a>
+												<a href="policy.html" target="_blank" rel="noopener">Политика обработки персональных данных</a>
+						<a href="cookie.html" target="_blank" rel="noopener">Политика Cookie</a>
 					</p>
 					<p class="site-footer__disclaimer">*принадлежит запрещенной в РФ Meta</p>
 				</div>
@@ -602,7 +603,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="consent contact-form__consent" data-required-group="consent">
 						<input class="radio-control" type="checkbox" name="contact_consent" id="popup-project-consent">
 			<span class="consent__text">
-					Нажимая на кнопку «Отправить», вы даете <a href="policy.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html">политикой обработки персональных данных</a>.
+					Нажимая на кнопку «Отправить», вы даете <a href="policy.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html" target="_blank" rel="noopener">политикой обработки персональных данных</a>.
 			</span>
 			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
@@ -651,7 +652,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<div class="consent contact-form__consent" data-required-group="consent">
 			<input class="radio-control" type="checkbox" name="career_consent" id="popup-career-consent">
 			<span class="consent__text">
-					Нажимая на кнопку «Отправить», вы даете <a href="policy.html">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html">политикой обработки персональных данных</a>.
+					Нажимая на кнопку «Отправить», вы даете <a href="policy.html" target="_blank" rel="noopener">согласие на обработку персональных данных</a> и соглашаетесь с <a href="policy.html" target="_blank" rel="noopener">политикой обработки персональных данных</a>.
 			</span>
 			<p class="consent__error" data-consent-error="" hidden="">Необходимо ваше согласие</p>
 		</div>
@@ -707,7 +708,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 		<p class="cookie-banner__text">
 			Они помогают обеспечивать работу сайта. Оставаясь на сайте, вы соглашаетесь
-			с <a href="cookie.html">политикой использования файлов cookie</a>.
+			с <a href="cookie.html" target="_blank" rel="noopener">политикой использования файлов cookie</a>.
 		</p>
 
 		<button type="button" class="btn btn--cookie cookie-banner__accept" data-cookie-accept="">Принять</button>
