@@ -138,3 +138,64 @@
 		grid-template-columns: minmax(0, 1fr);
 	}
 }
+
+/*
+ * Кейс (1293:4286) считает заголовки на уровень крупнее статьи: H1
+ * стоит во всю ширину над текстом (1220 — четыре колонки), а на поля
+ * уходит H2. Остальные заголовки — те же, что в статье.
+ */
+.article-page--project .article-content > h1 {
+	margin: 0;
+	font-size: var(--font-size-h2);
+	/*
+	 * Ширина — четыре колонки (1220 в макете). Задана долей сетки, а не
+	 * grid-column: колонок у самой ленты текста нет, их держат разделы.
+	 */
+	max-width: calc(4 * (100% - 5 * var(--grid-gap)) / 6 + 3 * var(--grid-gap));
+}
+
+/*
+ * Крупный заголовок отбивается на 80 — столько же берёт раздел под ним
+ * (в макете 1293:4521 и 1865:4166 отступ у обоих одинаковый).
+ */
+.article-page--project .article-content > h1:not(:first-child),
+.article-page--project .article-content > h1 + .article-section {
+	margin-top: 80px;
+}
+
+.article-page--project .article-section > h2 {
+	grid-column: 1 / 3;
+	margin: 0;
+	font-size: var(--font-size-h4);
+	/* Ширина текста на полях — полторы колонки, как у заголовка статьи */
+	max-width: calc((100% - var(--grid-gap)) / 2 * 1.5 + var(--grid-gap));
+}
+
+.article-page--project .article-section__body > h3 {
+	font-size: var(--font-size-h5);
+}
+
+.article-page--project .article-section__body > h4 {
+	font-size: var(--font-size-h6);
+}
+
+/*
+ * Отступы сверху идут по той же шкале: у кейса H3 отбивается как H2 в
+ * статье (64), а H4 — как её H3 (32).
+ */
+.article-page--project .article-section__body > h3 {
+	margin-top: 64px;
+}
+
+.article-page--project .article-section__body > h4 {
+	margin-top: 32px;
+}
+
+/*
+ * Первый блок раздела встаёт вровень с заголовком H2: отступ берёт весь
+ * раздел, а внутри него добавочного отступа быть не должно — иначе
+ * текст сползает ниже заголовка, который стоит слева.
+ */
+.article-page--project .article-section__body > :first-child {
+	margin-top: 0;
+}

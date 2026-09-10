@@ -55,6 +55,8 @@ const PAGES = [
   { url: 'http://localhost:8080/services/cg-motion/', out: 'cg-motion.html' },
   { url: 'http://localhost:8080/services/design-support/', out: 'design-support.html' },
   { url: 'http://localhost:8080/projects/', out: 'projects.html' },
+  { url: 'http://localhost:8080/about/', out: 'about.html' },
+  { url: 'http://localhost:8080/hr/', out: 'hr.html' },
   { url: 'http://localhost:8080/blog/', out: 'blog.html' },
   { url: 'http://localhost:8080/policy/', out: 'policy.html' },
   { url: 'http://localhost:8080/cookie/', out: 'cookie.html' },
@@ -74,6 +76,8 @@ const ROUTES = [
   ['/services/', 'price-list.html'],
   ['/contacts/', 'contacts.html'],
   ['/projects/', 'projects.html'],
+  ['/about/', 'about.html'],
+  ['/hr/', 'hr.html'],
   ['/blog/', 'blog.html'],
   ['/policy/', 'policy.html'],
   ['/cookie/', 'cookie.html'],
@@ -205,6 +209,7 @@ async function collectPagination( page, url, prefix ) {
 
   await collectFromSitemap(browser, 'post-sitemap.xml', 'article-');
   await collectFromSitemap(browser, 'service-sitemap.xml', 'service-');
+  await collectFromSitemap(browser, 'project-sitemap.xml', 'case-');
   await collectBlogViews(browser);
   const assets = new Map();
   const pages = [];

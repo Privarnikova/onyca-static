@@ -1,0 +1,180 @@
+/**
+ * Вакансии — Figma 2271:7179 (список) и 2271:7102 (пусто), десктоп 1920.
+ *
+ * Строка раскрывается так же, как вопрос в списке вопросов, поэтому
+ * механика и отступы берутся оттуда (components/faq.css). Здесь — то,
+ * чем вакансия отличается: формат работы в четвёртой колонке, текст в
+ * колонках 1–3 и кнопка отклика под ним.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов остальных разрешений пока нет.
+ */
+
+.vacancies {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 52 от заголовка до первой строки (макет: 100 − 48) */
+	row-gap: 52px;
+}
+
+.vacancies__title {
+	grid-column: 1 / -1;
+	margin: 0;
+	font-size: var(--font-size-h2);
+}
+
+.vacancies__list {
+	grid-column: 1 / -1;
+}
+
+/* Текст «вакансий нет» — крупнее обычного, в колонках 1–3 */
+.vacancies__empty {
+	grid-column: 1 / 4;
+	margin: 0;
+	font-size: var(--font-size-h5);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-black);
+}
+
+/*
+ * Строка вакансии стоит по колонкам, а не в ряд: название в 1–2,
+ * формат работы в четвёртой, стрелка у правого края.
+ */
+.vacancies__row {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	align-items: start;
+}
+
+.vacancies__row .vacancies__name {
+	grid-column: 1 / 3;
+	flex: none;
+}
+
+.vacancies__row .vacancies__format {
+	grid-column: 4 / 5;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-muted);
+}
+
+.vacancies__row .faq__icon {
+	grid-column: 6;
+	justify-self: end;
+}
+
+/*
+ * Текст вакансии (2271:6774): абзац, заголовок 16 через 32 и буллеты
+ * через 16. Точка маркера та же, что в статье — 6px по центру 18-го
+ * пикселя, текст с отступом 36.
+ */
+/*
+ * Текст вакансии стоит в колонках 4–6, под форматом работы, а не под
+ * названием: в макете (2271:6774) он прижат к правому краю строки.
+ */
+.vacancies .faq__answer {
+	max-width: none;
+}
+
+.vacancies__body {
+	width: calc(3 * (100% - 5 * var(--grid-gap)) / 6 + 2 * var(--grid-gap));
+	margin-left: calc(3 * (100% - 5 * var(--grid-gap)) / 6 + 3 * var(--grid-gap));
+	color: var(--color-text);
+}
+
+.vacancies__body p,
+.vacancies__body li {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+/*
+ * Отступ принадлежит самому блоку и не зависит от соседа: у абзаца и
+ * буллетов 16, у заголовка 32.
+ */
+.vacancies__body p {
+	margin-top: 16px;
+}
+
+.vacancies__body h3,
+.vacancies__body h4 {
+	margin: 32px 0 0;
+	font-size: var(--font-size-h6);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+}
+
+.vacancies__body ul {
+	display: grid;
+	row-gap: 4px;
+	margin: 16px 0 0;
+	padding-left: 0;
+	list-style: none;
+}
+
+.vacancies__body ul > li {
+	position: relative;
+	/* 36px при кегле 16 — 2.25em, дальше растёт вместе с текстом */
+	padding-left: 2.25em;
+}
+
+.vacancies__body ul > li::before {
+	content: "";
+	position: absolute;
+	/* Центр точки на 18px от края: 1.125em минус её радиус */
+	left: 0.9375em;
+	/* Середина первой строки минус радиус */
+	top: calc(var(--line-height-b1) / 2 * 1em - 0.1875em);
+	width: 0.375em;
+	height: 0.375em;
+	border-radius: 50%;
+	background-color: var(--color-black);
+}
+
+/* Первый блок текста своего отступа не берёт */
+.vacancies__body > :first-child {
+	margin-top: 0;
+}
+
+/* Кнопка отклика: 52 от текста вакансии */
+.vacancies__apply {
+	margin-top: 52px;
+}
+
+/*
+ * Ниже 1200 макетов нет: формат работы уходит под название, чтобы
+ * строка не сжималась в столбик из букв.
+ */
+@media (max-width: 1199px) {
+	.vacancies__empty {
+		grid-column: 1 / -1;
+	}
+
+	.vacancies__row {
+		grid-template-columns: 1fr auto;
+	}
+
+	.vacancies__row .vacancies__name {
+		grid-column: 1 / 2;
+	}
+
+	.vacancies__row .vacancies__format {
+		grid-column: 1 / 2;
+	}
+
+	.vacancies__row .faq__icon {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	/* Ниже 1200 текст идёт во всю ширину: колонок под него не остаётся */
+	.vacancies__body {
+		width: auto;
+		margin-left: 0;
+	}
+}

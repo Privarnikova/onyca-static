@@ -1,0 +1,256 @@
+/**
+ * Страница «Студия» — Figma 1578:3136 (десктоп 1920).
+ *
+ * Поля по краям и расстояния между блоками задаёт страница целиком —
+ * как на главной и на специализациях: .studio-page это и контейнер, и
+ * сетка с зазором 188.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов остальных разрешений пока нет.
+ */
+
+.studio-page {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	row-gap: 188px;
+	padding-bottom: 188px;
+}
+
+/*
+ * Первый экран (2264:3640): заголовок в колонках 1–3, описание в 4–5,
+ * под ними полотно во всю ширину.
+ */
+.studio-hero {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 273 от верха заголовка до полотна при высоте заголовка 195 */
+	row-gap: 78px;
+	align-items: start;
+}
+
+.studio-hero__title {
+	grid-column: 1 / 4;
+	/* 765px в макете */
+	max-width: 765px;
+	margin: 0;
+	font-size: var(--font-size-h1);
+}
+
+.studio-hero__lead {
+	grid-column: 4 / 6;
+}
+
+.studio-hero__lead p {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+/* Абзацы описания разделены пустой строкой — как в макете */
+.studio-hero__lead p + p {
+	margin-top: calc(var(--font-size-b1) * var(--line-height-b1));
+}
+
+.studio-hero__media {
+	grid-column: 1 / -1;
+	/* 1840×900 в макете */
+	aspect-ratio: 1840 / 900;
+}
+
+/*
+ * «Мы воспринимаем дизайн как систему» (2264:3641): текст в колонках
+ * 1–2, изображение в 4–6.
+ */
+.studio-system {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	align-items: start;
+}
+
+.studio-system__text {
+	grid-column: 1 / 3;
+	/* 620px в макете — заголовок чуть шире двух колонок */
+	max-width: 620px;
+}
+
+.studio-system__title {
+	margin: 0;
+	font-size: var(--font-size-h2);
+}
+
+.studio-system__body {
+	/* 52 от заголовка до текста */
+	margin-top: 52px;
+	max-width: 600px;
+}
+
+.studio-system__body p {
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+.studio-system__body p + p {
+	margin-top: calc(var(--font-size-b1) * var(--line-height-b1));
+}
+
+.studio-system__media {
+	grid-column: 4 / -1;
+	/* 909×445 в макете */
+	aspect-ratio: 909 / 445;
+}
+
+/*
+ * «Бизнес меняется» (3022:6585): заголовок и текст в колонках 1–2,
+ * под ними круги направлений во всю ширину.
+ */
+.studio-circles {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+}
+
+.studio-circles__title {
+	grid-column: 1 / 3;
+	margin: 0;
+	font-size: var(--font-size-h2);
+}
+
+.studio-circles__text {
+	grid-column: 1 / 3;
+	/* 148 от верха заголовка до текста при высоте заголовка 96 */
+	margin: 52px 0 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+/*
+ * Круги — одна картинка во всю ширину сетки. Подписи внутри неё, цвет
+ * наследуется от страницы.
+ */
+.studio-circles__figure {
+	grid-column: 1 / -1;
+	/* 32 от текста до композиции (макет: 246 − 214) */
+	margin-top: 32px;
+	color: var(--color-black);
+}
+
+.studio-circles__figure svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+/*
+ * Три блока с картинками (2264:3636): изображение в трёх колонках,
+ * текст — в трёх соседних. Стороны чередуются.
+ */
+.studio-features {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	/* 52 между блоками */
+	row-gap: 52px;
+}
+
+.studio-feature {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	align-items: start;
+}
+
+.studio-feature__media {
+	/* 909×445 в макете */
+	aspect-ratio: 909 / 445;
+}
+
+.studio-feature--left .studio-feature__media {
+	grid-column: 1 / 4;
+}
+
+.studio-feature--left .studio-feature__text {
+	grid-column: 4 / -1;
+}
+
+/* У блока с картинкой справа текст прижат к её краю */
+.studio-feature--right .studio-feature__media {
+	grid-column: 4 / -1;
+	grid-row: 1;
+}
+
+.studio-feature--right .studio-feature__text {
+	grid-column: 1 / 4;
+	grid-row: 1;
+	justify-self: end;
+	max-width: 600px;
+	text-align: right;
+}
+
+.studio-feature__title {
+	margin: 0;
+	font-size: var(--font-size-h4);
+}
+
+.studio-feature__body {
+	/* 61 от верха заголовка до текста при высоте заголовка 29 */
+	margin: 32px 0 0;
+	max-width: 600px;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+}
+
+/* Форма приходит со своими внешними отступами — их задаёт страница */
+.studio-page .studio-page__form {
+	margin-block: 0;
+}
+
+/*
+ * Ниже 1200 макетов нет. Чтобы страница не разъезжалась, колонки
+ * складываются: текст и изображение идут друг под другом.
+ */
+@media (max-width: 1199px) {
+	.studio-page {
+		row-gap: 78px;
+		padding-bottom: 78px;
+	}
+
+	.studio-hero__title,
+	.studio-hero__lead,
+	.studio-system__text,
+	.studio-system__media,
+	.studio-circles__title,
+	.studio-circles__text {
+		grid-column: 1 / -1;
+		max-width: none;
+	}
+
+	.studio-hero {
+		row-gap: 52px;
+	}
+
+	.studio-system {
+		row-gap: 52px;
+	}
+
+	.studio-feature__media,
+	.studio-feature--left .studio-feature__media,
+	.studio-feature--right .studio-feature__media,
+	.studio-feature__text,
+	.studio-feature--left .studio-feature__text,
+	.studio-feature--right .studio-feature__text {
+		grid-column: 1 / -1;
+		grid-row: auto;
+		justify-self: stretch;
+		max-width: none;
+		text-align: left;
+	}
+
+	.studio-feature {
+		row-gap: 32px;
+	}
+}

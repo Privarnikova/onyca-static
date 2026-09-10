@@ -62,13 +62,12 @@
 }
 
 /*
- * Визуалы и текст. В макете (1542:2815) до первого визуала от текста
- * 64, а после последнего до следующего блока — 48.
+ * Визуалы и текст: 64 в обе стороны — и до визуалов, и после них,
+ * каким бы ни был тип блока (1542:2815).
  */
-.article-section + .case-media {
+.article-section + .case-media,
+.case-media + .article-section,
+.case-media + h1,
+h1 + .case-media {
 	margin-top: 64px;
-}
-
-.case-media + .article-section {
-	margin-top: 48px;
 }
