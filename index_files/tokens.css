@@ -61,6 +61,8 @@
 	--font-size-h5: clamp(18px, calc(8px + 0.625vw), 20px);
 	--font-size-h6: clamp(15px, calc(10px + 0.3125vw), 16px);
 	--font-weight-heading: 600;
+	/* Bold — выделения внутри текста (названия форматов в вопросах) */
+	--font-weight-bold: 700;
 	--line-height-heading: 1.2;
 
 	/*

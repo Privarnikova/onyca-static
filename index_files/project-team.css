@@ -1,0 +1,114 @@
+/**
+ * Команда кейса — Figma 1548:3460 (десктоп 1920).
+ *
+ * Исполнители по три в ряд, каждый в двух колонках: имя, под ним
+ * должность, снизу линия. Ниже дата выпуска в первой колонке, срок во
+ * второй и описание в колонках 3–4.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов остальных разрешений пока нет.
+ */
+
+.project-team {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 48 от последнего исполнителя до строки с датой (макет: 139 − 91) */
+	row-gap: 48px;
+}
+
+.project-team__list {
+	grid-column: 1 / -1;
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	column-gap: var(--grid-gap);
+	/* 139 шаг ряда при высоте карточки 91 */
+	row-gap: 48px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.project-team__member {
+	grid-column: span 2;
+	display: grid;
+	/* 16 от имени до должности (макет: 139 − 117.5 − 5.5) */
+	row-gap: 16px;
+	/* 32 от должности до линии */
+	padding-bottom: 32px;
+	border-bottom: 1px solid var(--color-divider);
+}
+
+.project-team__name {
+	font-size: var(--font-size-h4);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.project-team__role {
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-muted);
+}
+
+/* Дата и срок: значение сверху, подпись под ним */
+.project-team__fact {
+	display: grid;
+	row-gap: 16px;
+	align-content: start;
+}
+
+.project-team__fact--release {
+	grid-column: 1 / 2;
+}
+
+.project-team__fact--duration {
+	grid-column: 2 / 3;
+}
+
+.project-team__value {
+	font-size: var(--font-size-h4);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+}
+
+.project-team__label {
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text-muted);
+}
+
+.project-team__summary {
+	grid-column: 3 / 5;
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+}
+
+/*
+ * Ниже 1200 макетов нет: карточки исполнителей идут по две в ряд, а на
+ * телефоне — по одной, иначе имя не помещается в колонку.
+ */
+@media (max-width: 1199px) {
+	.project-team__member {
+		grid-column: span 3;
+	}
+
+	.project-team__summary {
+		grid-column: 3 / -1;
+	}
+}
+
+@media (max-width: 699px) {
+	.project-team__member,
+	.project-team__fact--release,
+	.project-team__fact--duration,
+	.project-team__summary {
+		grid-column: 1 / -1;
+	}
+}

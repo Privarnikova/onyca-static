@@ -392,3 +392,21 @@
 		grid-auto-flow: row;
 	}
 }
+
+/*
+ * Форма без выбора услуг (2034:9502): заголовок стоит вровень с первой
+ * строкой полей. Когда в эту строку начинают писать, подпись поля
+ * уезжает наверх — и заголовок уходит наверх ровно на столько же,
+ * оставаясь с ней в одной строке.
+ *
+ * Состояние берётся у полей: :has() смотрит на первую строку формы, где
+ * поля идут сразу, без пилюль услуг.
+ */
+.contact-form-intro {
+	transition: margin-top 0.2s ease;
+}
+
+.contact-form-section:has(.contact-form__fields:first-child .contact-form__field:nth-child(-n+2) input:focus) .contact-form-intro,
+.contact-form-section:has(.contact-form__fields:first-child .contact-form__field:nth-child(-n+2) input:not(:placeholder-shown)) .contact-form-intro {
+	margin-top: calc(-1 * var(--field-label-shift));
+}

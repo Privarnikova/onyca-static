@@ -1780,15 +1780,36 @@
 	 *
 	 * Тем можно отметить несколько: между ними ИЛИ (ТЗ, п. 05-01).
 	 */
-	function initBlogFilter() {
-		var filters = document.querySelector( '[data-blog-filters]' );
-		var grid = document.querySelector( '[data-blog-grid]' );
+	/**
+	 * Фильтр карточек табами — в блоге по темам, в проектах по отраслям
+	 * и услугам. Механика одна: карточки на странице скрываются, размеры
+	 * в сетке пересобираются по рисунку макета, адрес остаётся понятным.
+	 *
+	 * Наборы независимы: внутри одного «или», между наборами «и» (ТЗ,
+	 * п. 05-02-2).
+	 *
+	 * @param {Object} options Настройки: сетка, карточки и наборы табов.
+	 */
+	function initCardFilter( options ) {
+		var grid = document.querySelector( options.grid );
 
-		if ( ! filters || ! grid ) {
+		if ( ! grid ) {
 			return;
 		}
 
-		var selected = [];
+		var groups = options.groups.filter( function ( group ) {
+			group.tabs = document.querySelector( group.filters );
+			/* Имя атрибута таба у блога своё — разметку менять незачем */
+			group.tabAttr = group.tabAttr || 'data-term';
+
+			return group.tabs;
+		} );
+
+		if ( ! groups.length ) {
+			return;
+		}
+
+		var params = new URLSearchParams( window.location.search );
 
 		/*
 		 * Что выбрано сейчас: сначала смотрим адрес — по нему страница
@@ -1796,79 +1817,101 @@
 		 * отмеченные табы из разметки: в статической копии фильтр по
 		 * одной теме — это отдельная страница, и адрес там обычный.
 		 */
-		var current = new URLSearchParams( window.location.search ).get( 'topic' );
+		groups.forEach( function ( group ) {
+			var current = params.get( group.param );
 
-		if ( current ) {
-			selected = current.split( ',' ).filter( Boolean );
-		} else {
-			filters.querySelectorAll( '[data-topic].is-selected' ).forEach( function ( tab ) {
-				var topic = tab.getAttribute( 'data-topic' );
+			if ( current ) {
+				group.selected = current.split( ',' ).filter( Boolean );
 
-				if ( topic ) {
-					selected.push( topic );
+				return;
+			}
+
+			group.selected = [];
+
+			group.tabs.querySelectorAll( '[' + group.tabAttr + '].is-selected' ).forEach( function ( tab ) {
+				var value = tab.getAttribute( group.tabAttr );
+
+				if ( value ) {
+					group.selected.push( value );
 				}
+			} );
+		} );
+
+		function chosen() {
+			return groups.some( function ( group ) {
+				return group.selected.length;
 			} );
 		}
 
 		function cards() {
-			return grid.querySelectorAll( '.card-post' );
+			return grid.querySelectorAll( options.card );
 		}
 
 		/* Порядок размеров карточек из макета — тот же, что на сервере */
-		var layout = ( grid.getAttribute( 'data-blog-layout' ) || '' ).split( ',' ).filter( Boolean );
+		var layout = ( grid.getAttribute( options.layout ) || '' ).split( ',' ).filter( Boolean );
 
 		function apply() {
 			var shown = 0;
 
 			cards().forEach( function ( card ) {
-				var topics = ( card.getAttribute( 'data-topics' ) || '' ).split( ' ' );
-				var visible = ! selected.length || selected.some( function ( topic ) {
-					return topics.indexOf( topic ) !== -1;
+				/* Карточка проходит, если подходит каждому набору с выбором */
+				var visible = groups.every( function ( group ) {
+					if ( ! group.selected.length ) {
+						return true;
+					}
+
+					var values = ( card.getAttribute( group.attr ) || '' ).split( ' ' );
+
+					return group.selected.some( function ( value ) {
+						return values.indexOf( value ) !== -1;
+					} );
 				} );
 
 				card.hidden = ! visible;
 
 				/*
 				 * Размер карточки зависит от её места в сетке, а не от
-				 * самой статьи: после фильтра места сдвигаются, поэтому
+				 * самой записи: после фильтра места сдвигаются, поэтому
 				 * размеры назначаем заново — по порядку видимых.
 				 */
 				if ( visible && layout.length ) {
 					var size = layout[ shown % layout.length ];
 
 					layout.forEach( function ( name ) {
-						card.classList.toggle( 'card-post--' + name, name === size );
+						card.classList.toggle( options.size + name, name === size );
 					} );
 
 					shown++;
 				}
 			} );
 
-			filters.querySelectorAll( '[data-topic]' ).forEach( function ( tab ) {
-				var topic = tab.getAttribute( 'data-topic' );
+			groups.forEach( function ( group ) {
+				group.tabs.querySelectorAll( '[' + group.tabAttr + ']' ).forEach( function ( tab ) {
+					var value = tab.getAttribute( group.tabAttr );
 
-				tab.classList.toggle(
-					'is-selected',
-					topic ? selected.indexOf( topic ) !== -1 : ! selected.length
-				);
+					tab.classList.toggle(
+						'is-selected',
+						value ? group.selected.indexOf( value ) !== -1 : ! group.selected.length
+					);
+				} );
 			} );
 
 			/*
 			 * Пока фильтр включён, пагинация и догрузка не нужны: на
-			 * странице уже все статьи, которые скрипт успел собрать.
+			 * странице уже все записи, которые скрипт успел собрать.
 			 */
 			var footer = document.querySelector( '[data-load-more-area]' );
 
 			if ( footer ) {
-				footer.hidden = selected.length > 0;
+				footer.hidden = chosen();
 			}
 		}
 
 		/*
-		 * Статьи, которые скрипт дотянул ради фильтра, остаются служебными:
-		 * когда фильтр снимают, блог должен вернуться к первой странице, а
-		 * не показать разом весь архив. Карточки, которые читатель открыл
-		 * сам кнопкой «Посмотреть ещё», сюда не попадают и остаются на месте.
+		 * Записи, которые скрипт дотянул ради фильтра, остаются служебными:
+		 * когда фильтр снимают, страница должна вернуться к первой, а не
+		 * показать разом весь архив. Карточки, которые читатель открыл сам
+		 * кнопкой «Посмотреть ещё», сюда не попадают и остаются на месте.
 		 */
 		var area = document.querySelector( '[data-load-more-area]' );
 		var areaHtml = area ? area.innerHTML : '';
@@ -1894,7 +1937,7 @@
 
 		/*
 		 * Отбор идёт по карточкам на странице, поэтому перед первым
-		 * фильтром дотягиваем остальные страницы блога — иначе статья со
+		 * фильтром дотягиваем остальные страницы — иначе запись со
 		 * второй страницы в выборку не попадёт.
 		 */
 		var loading = null;
@@ -1920,16 +1963,16 @@
 						.then( function ( html ) {
 							var page = new DOMParser().parseFromString( html, 'text/html' );
 
-							page.querySelectorAll( '[data-blog-grid] .card-post' ).forEach( function ( card ) {
+							page.querySelectorAll( '[data-card-grid] ' + options.card ).forEach( function ( card ) {
 								card.setAttribute( 'data-filter-loaded', '' );
 								grid.appendChild( card );
 							} );
 
-							var area = document.querySelector( '[data-load-more-area]' );
+							var current = document.querySelector( '[data-load-more-area]' );
 							var fresh = page.querySelector( '[data-load-more-area]' );
 
-							if ( area && fresh ) {
-								area.innerHTML = fresh.innerHTML;
+							if ( current && fresh ) {
+								current.innerHTML = fresh.innerHTML;
 							}
 
 							next();
@@ -1943,48 +1986,205 @@
 			return loading;
 		}
 
-		filters.addEventListener( 'click', function ( event ) {
-			var tab = event.target.closest( '[data-topic]' );
+		/* Адрес остаётся понятным: по нему страница откроется с тем же фильтром */
+		function updateUrl() {
+			var query = groups
+				.filter( function ( group ) {
+					return group.selected.length;
+				} )
+				.map( function ( group ) {
+					return group.param + '=' + group.selected.join( ',' );
+				} )
+				.join( '&' );
 
-			if ( ! tab ) {
-				return;
-			}
+			window.history.replaceState( null, '', window.location.pathname + ( query ? '?' + query : '' ) );
+		}
 
-			event.preventDefault();
+		groups.forEach( function ( group ) {
+			group.tabs.addEventListener( 'click', function ( event ) {
+				var tab = event.target.closest( '[' + group.tabAttr + ']' );
 
-			var topic = tab.getAttribute( 'data-topic' );
+				if ( ! tab ) {
+					return;
+				}
 
-			if ( ! topic ) {
-				selected = [];
-			} else if ( selected.indexOf( topic ) === -1 ) {
-				selected = selected.concat( topic );
-			} else {
-				selected = selected.filter( function ( item ) {
-					return item !== topic;
-				} );
-			}
+				event.preventDefault();
 
-			/* Адрес остаётся понятным: по нему страница откроется с тем же фильтром */
-			var url = selected.length
-				? window.location.pathname + '?topic=' + selected.join( ',' )
-				: window.location.pathname;
+				var value = tab.getAttribute( group.tabAttr );
 
-			window.history.replaceState( null, '', url );
+				if ( ! value ) {
+					/* «Все» снимает только свой набор, соседний остаётся */
+					group.selected = [];
+				} else if ( group.selected.indexOf( value ) === -1 ) {
+					group.selected = group.selected.concat( value );
+				} else {
+					group.selected = group.selected.filter( function ( item ) {
+						return item !== value;
+					} );
+				}
 
-			if ( selected.length ) {
-				loadRest().then( apply );
-			} else {
-				dropLoaded();
-			}
+				updateUrl();
 
-			apply();
+				if ( chosen() ) {
+					loadRest().then( apply );
+				} else {
+					dropLoaded();
+				}
+
+				apply();
+			} );
 		} );
 
-		if ( selected.length ) {
+		if ( chosen() ) {
 			loadRest().then( apply );
 		}
 
 		apply();
+	}
+
+	/**
+	 * Список вопросов: открытым остаётся один. По ТЗ (п. 05-03) новый
+	 * вопрос закрывает предыдущий, поэтому при раскрытии одного
+	 * остальные в списке схлопываются.
+	 *
+	 * Само раскрытие делает браузер (<details>), скрипт только следит,
+	 * чтобы открытый был один: без JS список остаётся рабочим.
+	 */
+	function initFaq() {
+		var lists = document.querySelectorAll( '.faq__list' );
+
+		if ( ! lists.length ) {
+			return;
+		}
+
+		/*
+		 * Спокойный разгон и торможение: с резкой кривой основная часть
+		 * пути проходила за первые сто миллисекунд, и раскрытие
+		 * читалось как рывок.
+		 */
+		var DURATION = 420;
+		var EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
+		var still = window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+
+		lists.forEach( function ( list ) {
+			var items = Array.prototype.slice.call( list.querySelectorAll( '.faq__details' ) );
+
+			items.forEach( function ( item ) {
+				var summary = item.querySelector( '.faq__question' );
+				var answer = item.querySelector( '.faq__answer' );
+
+				if ( ! summary || ! answer ) {
+					return;
+				}
+
+				/* Идущая анимация: её отменяем, если по вопросу щёлкнули снова */
+				var running = null;
+
+				function slide( from, to, done ) {
+					if ( running ) {
+						running.cancel();
+					}
+
+					running = answer.animate(
+						[ { height: from + 'px' }, { height: to + 'px' } ],
+						{ duration: DURATION, easing: EASING }
+					);
+
+					running.onfinish = function () {
+						running = null;
+
+						if ( done ) {
+							done();
+						}
+					};
+				}
+
+				function open() {
+					if ( item.open ) {
+						return;
+					}
+
+					item.open = true;
+					item.classList.add( 'is-open' );
+
+					if ( still ) {
+						return;
+					}
+
+					slide( 0, answer.scrollHeight );
+				}
+
+				function close() {
+					if ( ! item.open ) {
+						return;
+					}
+
+					/* Отступ под вопросом едет вместе с высотой ответа */
+					item.classList.remove( 'is-open' );
+
+					if ( still ) {
+						item.open = false;
+
+						return;
+					}
+
+					/* Закрываем после анимации: иначе ответ пропадёт рывком */
+					slide( answer.getBoundingClientRect().height, 0, function () {
+						item.open = false;
+					} );
+				}
+
+				item.onycaOpen = open;
+				item.onycaClose = close;
+
+				summary.addEventListener( 'click', function ( event ) {
+					/* Раскрытием управляем сами — ради плавности */
+					event.preventDefault();
+
+					if ( item.open ) {
+						close();
+
+						return;
+					}
+
+					/* Открытым остаётся один вопрос (ТЗ, п. 05-03) */
+					items.forEach( function ( other ) {
+						if ( other !== item && other.onycaClose ) {
+							other.onycaClose();
+						}
+					} );
+
+					open();
+				} );
+			} );
+		} );
+	}
+
+	/** Блог: один набор табов — темы статей */
+	function initBlogFilter() {
+		initCardFilter( {
+			grid: '[data-blog-grid]',
+			card: '.card-post',
+			size: 'card-post--',
+			layout: 'data-blog-layout',
+			groups: [
+				{ filters: '[data-blog-filters]', param: 'topic', attr: 'data-topics', tabAttr: 'data-topic' }
+			]
+		} );
+	}
+
+	/** Проекты: два набора — отрасли и услуги, между ними «и» */
+	function initProjectFilter() {
+		initCardFilter( {
+			grid: '[data-card-grid]',
+			card: '.card-case',
+			size: 'card-case--',
+			layout: 'data-grid-layout',
+			groups: [
+				{ filters: '[data-project-filter="industry"]', param: 'industry', attr: 'data-industries' },
+				{ filters: '[data-project-filter="project_service"]', param: 'project_service', attr: 'data-services' }
+			]
+		} );
 	}
 
 	/**
@@ -2123,6 +2323,8 @@
 		initCounters();
 		initLoadMore();
 		initBlogFilter();
+		initProjectFilter();
+		initFaq();
 		initShowreelWatch();
 		initStackedProjects();
 		initClientLogos();

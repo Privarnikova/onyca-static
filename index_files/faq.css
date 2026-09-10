@@ -61,9 +61,33 @@
 	padding-top: 0;
 }
 
-/* У открытого вопроса до ответа 16, а 32 отсчитываются уже от ответа */
-.faq__details[open] .faq__question {
+/*
+ * У открытого вопроса до ответа 16, а 32 отсчитываются уже от ответа.
+ * Состояние помечает скрипт в начале анимации, а не атрибут open: он
+ * снимается только в её конце, и отступ дёргался бы рывком.
+ */
+.faq__details.is-open .faq__question {
 	padding-bottom: 16px;
+}
+
+/*
+ * Раскрытие плавное: высоту ответа ведёт скрипт (initFaq), а отступ под
+ * вопросом — переход. Тем, кто просил уменьшить движение, показываем
+ * сразу.
+ */
+.faq__question {
+	/* Отступ едет тем же временем и кривой, что высота ответа (main.js) */
+	transition: color 0.3s ease, padding-bottom 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq__answer {
+	overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.faq__question {
+		transition: color 0.3s ease;
+	}
 }
 
 .faq__question::-webkit-details-marker {
@@ -82,32 +106,67 @@
 	flex: none;
 	/* В макете стрелка чёрная в обоих состояниях — серым становится текст */
 	color: var(--color-black);
-	transition: transform 0.3s ease;
+	/* Стрелка поворачивается вместе с раскрытием */
+	transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Открытый вопрос: стрелка смотрит вверх */
-.faq__details[open] .faq__icon {
+/*
+ * Открытый вопрос: стрелка смотрит вверх. Состояние берём у класса, а
+ * не у атрибута open: он снимается только в конце анимации, и стрелка
+ * при закрытии поворачивалась с опозданием.
+ */
+.faq__details.is-open .faq__icon {
 	transform: rotate(180deg);
 }
 
 .faq__answer {
-	/* 32 от ответа до линии */
-	padding-bottom: 32px;
 	/* Ответ идёт в той же ширине, что и вопрос */
 	max-width: calc(3 * (100% - 5 * var(--grid-gap)) / 6 + 2 * var(--grid-gap));
 	color: var(--color-text-footer);
 }
 
-.faq__answer p {
+/* 32 от ответа до линии — на внутренней обёртке, см. faq.php */
+.faq__answer-inner {
+	padding-bottom: 32px;
+}
+
+.faq__answer p,
+.faq__answer li {
 	margin: 0;
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
 	line-height: var(--line-height-b1);
 }
 
-/* Абзацы длинного ответа идут строка за строкой, без пустых строк */
-.faq__answer p + p {
-	margin-top: 0;
+/* Абзацы ответа отбиваются пустой строкой */
+.faq__answer p + p,
+.faq__answer ul,
+.faq__answer ol {
+	margin-top: calc(var(--font-size-b1) * var(--line-height-b1));
+}
+
+/*
+ * Список в ответе (2508:11753): обычные точки с отступом 1.5em, между
+ * пунктами интервала нет — как в макете.
+ */
+.faq__answer ul {
+	margin-bottom: 0;
+	padding-left: 1.5em;
+	list-style: disc;
+}
+
+.faq__answer li {
+	margin: 0;
+}
+
+/* Название формата в пункте — тем же кеглем и цветом, но жирнее */
+.faq__answer strong {
+	font-weight: var(--font-weight-bold);
+	color: inherit;
+}
+
+.faq__answer a {
+	color: inherit;
 }
 
 /* Наведение (2034:9768): вопрос темнеет до Grey-700 */
