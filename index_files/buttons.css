@@ -183,9 +183,12 @@
 
 }
 
-/* Кнопка лид-магнита */
+/*
+ * Кнопка «Закрыть» у лид-магнита кейса (975:3693 — статика, 975:3695 —
+ * наведение). Отступы из макета: кнопка 92×40 при тексте 60.
+ */
 .btn--lead-magnet {
-	padding: 11px 18px 13px;
+	padding: 11px 16px 14px;
 	font-size: var(--font-size-button-sm);
 	background-color: var(--color-dark-grey);
 	color: var(--color-white);

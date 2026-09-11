@@ -35,6 +35,52 @@ body {
 }
 
 /*
+ * Полоса прокрутки — чёрный ползунок на светлой дорожке, вместо
+ * системной серой. Двумя способами сразу: свойство scrollbar-* понимают
+ * Firefox и новые Chrome с Safari, ::-webkit-scrollbar — те, что
+ * постарше. Правила не спорят: где работает первое, второе браузер
+ * игнорирует.
+ */
+html {
+	scrollbar-color: var(--color-black) var(--color-surface-alt);
+	scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	background-color: var(--color-surface-alt);
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 100px;
+	background-color: var(--color-black);
+}
+
+/*
+ * Выделение текста: чёрная подложка и белый текст на всём сайте.
+ * Анимации у выделения быть не может — ::selection принимает только
+ * цвет, тени и подчёркивание, а переходы к нему не применяются.
+ */
+::selection {
+	background-color: var(--color-black);
+	color: var(--color-white);
+}
+
+/*
+ * На тёмных полотнах подсветка инвертируется: чёрное на синем и на
+ * чёрном не читалось бы. Это страница 404 и полоса лид-магнита.
+ */
+.page-404 ::selection,
+.case-lead ::selection {
+	background-color: var(--color-white);
+	color: var(--color-black);
+}
+
+/*
  * Синяя рамка фокуса полностью убрана — на ВСЕХ элементах и во всех
  * состояниях (:focus и :focus-visible), включая кнопки, ссылки, инпуты,
  * радиокнопки и чекбоксы. Раньше тут было «убрать на клик, оставить на

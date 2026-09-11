@@ -1,0 +1,164 @@
+/**
+ * Лид-магнит кейса — Figma 933:547 (плашка) и 975:3694 (кнопка
+ * «Закрыть»), эталон 1920. Разметка —
+ * template-parts/components/case-lead.php, поведение — initCaseLead в
+ * assets/js/main.js.
+ *
+ * Полоса стоит на одном уровне с кнопкой «Обсудить проект» и занимает
+ * пять колонок сетки из шести: 1530 при рабочей области 1840. Шестая
+ * колонка остаётся кнопке.
+ *
+ * ВНИМАНИЕ: свёрстано под 1920, макетов остальных разрешений нет. Ниже
+ * 1200 полоса перебирается на строку выше кнопки и занимает всю
+ * рабочую ширину — иначе тексты в неё не помещаются.
+ */
+
+.case-lead {
+	/* Ширина рабочей области: выше 1920 контейнер центруется */
+	--work: min(
+		calc(100vw - 2 * var(--container-padding)),
+		calc(var(--container-max-width) - 2 * var(--container-padding))
+	);
+	/* Колонка сетки и отступ от низа — те же, что у кнопки «Обсудить проект» */
+	--col: calc((var(--work) - 5 * var(--grid-gap)) / 6);
+	--case-lead-bottom: clamp(20px, 2.0833vw, 40px);
+	/* На сколько полоса поднята над кнопкой «Обсудить проект» */
+	--case-lead-lift: 0px;
+
+	position: fixed;
+	z-index: 190;
+	/*
+	 * Доехав до подвала, полоса поднимается вместе со страницей: JS
+	 * пишет в --case-lead-dock, на сколько она заехала бы на подвал.
+	 * Кнопка «Обсудить проект» останавливается внутри подвала, полоса —
+	 * над ним: она шире и накрыла бы половину подвала.
+	 */
+	bottom: calc(var(--case-lead-bottom) + var(--case-lead-lift) + var(--case-lead-dock, 0px));
+	/*
+	 * Левый край — по сетке, а не по краю окна: выше 1920 контейнер
+	 * центруется, и полоса должна остаться в рабочей области (то же
+	 * правило, что у баннера cookie и плавающей кнопки).
+	 */
+	left: max(
+		var(--container-padding),
+		calc(50vw - var(--container-max-width) / 2 + var(--container-padding))
+	);
+	/* Пять колонок из шести: 1530 при 1840 */
+	width: calc(var(--work) - var(--col) - var(--grid-gap));
+
+	/*
+	 * До появления полоса уведена под нижнюю кромку экрана и не ловит
+	 * клики. Показ — класс .is-visible от JS на 70% прокрутки кейса.
+	 */
+	transform: translateY(calc(100% + var(--case-lead-bottom)));
+	opacity: 0;
+	pointer-events: none;
+	transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+
+.case-lead.is-visible {
+	transform: translateY(0);
+	opacity: 1;
+	pointer-events: auto;
+}
+
+/*
+ * Скрываем и классом, и атрибутом hidden: в Safari на iOS у элемента с
+ * position: fixed атрибут иногда не срабатывает, и полоса оставалась на
+ * экране после нажатия «Закрыть».
+ */
+.case-lead.is-hidden {
+	display: none;
+}
+
+/*
+ * Внутри полосы: заголовок в первой колонке, текст со второй, кнопка
+ * прижата к правому краю. Отступы по макету — 25 слева и 6 со всех
+ * остальных сторон (кнопка 40 в полосе 52).
+ */
+.case-lead__inner {
+	display: grid;
+	/* Первая колонка сетки за вычетом левого отступа: текст встаёт на
+	   вторую колонку страницы, как в макете (350 при 1920) */
+	grid-template-columns: calc(var(--col) - 25px) 1fr auto;
+	column-gap: var(--grid-gap);
+	align-items: center;
+	min-height: 52px;
+	padding: 6px 6px 6px 25px;
+	border-radius: 100px;
+	background-color: var(--color-black);
+}
+
+.case-lead__link {
+	/* H6 SemiBold 16 в макете */
+	font-size: var(--font-size-h6);
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-white);
+	text-decoration: none;
+}
+
+/* Кликабельна вся полоса, а не только заголовок */
+.case-lead__link::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+}
+
+.case-lead__text {
+	/* B1 Medium 16, Grey-30 в макете */
+	margin: 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-surface-alt);
+}
+
+/* Кнопка лежит выше растянутой ссылки, иначе клик по ней открывал бы поп-ап */
+.case-lead__close {
+	position: relative;
+	z-index: 1;
+	justify-self: end;
+}
+
+/*
+ * Ниже 1200 полоса встаёт над кнопкой «Обсудить проект» и занимает всю
+ * рабочую ширину: своей колонки кнопке уже мало, а тексты в остаток не
+ * помещаются. Высота кнопки 52 плюс отступ 20 — на них полоса и
+ * поднимается.
+ */
+@media (max-width: 1199px) {
+	.case-lead {
+		--case-lead-lift: 72px;
+
+		width: var(--work);
+	}
+
+	.case-lead__inner {
+		grid-template-columns: auto 1fr auto;
+	}
+}
+
+/*
+ * На телефоне строка не собирается: тексты идут друг под другом, кнопка
+ * уходит вниз. Скругление остаётся, но полоса становится плашкой.
+ */
+@media (max-width: 699px) {
+	.case-lead__inner {
+		grid-template-columns: 1fr;
+		row-gap: 12px;
+		padding: 20px;
+		border-radius: 26px;
+	}
+
+	.case-lead__close {
+		justify-self: start;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.case-lead {
+		transition: opacity 0.2s ease;
+		transform: none;
+	}
+}

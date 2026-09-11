@@ -22,6 +22,18 @@
 
 .studio-projects__lead {
 	margin: 0;
+	/*
+	 * Ширины у текста раньше не было, и он тянулся до самого заголовка.
+	 * Держим его в двух колонках с зазором — 620 при рабочей области
+	 * 1840. Доли считаем от рабочей области, а не от своей ячейки: она
+	 * зависит от ширины заголовка по центру.
+	 */
+	--work: min(
+		calc(100vw - 2 * var(--container-padding)),
+		calc(var(--container-max-width) - 2 * var(--container-padding))
+	);
+
+	max-width: calc(2 * (var(--work) - 5 * var(--grid-gap)) / 6 + 2 * var(--grid-gap));
 	font-size: var(--font-size-body);
 	font-weight: var(--font-weight-body);
 	line-height: var(--line-height-body);

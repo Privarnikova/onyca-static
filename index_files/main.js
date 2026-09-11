@@ -627,42 +627,60 @@
 			y: parseFloat( parts[ 5 ] ) || 0
 		};
 	}
+	/*
+	 * Пересборка списка магнитных кнопок. Значение задаёт
+	 * initMagneticButtons, вызывают те места, которые переписывают
+	 * разметку с кнопками (фильтр списка и догрузка).
+	 */
+	var refreshMagneticButtons = function () {};
+
 	function initMagneticButtons() {
-		var buttons = document.querySelectorAll( '.btn--cta' );
-
-		if ( ! buttons.length ) {
-			return;
-		}
-
 		// Тач и «уменьшить движение» — без магнита: там тянуть нечем и незачем.
 		var enabled = window.matchMedia( '(hover: hover)' ).matches &&
 			! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
 		var items = [];
 
-		buttons.forEach( function ( btn ) {
-			if ( ! btn.querySelector( '.btn__fill' ) ) {
-				var fill = document.createElement( 'span' );
-				fill.className = 'btn__fill';
-				fill.setAttribute( 'aria-hidden', 'true' );
+		/*
+		 * Список кнопок пересобираем целиком: списки проектов и статей
+		 * переписывают низ страницы разметкой с сервера, и кнопка
+		 * «Посмотреть еще» после фильтра или догрузки оказывалась новой —
+		 * без заливки и без магнита.
+		 */
+		function collect() {
+			items = [];
 
-				var text = document.createElement( 'span' );
-				text.className = 'btn__text';
-				while ( btn.firstChild ) {
-					text.appendChild( btn.firstChild );
+			document.querySelectorAll( '.btn--cta' ).forEach( function ( btn ) {
+				if ( ! btn.querySelector( '.btn__fill' ) ) {
+					var fill = document.createElement( 'span' );
+					fill.className = 'btn__fill';
+					fill.setAttribute( 'aria-hidden', 'true' );
+
+					if ( ! btn.querySelector( '.btn__text' ) ) {
+						var text = document.createElement( 'span' );
+						text.className = 'btn__text';
+
+						while ( btn.firstChild ) {
+							text.appendChild( btn.firstChild );
+						}
+
+						btn.appendChild( text );
+					}
+
+					btn.insertBefore( fill, btn.firstChild );
 				}
 
-				btn.appendChild( fill );
-				btn.appendChild( text );
-			}
-
-			items.push( {
-				el: btn,
-				text: btn.querySelector( '.btn__text' ),
-				strength: 25,
-				textStrength: 15
+				items.push( {
+					el: btn,
+					text: btn.querySelector( '.btn__text' ),
+					strength: 25,
+					textStrength: 15
+				} );
 			} );
-		} );
+		}
+
+		collect();
+		refreshMagneticButtons = collect;
 
 		if ( ! enabled ) {
 			return;
@@ -1151,6 +1169,187 @@
 	 * служит высота окна, а когда появится — размечается атрибутом
 	 * data-first-screen, и порог берётся по нему (см. PLAN.md).
 	 */
+	function initCaseLead() {
+		var lead = document.querySelector( '[data-case-lead]' );
+
+		if ( ! lead ) {
+			return;
+		}
+
+		var KEY = 'onyca-case-lead-shown';
+		/* Полоса выезжает, когда кейс прочитан на 70% */
+		var PART = 0.7;
+		var pending = false;
+		var shown = false;
+
+		/*
+		 * Отметка о показе живёт одну сессию: увидев полосу, посетитель не
+		 * встретит её ни в этом кейсе, ни в следующем, а закрыв сайт и
+		 * вернувшись — увидит снова. Поэтому sessionStorage, а не
+		 * localStorage: он сам очищается вместе с вкладкой.
+		 *
+		 * Запасной путь — сессионная кука (без срока жизни, тоже до конца
+		 * сессии): в приватном режиме Safari хранилище бросает исключение
+		 * на запись, и без дубля полоса выезжала бы в каждом кейсе.
+		 */
+		function wasShown() {
+			try {
+				if ( window.sessionStorage.getItem( KEY ) === '1' ) {
+					return true;
+				}
+			} catch ( e ) {}
+
+			return document.cookie.indexOf( KEY + '=1' ) !== -1;
+		}
+
+		function remember() {
+			try {
+				window.sessionStorage.setItem( KEY, '1' );
+
+				return;
+			} catch ( e ) {}
+
+			/* Без max-age и expires кука живёт до конца сессии браузера */
+			document.cookie = KEY + '=1; path=/; SameSite=Lax';
+		}
+
+		if ( wasShown() ) {
+			lead.hidden = true;
+			lead.classList.add( 'is-hidden' );
+			return;
+		}
+
+		function progress() {
+			var height = document.documentElement.scrollHeight - window.innerHeight;
+
+			/* Кейс короче экрана — считаем прочитанным целиком */
+			if ( height <= 0 ) {
+				return 1;
+			}
+
+			return ( window.scrollY + window.innerHeight ) / document.documentElement.scrollHeight;
+		}
+
+		function show() {
+			lead.hidden = false;
+			lead.classList.remove( 'is-hidden' );
+
+			/* Класс на следующем кадре: иначе перехода снизу не видно */
+			window.requestAnimationFrame( function () {
+				lead.classList.add( 'is-visible' );
+			} );
+
+			remember();
+
+			shown = true;
+		}
+
+		function hide() {
+			lead.classList.remove( 'is-visible' );
+
+			/* Ждём конец выезда вниз, потом убираем из потока */
+			window.setTimeout( function () {
+				lead.hidden = true;
+				lead.classList.add( 'is-hidden' );
+			}, 450 );
+		}
+
+		/*
+		 * Пока на экране баннер о cookie, полосу не показываем: они стоят в
+		 * одном углу и вдвоём наваливаются на посетителя. Полоса дождётся,
+		 * пока баннер примут.
+		 */
+		function cookieShown() {
+			var banner = document.querySelector( '[data-cookie-banner]' );
+
+			return !! banner && ! banner.hidden && ! banner.classList.contains( 'is-hidden' );
+		}
+
+		var footer = document.querySelector( '.site-footer' );
+
+		/*
+		 * Кнопка «Обсудить проект» останавливается внутри подвала, а
+		 * полоса — над ним: она шире и накрыла бы половину подвала.
+		 * Зазор до подвала берём равным шагу сетки.
+		 */
+		function dock() {
+			if ( ! footer ) {
+				return;
+			}
+
+			/* Зазор берём из самой сетки полосы: там column-gap уже в
+			   пикселях, в отличие от переменной с clamp() */
+			var inner = lead.querySelector( '.case-lead__inner' );
+			var gap = parseFloat( getComputedStyle( inner ).columnGap ) || 20;
+			var height = lead.offsetHeight;
+			var stopAt = footer.getBoundingClientRect().top + window.scrollY - height - gap;
+			var dock = parseFloat( lead.style.getPropertyValue( '--case-lead-dock' ) ) || 0;
+			/* Отступ от низа окна — из вычисленного bottom за вычетом уже
+			   сделанного подъёма: рамку элемента искажает выезд снизу */
+			var offset = ( parseFloat( getComputedStyle( lead ).bottom ) || 0 ) - dock;
+			/* Где полоса оказалась бы, оставаясь приклеенной к экрану */
+			var floatingTop = window.scrollY + window.innerHeight - offset - height;
+
+			lead.style.setProperty( '--case-lead-dock', Math.max( 0, floatingTop - stopAt ) + 'px' );
+		}
+
+		function check() {
+			pending = false;
+
+			if ( ! shown && ! cookieShown() && progress() >= PART ) {
+				show();
+			}
+
+			if ( shown ) {
+				dock();
+			}
+		}
+
+		function onScroll() {
+			if ( pending ) {
+				return;
+			}
+
+			pending = true;
+			window.requestAnimationFrame( check );
+		}
+
+		var close = lead.querySelector( '[data-case-lead-close]' );
+
+		if ( close ) {
+			close.addEventListener( 'click', hide );
+
+			/*
+			 * touchend вдобавок к click: в Safari на iOS click у кнопки внутри
+			 * position: fixed иногда не доходит. Повторный вызов безвреден.
+			 */
+			close.addEventListener( 'touchend', function ( event ) {
+				event.preventDefault();
+				hide();
+			} );
+		}
+
+		/* Полоса открывает тот же поп-ап, что и плавающая кнопка, и уходит */
+		var link = lead.querySelector( '.case-lead__link' );
+
+		if ( link ) {
+			link.addEventListener( 'click', function () {
+				hide();
+			} );
+		}
+
+		/* Баннер cookie приняли — проверяем сразу, не дожидаясь прокрутки */
+		var accept = document.querySelector( '[data-cookie-accept]' );
+
+		if ( accept ) {
+			accept.addEventListener( 'click', onScroll );
+		}
+
+		window.addEventListener( 'scroll', onScroll, { passive: true } );
+		window.addEventListener( 'resize', onScroll );
+		check();
+	}
+
 	function initDiscussButton() {
 		var wrap = document.querySelector( '[data-discuss-button]' );
 
@@ -1184,10 +1383,9 @@
 			return window.scrollY >= firstScreen.offsetHeight * HERO_GROW_PART;
 		}
 
-		function bottomOffset() {
-			var value = getComputedStyle( wrap ).getPropertyValue( '--discuss-bottom' );
-
-			return parseFloat( value ) || 0;
+		/* Насколько кнопка уже поднята: значение пишет сам же update() */
+		function currentLift() {
+			return parseFloat( document.documentElement.style.getPropertyValue( '--discuss-lift' ) ) || 0;
 		}
 
 		/* Где кнопка останавливается — в координатах документа */
@@ -1222,16 +1420,29 @@
 			}
 
 			var stopAt = dockTop();
+			var lift = currentLift();
+			/*
+			 * Отступ кнопки от низа окна. Читаем вычисленный bottom и
+			 * вычитаем уже сделанный подъём: сама переменная
+			 * --discuss-bottom в вычисленном стиле остаётся строкой
+			 * clamp(), числа из неё не достать, а рамку элемента искажает
+			 * анимация появления.
+			 */
+			var offset = ( parseFloat( getComputedStyle( wrap ).bottom ) || 0 ) - lift;
 			/* Где кнопка оказалась бы, оставаясь приклеенной к экрану */
-			var floatingTop = scrolled + window.innerHeight - bottomOffset() - wrap.offsetHeight;
+			var floatingTop = scrolled + window.innerHeight - offset - wrap.offsetHeight;
 
-			if ( floatingTop >= stopAt ) {
-				wrap.style.top = stopAt + 'px';
-				wrap.classList.add( 'is-docked' );
-			} else {
-				wrap.classList.remove( 'is-docked' );
-				wrap.style.top = '';
-			}
+			/*
+			 * Доехав до подвала, кнопка не переключается на absolute, а
+			 * поднимается ровно на то, на сколько она заехала бы за верх
+			 * блока бренда (макет 975:2657 — кнопка на 78 от верха
+			 * подвала). Система координат не меняется, и перехода из
+			 * одного положения в другое не видно.
+			 */
+			document.documentElement.style.setProperty(
+				'--discuss-lift',
+				Math.max( 0, floatingTop - stopAt ) + 'px'
+			);
 		}
 
 		function schedule() {
@@ -1678,6 +1889,9 @@
 					} else {
 						button.remove();
 					}
+
+					/* Кнопка приехала новая — возвращаем ей заливку и магнит */
+					refreshMagneticButtons();
 				} )
 				.catch( function () {
 					/* Не смогли догрузить — оставляем кнопку обычной ссылкой */
@@ -1929,6 +2143,8 @@
 
 			if ( area ) {
 				area.innerHTML = areaHtml;
+				/* Кнопка вернулась новой — возвращаем ей заливку и магнит */
+				refreshMagneticButtons();
 			}
 
 			/* Страницы удалены — при следующем фильтре тянем их заново */
@@ -1973,6 +2189,7 @@
 
 							if ( current && fresh ) {
 								current.innerHTML = fresh.innerHTML;
+								refreshMagneticButtons();
 							}
 
 							next();
@@ -2317,6 +2534,7 @@
 		initMoscowClock();
 		initCoverContrast();
 		initDiscussButton();
+		initCaseLead();
 		initHeroShowreel();
 		initServicesHover();
 		initHeaderDropdown();

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ru-RU"><head>
+<!DOCTYPE html><html lang="ru-RU" style="--discuss-lift: 0px;"><head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="robots" content="noindex, nofollow">
@@ -166,6 +166,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <link rel="stylesheet" id="onyca-support-page-css" href="./index_files/support-page.css" media="all">
 <link rel="stylesheet" id="onyca-vacancies-css" href="./index_files/vacancies.css" media="all">
 <link rel="stylesheet" id="onyca-career-page-css" href="./index_files/career-page.css" media="all">
+<link rel="stylesheet" id="onyca-case-lead-css" href="./index_files/case-lead.css" media="all">
 <link rel="stylesheet" id="onyca-cookie-banner-css" href="./index_files/cookie-banner.css" media="all">
 <link rel="stylesheet" id="onyca-page-404-css" href="./index_files/page-404.css" media="all">
 <link rel="stylesheet" id="onyca-page-contacts-css" href="./index_files/page-contacts.css" media="all">
@@ -587,10 +588,21 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	</div>
 </div>
 
-<div class="discuss-button is-visible" data-discuss-button="" style="">
-	<a class="btn btn--cta btn--cta--primary discuss-button__btn" href="contacts.html" data-popup-open="project"><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">
+<div class="discuss-button is-visible" data-discuss-button="">
+	<a class="btn btn--cta btn--cta--primary discuss-button__btn" href="contacts.html" data-popup-open="project"><span class="btn__fill" aria-hidden="true"></span>
 		<span class="btn__text">Обсудить проект</span>
-	</span></a>
+	</a>
+</div>
+
+<div class="case-lead" data-case-lead="" hidden="">
+	<div class="case-lead__inner">
+				<a class="case-lead__link" href="contacts.html" data-popup-open="project">
+			Есть похожая задача?		</a>
+
+		<p class="case-lead__text">Расскажите о ней — обсудим задачу и поможем найти подходящее решение.</p>
+
+		<button type="button" class="btn btn--lead-magnet case-lead__close" data-case-lead-close="">Закрыть</button>
+	</div>
 </div>
 
 <div class="cookie-banner" data-cookie-banner="" hidden="">

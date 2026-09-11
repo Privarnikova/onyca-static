@@ -167,11 +167,17 @@
 
 .faq__answer a {
 	color: inherit;
+	transition: color 0.2s ease;
 }
 
 /* Наведение (2034:9768): вопрос темнеет до Grey-700 */
 @media (hover: hover) and (min-width: 1200px) {
 	.faq__question:hover {
 		color: var(--color-text-hover);
+	}
+
+	/* Ссылка в ответе синеет — как ссылки в баннере cookie и подвале */
+	.faq__answer a:hover {
+		color: var(--color-accent-blue);
 	}
 }
