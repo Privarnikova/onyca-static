@@ -5,6 +5,30 @@
  * поведение — initDiscussButton в assets/js/main.js.
  */
 
+/*
+ * Дорожка плавающих элементов — кнопки «Обсудить проект» и полосы
+ * лид-магнита. Она тянется от верха страницы до линии остановки в
+ * подвале, а элемент внутри прилипает к низу окна (position: sticky).
+ * Прилипание и остановку ведёт сам браузер вместе с прокруткой, поэтому
+ * элемент не проскакивает линию даже при сильной прокрутке — раньше его
+ * положение пересчитывал скрипт, и он отставал на кадр. Скрипт задаёт
+ * только высоту дорожки и пересчитывает её, когда меняется высота
+ * страницы.
+ */
+.float-track {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 190;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	width: 100%;
+	/* Пока скрипт не посчитал линию — элемент внизу первого экрана */
+	height: 100vh;
+	pointer-events: none;
+}
+
 .discuss-button {
 	/*
 	 * Отступ от низа экрана: 40px на 1920 (макет 933:555 — кнопка на 988
@@ -13,23 +37,18 @@
 	 */
 	--discuss-bottom: clamp(20px, 2.0833vw, 40px);
 
-	position: fixed;
-	z-index: 190;
-	/*
-	 * Доехав до подвала, кнопка поднимается вместе со страницей: JS
-	 * пишет в корень документа --discuss-lift, на сколько она заехала
-	 * бы за верх блока бренда. Раньше здесь менялся position, и переход
-	 * между координатами был виден как скачок.
-	 */
-	bottom: calc(var(--discuss-bottom) + var(--discuss-lift, 0px));
+	position: sticky;
+	bottom: var(--discuss-bottom);
 	/*
 	 * Правый край — по сетке, а не по краю окна: выше 1920 контейнер
 	 * центруется, и кнопка должна остаться в рабочей области (то же
-	 * правило, что у баннера cookie).
+	 * правило, что у баннера cookie). Проценты — от ширины дорожки, то
+	 * есть окна без полосы прокрутки.
 	 */
-	right: max(
+	align-self: flex-end;
+	margin-right: max(
 		var(--container-padding),
-		calc(50vw - var(--container-max-width) / 2 + var(--container-padding))
+		calc(50% - var(--container-max-width) / 2 + var(--container-padding))
 	);
 
 	/*
@@ -57,15 +76,9 @@
  */
 @media (max-width: 440px) {
 	.discuss-button {
-		right: auto;
-		left: 50%;
-		transform: translate(-50%, calc(100% + var(--discuss-bottom)));
+		align-self: center;
+		margin-right: 0;
 	}
-
-	.discuss-button.is-visible {
-		transform: translate(-50%, 0);
-	}
-
 }
 
 /*
@@ -89,14 +102,5 @@
 	.discuss-button {
 		transition: opacity 0.2s ease;
 		transform: none;
-	}
-
-	/* В центрированной раскладке сдвиг на половину ширины — не анимация,
-	   его снимать нельзя, иначе кнопка уедет вправо от центра */
-	@media (max-width: 440px) {
-		.discuss-button,
-		.discuss-button.is-visible {
-			transform: translateX(-50%);
-		}
 	}
 }

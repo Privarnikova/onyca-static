@@ -1270,10 +1270,14 @@
 		/*
 		 * Кнопка «Обсудить проект» останавливается внутри подвала, а
 		 * полоса — над ним: она шире и накрыла бы половину подвала.
-		 * Зазор до подвала берём равным шагу сетки.
+		 * Полоса прилипает к низу окна внутри дорожки, дорожка кончается
+		 * на шаг сетки выше подвала. Прилипание ведёт браузер, здесь
+		 * только высота дорожки.
 		 */
-		function dock() {
-			if ( ! footer ) {
+		var track = lead.closest( '[data-float-track]' );
+
+		function measure() {
+			if ( ! footer || ! track ) {
 				return;
 			}
 
@@ -1281,16 +1285,8 @@
 			   пикселях, в отличие от переменной с clamp() */
 			var inner = lead.querySelector( '.case-lead__inner' );
 			var gap = parseFloat( getComputedStyle( inner ).columnGap ) || 20;
-			var height = lead.offsetHeight;
-			var stopAt = footer.getBoundingClientRect().top + window.scrollY - height - gap;
-			var dock = parseFloat( lead.style.getPropertyValue( '--case-lead-dock' ) ) || 0;
-			/* Отступ от низа окна — из вычисленного bottom за вычетом уже
-			   сделанного подъёма: рамку элемента искажает выезд снизу */
-			var offset = ( parseFloat( getComputedStyle( lead ).bottom ) || 0 ) - dock;
-			/* Где полоса оказалась бы, оставаясь приклеенной к экрану */
-			var floatingTop = window.scrollY + window.innerHeight - offset - height;
 
-			lead.style.setProperty( '--case-lead-dock', Math.max( 0, floatingTop - stopAt ) + 'px' );
+			track.style.height = ( footer.getBoundingClientRect().top + window.scrollY - gap ) + 'px';
 		}
 
 		function check() {
@@ -1298,10 +1294,6 @@
 
 			if ( ! shown && ! cookieShown() && progress() >= PART ) {
 				show();
-			}
-
-			if ( shown ) {
-				dock();
 			}
 		}
 
@@ -1347,6 +1339,14 @@
 
 		window.addEventListener( 'scroll', onScroll, { passive: true } );
 		window.addEventListener( 'resize', onScroll );
+		window.addEventListener( 'resize', measure );
+		window.addEventListener( 'load', measure );
+
+		if ( window.ResizeObserver ) {
+			new window.ResizeObserver( measure ).observe( document.body );
+		}
+
+		measure();
 		check();
 	}
 
@@ -1383,11 +1383,6 @@
 			return window.scrollY >= firstScreen.offsetHeight * HERO_GROW_PART;
 		}
 
-		/* Насколько кнопка уже поднята: значение пишет сам же update() */
-		function currentLift() {
-			return parseFloat( document.documentElement.style.getPropertyValue( '--discuss-lift' ) ) || 0;
-		}
-
 		/* Где кнопка останавливается — в координатах документа */
 		function dockTop() {
 			var brand = footer.querySelector( '.site-footer__brand' );
@@ -1408,41 +1403,27 @@
 			return top;
 		}
 
-		function update() {
-			pending = false;
+		/*
+		 * Кнопка прилипает к низу окна внутри дорожки, а дорожка кончается
+		 * на линии остановки: кнопка встаёт верхом вровень с логотипом
+		 * (макет 975:2657 — на 78 от верха подвала). Прилипание ведёт сам
+		 * браузер вместе с прокруткой; здесь только высота дорожки, и
+		 * меняется она лишь вместе с высотой страницы.
+		 */
+		var track = wrap.closest( '[data-float-track]' );
 
-			var scrolled = window.scrollY;
-
-			wrap.classList.toggle( 'is-visible', shouldShow() );
-
-			if ( ! footer ) {
+		function measure() {
+			if ( ! footer || ! track ) {
 				return;
 			}
 
-			var stopAt = dockTop();
-			var lift = currentLift();
-			/*
-			 * Отступ кнопки от низа окна. Читаем вычисленный bottom и
-			 * вычитаем уже сделанный подъём: сама переменная
-			 * --discuss-bottom в вычисленном стиле остаётся строкой
-			 * clamp(), числа из неё не достать, а рамку элемента искажает
-			 * анимация появления.
-			 */
-			var offset = ( parseFloat( getComputedStyle( wrap ).bottom ) || 0 ) - lift;
-			/* Где кнопка оказалась бы, оставаясь приклеенной к экрану */
-			var floatingTop = scrolled + window.innerHeight - offset - wrap.offsetHeight;
+			track.style.height = ( dockTop() + wrap.offsetHeight ) + 'px';
+		}
 
-			/*
-			 * Доехав до подвала, кнопка не переключается на absolute, а
-			 * поднимается ровно на то, на сколько она заехала бы за верх
-			 * блока бренда (макет 975:2657 — кнопка на 78 от верха
-			 * подвала). Система координат не меняется, и перехода из
-			 * одного положения в другое не видно.
-			 */
-			document.documentElement.style.setProperty(
-				'--discuss-lift',
-				Math.max( 0, floatingTop - stopAt ) + 'px'
-			);
+		/* Прокрутка решает только, видна ли кнопка */
+		function update() {
+			pending = false;
+			wrap.classList.toggle( 'is-visible', shouldShow() );
 		}
 
 		function schedule() {
@@ -1454,9 +1435,16 @@
 			window.requestAnimationFrame( update );
 		}
 
+		measure();
 		update();
 		window.addEventListener( 'scroll', schedule, { passive: true } );
-		window.addEventListener( 'resize', schedule );
+		window.addEventListener( 'resize', measure );
+		window.addEventListener( 'load', measure );
+
+		/* Догрузка статей, картинки и шрифты меняют высоту страницы */
+		if ( window.ResizeObserver ) {
+			new window.ResizeObserver( measure ).observe( document.body );
+		}
 	}
 
 	/**

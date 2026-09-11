@@ -25,23 +25,23 @@
 	/* На сколько полоса поднята над кнопкой «Обсудить проект» */
 	--case-lead-lift: 0px;
 
-	position: fixed;
-	z-index: 190;
 	/*
-	 * Доехав до подвала, полоса поднимается вместе со страницей: JS
-	 * пишет в --case-lead-dock, на сколько она заехала бы на подвал.
-	 * Кнопка «Обсудить проект» останавливается внутри подвала, полоса —
-	 * над ним: она шире и накрыла бы половину подвала.
+	 * Прилипает к низу окна внутри своей дорожки (.float-track в
+	 * components/discuss-button.css). Дорожка кончается над подвалом:
+	 * кнопка «Обсудить проект» останавливается внутри подвала, полоса —
+	 * над ним, она шире и накрыла бы половину подвала.
 	 */
-	bottom: calc(var(--case-lead-bottom) + var(--case-lead-lift) + var(--case-lead-dock, 0px));
+	position: sticky;
+	bottom: calc(var(--case-lead-bottom) + var(--case-lead-lift));
 	/*
 	 * Левый край — по сетке, а не по краю окна: выше 1920 контейнер
 	 * центруется, и полоса должна остаться в рабочей области (то же
 	 * правило, что у баннера cookie и плавающей кнопки).
 	 */
-	left: max(
+	align-self: flex-start;
+	margin-left: max(
 		var(--container-padding),
-		calc(50vw - var(--container-max-width) / 2 + var(--container-padding))
+		calc(50% - var(--container-max-width) / 2 + var(--container-padding))
 	);
 	/* Пять колонок из шести: 1530 при 1840 */
 	width: calc(var(--work) - var(--col) - var(--grid-gap));
