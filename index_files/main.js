@@ -67,7 +67,15 @@
 		}
 
 		function update() {
-			var currentScrollY = window.scrollY;
+			/*
+			 * На iPhone прокрутка пружинит: доехав до верха с разгона,
+			 * страница уходит ниже нуля и отскакивает обратно. Отскок —
+			 * рост позиции, и шапка принимала его за прокрутку вниз и
+			 * пряталась в самом верху страницы. Всё, что за краями
+			 * страницы, считаем самим краем.
+			 */
+			var maxScrollY = Math.max( document.documentElement.scrollHeight - window.innerHeight, 0 );
+			var currentScrollY = Math.min( Math.max( window.scrollY, 0 ), maxScrollY );
 			var onFirstScreen = currentScrollY < staticUntil();
 
 			if ( onFirstScreen ) {
@@ -131,7 +139,10 @@
 				} else {
 					header.classList.add( 'is-sticky' );
 
-					if ( currentScrollY > lastScrollY ) {
+					if ( currentScrollY <= 0 ) {
+						/* В самом верху страницы шапка видна всегда */
+						header.classList.remove( 'is-hidden' );
+					} else if ( currentScrollY > lastScrollY ) {
 						header.classList.add( 'is-hidden' );
 					} else if ( currentScrollY < lastScrollY ) {
 						header.classList.remove( 'is-hidden' );
@@ -1286,7 +1297,7 @@
 			var inner = lead.querySelector( '.case-lead__inner' );
 			var gap = parseFloat( getComputedStyle( inner ).columnGap ) || 20;
 
-			track.style.height = ( footer.getBoundingClientRect().top + window.scrollY - gap ) + 'px';
+			track.style.height = ( footer.getBoundingClientRect().top + window.scrollY - gap - track.offsetTop ) + 'px';
 		}
 
 		function check() {
@@ -1417,7 +1428,8 @@
 				return;
 			}
 
-			track.style.height = ( dockTop() + wrap.offsetHeight ) + 'px';
+			/* Дорожка начинается не с верха страницы — считаем от её верха */
+			track.style.height = ( dockTop() + wrap.offsetHeight - track.offsetTop ) + 'px';
 		}
 
 		/* Прокрутка решает только, видна ли кнопка */
@@ -1491,7 +1503,6 @@
 			return;
 		}
 
-		var MAX_SCALE = 1840 / 910;
 		var GROW_PART = HERO_GROW_PART;
 		/* Отступ под шапкой, на котором держится раскрытое видео */
 		var GAP_UNDER_HEADER = 16;
@@ -1517,6 +1528,8 @@
 		var targetShift = 0;
 		var running = false;
 
+		var inner = hero.querySelector( '.home-hero__inner' ) || hero;
+
 		function measure() {
 			/* Путь прокрутки, за который видео раскрывается полностью */
 			var growth = hero.offsetHeight * GROW_PART;
@@ -1525,18 +1538,31 @@
 				return;
 			}
 
+			/*
+			 * Во сколько раз видео вырастает: до всей ширины первого
+			 * экрана. На 1920 это прежние 1840 / 910, а на телефоне видео
+			 * уже во всю ширину — роста нет, иначе оно уехало бы за
+			 * экран. Между ними величина меняется плавно, вместе с шириной
+			 * видео, без переключения.
+			 */
+			var maxScale = Math.max( 1, inner.clientWidth / showreel.offsetWidth );
+			/* Удержание под шапкой — только пока видео есть куда расти */
+			var hold = HOLD_LENGTH * Math.min( 1, maxScale - 1 );
+
 			/* Считаем от первого пикселя прокрутки страницы */
 			var scrolled = window.scrollY;
 
 			var grown = Math.min( scrolled, growth ) / growth;
 
-			targetScale = 1 + grown * ( MAX_SCALE - 1 );
+			targetScale = 1 + grown * ( maxScale - 1 );
 
 			/*
 			 * Отступ первого экрана снизу тает вместе с ростом видео:
 			 * когда оно раскрылось, полосы пустоты под ним быть не должно.
+			 * Здесь только доля — саму величину (40 на десктопе, 0 на
+			 * телефоне) держит CSS.
 			 */
-			hero.style.setProperty( '--hero-bottom', ( 1 - grown ) * 40 + 'px' );
+			hero.style.setProperty( '--hero-shrink', String( 1 - grown ) );
 
 			/*
 			 * Где окажется верх раскрытого видео в документе: растёт оно
@@ -1544,7 +1570,7 @@
 			 */
 			var box = showreel.getBoundingClientRect();
 			var middle = box.top + window.scrollY + box.height / 2 - shift;
-			var openTop = middle - showreel.offsetHeight * MAX_SCALE / 2;
+			var openTop = middle - showreel.offsetHeight * maxScale / 2;
 
 			/*
 			 * Как только верх подошёл к шапке, видео едет вместе с окном:
@@ -1553,7 +1579,7 @@
 			 */
 			targetShift = Math.min(
 				Math.max( scrolled - ( openTop - topGap() ), 0 ),
-				HOLD_LENGTH
+				hold
 			);
 
 			/*
@@ -1564,7 +1590,7 @@
 			 */
 			hero.style.setProperty(
 				'--showreel-overflow',
-				( showreel.offsetHeight * ( MAX_SCALE - 1 ) / 2 + HOLD_LENGTH ) + 'px'
+				( showreel.offsetHeight * ( maxScale - 1 ) / 2 + hold ) + 'px'
 			);
 
 			if ( ! running ) {

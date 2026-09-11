@@ -50,7 +50,12 @@
 	 * Величину ведёт JS (initHeroShowreel).
 	 */
 	min-height: calc(100vh - 54px - var(--page-top));
-	padding-bottom: var(--hero-bottom, 40px);
+	/*
+	 * 40 на десктопе, к 360 плавно сходит к нулю: в макете 2861:3955
+	 * после нижнего тезиса сразу идёт шаг между блоками. Доля (от 1 до
+	 * 0 по мере роста видео) приходит из initHeroShowreel.
+	 */
+	padding-bottom: calc(var(--hero-shrink, 1) * clamp(0px, calc(-42.35px + 11.765vw), 40px));
 	/*
 	 * Видео растёт в обе стороны и выходит за низ секции — этот вылет
 	 * добавляем к полю снизу, чтобы до специализаций осталось
@@ -155,6 +160,33 @@
 	.home-hero__note--bottom,
 	.home-hero__showreel {
 		grid-column: 1 / -1;
+	}
+
+	/*
+	 * Стопкой, в порядке макета 2861:3955: заголовок, тезис, видео,
+	 * нижний тезис. Раньше тезисы оставались в своих строках десктопа и
+	 * наезжали — верхний на заголовок, нижний на видео. Распорка между
+	 * тезисом и видео не меньше 78 из макета, на высоком экране она
+	 * растёт и прижимает видео с нижним тезисом к низу, как на десктопе.
+	 */
+	.home-hero__inner {
+		grid-template-rows: auto auto minmax(78px, 1fr) auto auto;
+	}
+
+	.home-hero__note--top {
+		grid-row: 2;
+		/* 32 от заголовка */
+		margin-top: 32px;
+	}
+
+	.home-hero__showreel {
+		grid-row: 4;
+	}
+
+	.home-hero__note--bottom {
+		grid-row: 5;
+		/* 52 от видео */
+		margin-top: 52px;
 	}
 
 	/*
@@ -453,6 +485,150 @@
 	max-width: 100%;
 	max-height: 100%;
 	object-fit: contain;
+}
+
+/*
+ * Главная на телефоне — макет 2861:3955 (360). Все величины ниже
+ * тянутся от значений на 700 к макету 360 по прямой (clamp по двум
+ * точкам), поэтому на 699 и 700 они совпадают — скачка нет. Формулы
+ * посчитаны так: наклон = (v700 − v360) / 340, сдвиг = v360 − наклон × 360.
+ */
+@media (max-width: 699px) {
+	/* Шаг между блоками: 188 → 148 */
+	.front-page {
+		row-gap: clamp(148px, calc(105.65px + 11.765vw), 188px);
+		padding-bottom: clamp(148px, calc(105.65px + 11.765vw), 188px);
+	}
+
+	/*
+	 * Специализации: строка 93 — над названием 31, под ним до линии 32.
+	 * У первой строки своя полоса сверху тоже есть.
+	 */
+	.home-services__link {
+		padding-bottom: clamp(32px, calc(12.94px + 5.294vw), 50px);
+	}
+
+	.home-services__item + .home-services__item .home-services__link {
+		padding-top: clamp(31px, calc(10.88px + 5.588vw), 50px);
+	}
+
+	.home-services__item:first-child .home-services__link {
+		padding-top: clamp(0px, calc(63.82px - 9.118vw), 31px);
+	}
+
+	/*
+	 * Стрелка 24 по центру строки названия, у самого края: запас под
+	 * сдвиг при наведении не нужен — наведения ниже 1200 нет.
+	 */
+	.home-services__arrow {
+		margin-top: clamp(2px, calc(-3.29px + 1.47vw), 7px);
+		margin-right: clamp(0px, calc(-8.47px + 2.353vw), 8px);
+	}
+
+	/* Последняя работа: от заголовка до карточки 38 → 32 */
+	.home-latest__title {
+		margin-bottom: clamp(32px, calc(25.65px + 1.765vw), 38px);
+	}
+
+	/* Telegram: плашка 900 → 550, текст под заголовком 16 → 12 */
+	.home-telegram__inner {
+		min-height: clamp(550px, calc(179.4px + 102.94vw), 900px);
+	}
+
+	.home-telegram__text {
+		margin-top: clamp(12px, calc(7.76px + 1.176vw), 16px);
+	}
+
+	.home-telegram__actions {
+		gap: clamp(10px, calc(3.65px + 1.765vw), 16px);
+	}
+
+	/*
+	 * Блог стопкой: дата, через 12 название, через 32 кнопка. От
+	 * заголовка «Блог» до первой даты 52 — это верхняя полоса строки,
+	 * свой отступ у заголовка сходит к нулю. Между статьями после линии 32.
+	 */
+	.home-blog__title {
+		margin-bottom: clamp(0px, calc(-40.24px + 11.176vw), 38px);
+	}
+
+	.home-blog__item {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 12px;
+	}
+
+	.home-blog__item + .home-blog__item {
+		padding-top: clamp(32px, calc(10.82px + 5.882vw), 52px);
+	}
+
+	.home-blog__date,
+	.home-blog__content {
+		grid-column: 1 / -1;
+	}
+
+	/* Кнопка под статьями во всю ширину, после последней линии 32 */
+	.home-blog__footer {
+		margin-top: clamp(32px, calc(10.82px + 5.882vw), 52px);
+	}
+
+	.home-blog__all {
+		grid-column: 1 / -1;
+	}
+
+	/*
+	 * Логотипы: ячейка 210×80 → 143.6×54.7, зазор 60 → 41, растворение
+	 * по краям 330 → 225.7. На 360 лента во всю ширину экрана, за полями
+	 * страницы: отрицательное поле растёт от 0 на 700 до 15 на 360.
+	 */
+	.client-logos {
+		--logos-fade: clamp(225.7px, calc(115.27px + 30.68vw), 330px);
+		--logos-bleed: clamp(0px, calc(30.88px - 4.412vw), 15px);
+
+		margin-inline: calc(-1 * var(--logos-bleed));
+		-webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--logos-fade), #000 calc(100% - var(--logos-fade)), transparent 100%);
+		mask-image: linear-gradient(to right, transparent 0, #000 var(--logos-fade), #000 calc(100% - var(--logos-fade)), transparent 100%);
+	}
+
+	.client-logos__row {
+		gap: clamp(41px, calc(20.88px + 5.588vw), 60px);
+		padding-right: clamp(41px, calc(20.88px + 5.588vw), 60px);
+	}
+
+	.client-logos__item {
+		width: clamp(143.6px, calc(73.3px + 19.53vw), 210px);
+		height: clamp(54.7px, calc(27.91px + 7.441vw), 80px);
+	}
+}
+
+/*
+ * Telegram на телефоне (2861:3955): текст во всю ширину плашки с полем
+ * 20, кнопки прижаты к низу. Переключаемся не по круглому числу, а там,
+ * где правая половина плашки (три колонки сетки) становится уже 290 —
+ * ширины текста в макете: это около 644.
+ */
+@media (max-width: 644px) {
+	.home-telegram__inner {
+		align-content: stretch;
+		padding: 20px;
+	}
+
+	.home-telegram__content {
+		display: flex;
+		flex-direction: column;
+		grid-column: 1 / -1;
+		max-width: none;
+	}
+
+	/* Кнопки у нижнего края плашки, как в макете */
+	.home-telegram__actions {
+		margin-top: auto;
+		padding-top: 32px;
+	}
+
+	/* «Перейти в канал» занимает строку до круглой кнопки: 228 при 290 */
+	.home-telegram__actions .btn {
+		flex: 1 1 auto;
+	}
 }
 
 /* Наведение — только с 1200 и на устройствах с курсором */

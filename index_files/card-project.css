@@ -171,3 +171,80 @@
 		border-radius: 40px;
 	}
 }
+
+/*
+ * Узкая карточка — подпись под картинкой (макет 360: «Последняя работа»
+ * 2861:7333, «Проекты студии» 2908:5608). Поверх картинки название с
+ * метками перестаёт помещаться с отступом 28 от краёв: на 570 ещё
+ * влезает у самой длинной подписи, на 568 уже нет — отсюда 569.
+ *
+ * Картинка сохраняет пропорцию карточки (1840×900 — в макете 360 те же
+ * 993×486), под ней через 12 название H5 и ещё через 12 метки. Цвета
+ * — светлого варианта: подпись теперь на белом, инверсия от обложки
+ * (.is-on-dark) здесь не нужна.
+ */
+@media (max-width: 569px) {
+	.card-project {
+		aspect-ratio: auto;
+		overflow: visible;
+		background-color: transparent;
+	}
+
+	.card-project__link {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		height: auto;
+	}
+
+	.card-project__cover {
+		aspect-ratio: 1840 / 900;
+		height: auto;
+	}
+
+	/*
+	 * Обложки нет — на её месте светлая подложка той же пропорции. Тёмный
+	 * вариант (.card-project--blank) здесь не нужен: он был ради подписи
+	 * поверх картинки, а в макете 360 все подложки светлые.
+	 */
+	.card-project:not(:has(.card-project__cover)) .card-project__link::before {
+		content: '';
+		aspect-ratio: 1840 / 900;
+		background-color: var(--color-surface-alt);
+	}
+
+	.card-project__content,
+	.card-project--bottom .card-project__content {
+		position: static;
+		gap: 12px;
+		max-width: none;
+	}
+
+	.card-project__title,
+	.card-project.is-on-dark .card-project__title {
+		font-size: var(--font-size-h5);
+		color: var(--color-text);
+	}
+
+	.card-project__tags {
+		gap: 10px;
+	}
+
+	.project-tag--industry,
+	.card-project.is-on-dark .project-tag--industry {
+		background-color: var(--color-black);
+		color: var(--color-white);
+	}
+
+	/* Услуга на белом: полупрозрачная подложка пропала бы — Grey-50 из макета */
+	.project-tag--service,
+	.card-project.is-on-dark .project-tag--service {
+		background-color: var(--color-surface);
+		color: var(--color-text);
+	}
+
+	/* В «Проектах студии» на телефоне только название, без меток */
+	.studio-projects .card-project__tags {
+		display: none;
+	}
+}

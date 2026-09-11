@@ -84,3 +84,28 @@
 	margin-top: 32px;
 	width: 100%;
 }
+
+/*
+ * Шапка стопкой (макет 360 — 2908:5608): заголовок, под ним через 12
+ * подзаголовок, до карточек 52. Переключаемся там, где подзаголовок
+ * рядом с заголовком перестаёт помещаться в две строки: на 815 он ещё
+ * в две, на 810 уже в три — замер, а не круглое число.
+ */
+@media (max-width: 812px) {
+	.studio-projects__head {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 12px;
+		margin-bottom: 52px;
+	}
+
+	.studio-projects__title {
+		order: -1;
+		text-align: left;
+	}
+
+	.studio-projects__lead {
+		max-width: none;
+	}
+}
