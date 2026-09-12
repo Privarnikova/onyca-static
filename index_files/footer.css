@@ -159,6 +159,18 @@
 	text-decoration: none;
 }
 
+/*
+ * Пункт открытой страницы — серым, теми же классами и тем же токеном,
+ * что в шапке (header.css, .site-header__menu .current-menu-item > a).
+ * Классы ставит сам wp_nav_menu, поэтому разметку править не нужно.
+ * Подчёркивание при наведении на нём и так не появляется — за это
+ * отвечает общее правило в components/link-underline.css.
+ */
+.site-footer__menu .current-menu-item > a,
+.site-footer__menu .current_page_item > a {
+	color: var(--color-text-disclaimer);
+}
+
 .site-footer__policy {
 	display: flex;
 	flex-direction: column;

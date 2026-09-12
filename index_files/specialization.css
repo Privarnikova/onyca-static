@@ -107,7 +107,8 @@
 	pointer-events: none;
 }
 
-.service-list__preview img {
+.service-list__preview img,
+.service-list__preview video {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;

@@ -1561,8 +1561,12 @@
 			 * когда оно раскрылось, полосы пустоты под ним быть не должно.
 			 * Здесь только доля — саму величину (40 на десктопе, 0 на
 			 * телефоне) держит CSS.
+			 *
+			 * Там, где видео уже во всю ширину и не растёт (телефон),
+			 * отступ остаётся на месте: иначе при прокрутке блок ужимался
+			 * бы без всякой причины.
 			 */
-			hero.style.setProperty( '--hero-shrink', String( 1 - grown ) );
+			hero.style.setProperty( '--hero-shrink', String( maxScale > 1 ? 1 - grown : 1 ) );
 
 			/*
 			 * Где окажется верх раскрытого видео в документе: растёт оно
@@ -1655,6 +1659,35 @@
 			return;
 		}
 
+		/*
+		 * В баннере лежит ролик услуги или направления — тот же, что
+		 * вверху её страницы. Он не грузится заранее (preload="none") и
+		 * не играет сам: в длинном списке это были бы десятки роликов
+		 * разом. Пускаем с начала, когда баннер показался, и
+		 * останавливаем, когда он скрылся.
+		 */
+		function play( item, on ) {
+			var video = item.querySelector( 'video' );
+
+			if ( ! video ) {
+				return;
+			}
+
+			if ( ! on ) {
+				video.pause();
+				return;
+			}
+
+			video.currentTime = 0;
+
+			var started = video.play();
+
+			/* Браузер вправе отказать в автозапуске — тогда виден постер */
+			if ( started && started.catch ) {
+				started.catch( function () {} );
+			}
+		}
+
 		lists.forEach( function ( list ) {
 			var items = list.querySelectorAll( itemSelector );
 
@@ -1663,12 +1696,16 @@
 					list.classList.add( 'is-hovered' );
 
 					items.forEach( function ( other ) {
-						other.classList.toggle( 'is-active', other === item );
+						var active = other === item;
+
+						other.classList.toggle( 'is-active', active );
+						play( other, active );
 					} );
 				} );
 
 				item.addEventListener( 'mouseleave', function () {
 					item.classList.remove( 'is-active' );
+					play( item, false );
 
 					if ( ! list.querySelector( '.is-active' ) ) {
 						list.classList.remove( 'is-hovered' );
