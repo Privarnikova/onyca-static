@@ -181,7 +181,12 @@ img.site-header__logo-icon {
 	height: var(--header-chevron-size);
 }
 
-.menu-trigger__chevron--32 {
+/*
+ * Лишний контур прячем селектором с контекстом: components/icon.css
+ * подключается позже header.css, и правило .icon { display: block }
+ * перебивало голый класс — на десктопе было видно обе стрелки сразу.
+ */
+.menu-trigger .menu-trigger__chevron--32 {
 	display: none;
 }
 
@@ -552,11 +557,11 @@ body.home.admin-bar .site-header.is-sticky {
 	 * 3291:29095 на телефоне), а не растянутый четырнадцатипиксельный.
 	 * Толщина приходит из токена размера: 3 на планшете, 2.5 на телефоне.
 	 */
-	.burger-menu__list .menu-trigger__chevron--14 {
+	.burger-menu__list .menu-trigger .menu-trigger__chevron--14 {
 		display: none;
 	}
 
-	.burger-menu__list .menu-trigger__chevron--32 {
+	.burger-menu__list .menu-trigger .menu-trigger__chevron--32 {
 		display: block;
 		transition: transform 0.2s ease;
 	}
