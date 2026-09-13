@@ -9,6 +9,16 @@
  * поэтому вёрстка тянет единственный имеющийся, а не выдумывает раскладку.
  */
 
+/*
+ * Синим красится вся страница, а не только полотно: у Safari на iPhone
+ * системные поля сверху и снизу берут цвет фона у кромок документа, и
+ * на белом body они оставались белой рамкой вокруг синего экрана.
+ * Верхнюю панель отдельно задаёт theme-color в 404.php.
+ */
+body.error404 {
+	background-color: var(--color-accent-blue);
+}
+
 .page-404 {
 	position: relative;
 	display: flex;
@@ -70,7 +80,14 @@
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-	padding-block: clamp(77px, 7.7083vw, 148px) clamp(123px, 12.3438vw, 237px);
+	/*
+	 * К полям добавляются системные поля iPhone: страница выводится с
+	 * viewport-fit=cover, чтобы синий фон уходил под них, и без этой
+	 * добавки текст залезал бы под статус-бар и домашний индикатор.
+	 */
+	padding-block:
+		calc(clamp(77px, 7.7083vw, 148px) + env(safe-area-inset-top, 0px))
+		calc(clamp(123px, 12.3438vw, 237px) + env(safe-area-inset-bottom, 0px));
 }
 
 .page-404__face {
@@ -148,8 +165,10 @@
 	}
 
 	.page-404__inner {
-		/* 78 сверху и снизу на 360 */
-		padding-block: clamp(77px, calc(78.6px - 0.157vw), 78px);
+		/* 78 сверху и снизу на 360, плюс системные поля iPhone */
+		padding-block:
+			calc(clamp(77px, calc(78.6px - 0.157vw), 78px) + env(safe-area-inset-top, 0px))
+			calc(clamp(77px, calc(78.6px - 0.157vw), 78px) + env(safe-area-inset-bottom, 0px));
 	}
 
 	.page-404__face {
