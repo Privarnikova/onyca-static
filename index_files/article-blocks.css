@@ -238,11 +238,11 @@
 }
 
 
-.article-section__body > h2 {
+.article-section__body > .article-heading--2 {
 	margin-top: 64px;
 }
 
-.article-section__body > h3 {
+.article-section__body > .article-heading--3 {
 	margin-top: 32px;
 }
 
@@ -271,17 +271,17 @@
  * не задаём числа заново: на 1600 и ниже размеры уедут вместе со всей
  * типографикой сайта.
  */
-.article-section > h1 {
+.article-section > .article-heading--1 {
 	grid-column: 1 / 3;
 	margin: 0;
 	font-size: var(--font-size-h4);
 }
 
-.article-section__body > h2 {
+.article-section__body > .article-heading--2 {
 	font-size: var(--font-size-h5);
 }
 
-.article-section__body > h3 {
+.article-section__body > .article-heading--3 {
 	font-size: var(--font-size-h6);
 }
 
@@ -291,7 +291,7 @@
  * ширину, а полторы колонки — 455 при колонке 290. От этой ширины
  * зависят переносы строк, поэтому она задана долей сетки, а не числом.
  */
-.article-section > h1,
+.article-section > .article-heading--1,
 .article-section__body > .article-quote {
 	max-width: calc((100% - var(--grid-gap)) / 2 * 1.5 + var(--grid-gap));
 }
@@ -313,11 +313,11 @@
 	width: calc(1.5 * var(--article-column) + var(--grid-gap));
 }
 
-.article-section__body > .article-quote:has(+ h2) {
+.article-section__body > .article-quote:has(+ .article-heading--2) {
 	margin-top: 64px;
 }
 
-.article-section__body > .article-quote:has(+ h3) {
+.article-section__body > .article-quote:has(+ .article-heading--3) {
 	margin-top: 32px;
 }
 

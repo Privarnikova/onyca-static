@@ -140,19 +140,50 @@
 }
 
 /*
- * На телефоне строка не собирается: тексты идут друг под другом, кнопка
- * уходит вниз. Скругление остаётся, но полоса становится плашкой.
+ * С 700 и ниже — поп-ап во всю ширину внизу экрана (макет 3291:26507,
+ * 360×640), устроенный так же, как баннер cookie: чёрная панель прижата
+ * к нижней кромке, внутри поля 15, сверху 24 и снизу 20, заголовок H5
+ * 18, через 12 текст, через 24 кнопка «Закрыть» во всю ширину.
+ *
+ * Здесь панель уже не едет в дорожке над подвалом, а держится за окно:
+ * на телефоне это именно поп-ап. Поэтому position: fixed и свой слой —
+ * выше плавающей кнопки «Обсудить проект» (z-index 190): пока поп-ап
+ * открыт, кнопка спрятана под ним, а после закрытия снова видна.
+ *
+ * Отступ снизу считается вместе с системной полосой iPhone: панель
+ * заходит под неё, и Safari красит полосу в цвет панели.
  */
-@media (max-width: 699px) {
+@media (max-width: 700px) {
+	.case-lead {
+		--case-lead-bottom: 0px;
+		--case-lead-lift: 0px;
+
+		position: fixed;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 200;
+		width: auto;
+		margin-left: 0;
+	}
+
 	.case-lead__inner {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 		row-gap: 12px;
-		padding: 20px;
-		border-radius: 26px;
+		padding: 24px var(--container-padding);
+		padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+		border-radius: 0;
+	}
+
+	.case-lead__link {
+		font-size: var(--font-size-h5);
 	}
 
 	.case-lead__close {
-		justify-self: start;
+		/* 24 от текста: 12 из row-gap и столько же здесь */
+		margin-top: 12px;
+		justify-self: stretch;
+		width: 100%;
 	}
 }
 

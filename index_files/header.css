@@ -47,6 +47,15 @@
 	top: 0;
 	z-index: 100;
 	background-color: var(--color-white);
+	/*
+	 * Страница выводится с viewport-fit=cover (header.php) — это нужно
+	 * поп-апам внизу, чтобы Safari красил системную полосу iPhone в их
+	 * цвет. В обычном Safari верхний отступ нулевой и шапка не меняется;
+	 * ненулевым он становится там, где над страницей действительно есть
+	 * системное поле (альбомная ориентация, приложение с домашнего
+	 * экрана) — тогда шапка опускается под него, а не под него подлезает.
+	 */
+	padding-top: env(safe-area-inset-top, 0px);
 	/* Показ/скрытие при скролле — референс celerart.com (smart-nav),
 	   400ms ease; класс .is-hidden ставит main.js (initHeaderScroll) */
 	transition: transform 0.4s ease;

@@ -34,7 +34,7 @@
 }
 
 .legal-page .article-section__body > * + .wp-block-table,
-.legal-page .article-section__body > .wp-block-table + :is(h2, h3, p, ul) {
+.legal-page .article-section__body > .wp-block-table + :is(.article-heading--2, .article-heading--3, p, ul) {
 	margin-top: 80px;
 }
 

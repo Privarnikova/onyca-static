@@ -83,3 +83,41 @@
 		color: var(--color-accent-blue);
 	}
 }
+
+/*
+ * С 700 и ниже — поп-ап во всю ширину внизу экрана (макет 3291:26475,
+ * 360×640). Панель прижата к нижней кромке без отступов и скруглений,
+ * внутри поля 15 по бокам, 24 сверху и 20 снизу; заголовок H5 18,
+ * через 12 текст B1 16, через 24 кнопка «Принять» во всю ширину.
+ *
+ * Отступ снизу считается вместе с системной полосой iPhone
+ * (env(safe-area-inset-bottom)): панель заходит под неё, и Safari
+ * красит полосу в цвет панели — Grey-30, как просили. Работает это
+ * только с viewport-fit=cover в header.php.
+ */
+@media (max-width: 700px) {
+	.cookie-banner {
+		right: 0;
+		bottom: 0;
+		left: 0;
+		max-width: none;
+	}
+
+	.cookie-banner__inner {
+		padding: 24px var(--container-padding);
+		padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+	}
+
+	.cookie-banner__title {
+		font-size: var(--font-size-h5);
+	}
+
+	.cookie-banner__text {
+		margin-top: 12px;
+	}
+
+	.cookie-banner__accept {
+		margin-top: 24px;
+		width: 100%;
+	}
+}

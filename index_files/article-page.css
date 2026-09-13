@@ -92,13 +92,13 @@
 		grid-template-columns: minmax(0, 1fr);
 	}
 
-	.article-section > h1,
+	.article-section > .article-heading--1,
 	.article-section__body {
 		grid-column: 1 / -1;
 		max-width: none;
 	}
 
-	.article-section > h1 {
+	.article-section > .article-heading--1 {
 		margin-bottom: 32px;
 	}
 
@@ -144,7 +144,7 @@
  * стоит во всю ширину над текстом (1220 — четыре колонки), а на поля
  * уходит H2. Остальные заголовки — те же, что в статье.
  */
-.article-page--project .article-content > h1 {
+.article-page--project .article-content > .article-heading--1 {
 	margin: 0;
 	font-size: var(--font-size-h2);
 	/*
@@ -158,12 +158,12 @@
  * Крупный заголовок отбивается на 80 — столько же берёт раздел под ним
  * (в макете 1293:4521 и 1865:4166 отступ у обоих одинаковый).
  */
-.article-page--project .article-content > h1:not(:first-child),
-.article-page--project .article-content > h1 + .article-section {
+.article-page--project .article-content > .article-heading--1:not(:first-child),
+.article-page--project .article-content > .article-heading--1 + .article-section {
 	margin-top: 80px;
 }
 
-.article-page--project .article-section > h2 {
+.article-page--project .article-section > .article-heading--2 {
 	grid-column: 1 / 3;
 	margin: 0;
 	font-size: var(--font-size-h4);
@@ -171,11 +171,11 @@
 	max-width: calc((100% - var(--grid-gap)) / 2 * 1.5 + var(--grid-gap));
 }
 
-.article-page--project .article-section__body > h3 {
+.article-page--project .article-section__body > .article-heading--3 {
 	font-size: var(--font-size-h5);
 }
 
-.article-page--project .article-section__body > h4 {
+.article-page--project .article-section__body > .article-heading--4 {
 	font-size: var(--font-size-h6);
 }
 
@@ -183,11 +183,11 @@
  * Отступы сверху идут по той же шкале: у кейса H3 отбивается как H2 в
  * статье (64), а H4 — как её H3 (32).
  */
-.article-page--project .article-section__body > h3 {
+.article-page--project .article-section__body > .article-heading--3 {
 	margin-top: 64px;
 }
 
-.article-page--project .article-section__body > h4 {
+.article-page--project .article-section__body > .article-heading--4 {
 	margin-top: 32px;
 }
 

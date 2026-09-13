@@ -4,8 +4,9 @@
  * остальных страниц/брейкпоинтов — не выдумываем недостающее.
  *
  * Шрифт — локальные файлы из assets/font (вариативный TTF), не Google
- * Fonts. Диапазон весов 100–900 покрывает оба используемых веса (500, 600)
- * одним файлом.
+ * Fonts. Диапазон весов 100–900 покрывает оба используемых веса (500, 550)
+ * одним файлом. SemiBold у нас 550, а не каноничные 600: на 600 начертание
+ * выглядело тяжелее макета — вариативный шрифт даёт промежуточный вес.
  */
 
 @font-face {
@@ -21,7 +22,7 @@
 	--font-family-base: 'Wix Madefor Display', sans-serif;
 
 	/*
-	 * Заголовки H1–H6, вес 600, line-height 120%.
+	 * Заголовки H1–H6, вес 550, line-height 120%.
 	 *
 	 * По всем пяти контрольным точкам:
 	 *
@@ -60,7 +61,7 @@
 	--font-size-h4: clamp(21px, calc(6px + 0.9375vw), 24px);
 	--font-size-h5: clamp(18px, calc(8px + 0.625vw), 20px);
 	--font-size-h6: clamp(15px, calc(10px + 0.3125vw), 16px);
-	--font-weight-heading: 600;
+	--font-weight-heading: 550;
 	/* Bold — выделения внутри текста (названия форматов в вопросах) */
 	--font-weight-bold: 700;
 	--line-height-heading: 1.2;
@@ -114,7 +115,7 @@
 	--font-weight-body: 500;
 	--line-height-body: 1.4;
 
-	/* Кнопки: два размера, вес 600, line-height 110% */
+	/* Кнопки: два размера, вес 550, line-height 110% */
 	/*
 	 * Кнопки:
 	 *                  1920   1600   1200    700    360
@@ -123,7 +124,7 @@
 	 */
 	--font-size-button: clamp(15px, calc(10px + 0.3125vw), 16px);
 	--font-size-button-sm: clamp(13px, calc(8px + 0.3125vw), 14px);
-	--font-weight-button: 600;
+	--font-weight-button: 550;
 	--line-height-button: 1.1;
 
 	/* Цвета — текст и служебные */
