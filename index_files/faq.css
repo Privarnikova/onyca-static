@@ -110,13 +110,18 @@
 	transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.faq__icon::after {
+	transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /*
  * Открытый вопрос: стрелка смотрит вверх. Состояние берём у класса, а
  * не у атрибута open: он снимается только в конце анимации, и стрелка
  * при закрытии поворачивалась с опозданием.
  */
-.faq__details.is-open .faq__icon {
-	transform: rotate(180deg);
+.faq__details.is-open .faq__icon::after {
+	/* Уголок и так повёрнут на 45, раскрытому добавляем полоборота */
+	transform: translate(-50%, -30%) rotate(225deg);
 }
 
 .faq__answer {

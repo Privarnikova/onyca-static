@@ -167,16 +167,22 @@ img.site-header__logo-icon {
 	gap: 4px; /* одинаково на обеих точках, не фluid */
 }
 
-.site-header__menu .menu-item-has-children > .menu-trigger::after {
-	content: '';
+/*
+ * Стрелка «Услуги». В подменю десктопа — контур на 14 (975:2860), поле
+ * тянется вместе с шапкой; контур на 32 здесь не нужен и скрыт.
+ * Толщину линии обоим держит токен своего размера (icon.css).
+ */
+.menu-trigger__chevron {
+	transition: transform 0.15s ease;
+}
+
+.menu-trigger__chevron--14 {
 	width: var(--header-chevron-size);
 	height: var(--header-chevron-size);
-	/* ?v=2 — вручную бампать при каждой правке самого SVG: в отличие от
-	   CSS/JS-файлов (версionируются по mtime через wp_enqueue), путь внутри
-	   url() тут статический текст, PHP его не трогает — без версии браузер
-	   может продолжать показывать старую закэшированную картинку */
-	background: url('./chevron-down.svg') center / contain no-repeat;
-	transition: transform 0.15s ease;
+}
+
+.menu-trigger__chevron--32 {
+	display: none;
 }
 
 
@@ -236,7 +242,7 @@ img.site-header__logo-icon {
  * Список раскрыт кликом. Правило вне @media (hover) — на тач-экране
  * навести нельзя, а нажать можно.
  */
-.site-header__menu .menu-item-has-children.is-open > .menu-trigger::after {
+.site-header__menu .menu-item-has-children.is-open .menu-trigger__chevron {
 	transform: rotate(180deg);
 }
 
@@ -331,37 +337,35 @@ body.home.admin-bar .site-header.is-sticky {
 	cursor: pointer;
 }
 
-.burger::before,
-.burger::after {
-	content: '';
-	position: absolute;
-	left: 4px;
-	width: 24px;
-	height: 3px;
-	background-color: var(--color-black);
-	transition: top 0.2s ease, transform 0.2s ease;
+.burger__icon {
+	display: block;
+	color: var(--color-black);
 }
 
-.burger::before {
-	top: 12px;
-}
-
-.burger::after {
-	top: 20px;
+/*
+ * Линии поворачиваются внутри самой пиктограммы: у SVG для этого нужен
+ * transform-box, иначе точка отсчёта берётся от всего холста.
+ */
+.burger__line {
+	transform-box: fill-box;
+	transform-origin: center;
+	transition: transform 0.2s ease;
 }
 
 /* Открытое состояние (Figma: компонент «Menu», property1=«Выбрано») —
    те же 2 полосы поворачиваются в крестик, отдельная SVG-иконка не
    заводится: бургер и так CSS-иконка, а не asset, логично тем же путём
    сделать и открытое состояние. */
-.burger[aria-expanded='true']::before {
-	top: 14.5px;
-	transform: rotate(45deg);
+/*
+ * Открытое состояние («Выбрано» в макете): линии съезжаются в центр
+ * поля (с 12 и 20 на 16) и расходятся крестом.
+ */
+.burger[aria-expanded='true'] .burger__line--top {
+	transform: translateY(4px) rotate(45deg);
 }
 
-.burger[aria-expanded='true']::after {
-	top: 14.5px;
-	transform: rotate(-45deg);
+.burger[aria-expanded='true'] .burger__line--bottom {
+	transform: translateY(-4px) rotate(-45deg);
 }
 
 /*
@@ -543,16 +547,21 @@ body.home.admin-bar .site-header.is-sticky {
 		gap: 12px;
 	}
 
-	.burger-menu__list .menu-item-has-children > .menu-trigger::after {
-		content: '';
-		flex-shrink: 0;
-		width: 32px;
-		height: 32px;
-		background: url('./chevron-down.svg') center/contain no-repeat;
+	/*
+	 * В бургер-меню стрелка своя — контур на 32 (2642:13312 на планшете,
+	 * 3291:29095 на телефоне), а не растянутый четырнадцатипиксельный.
+	 * Толщина приходит из токена размера: 3 на планшете, 2.5 на телефоне.
+	 */
+	.burger-menu__list .menu-trigger__chevron--14 {
+		display: none;
+	}
+
+	.burger-menu__list .menu-trigger__chevron--32 {
+		display: block;
 		transition: transform 0.2s ease;
 	}
 
-	.burger-menu__list .menu-item-has-children.is-open > .menu-trigger::after {
+	.burger-menu__list .menu-item-has-children.is-open .menu-trigger__chevron {
 		transform: rotate(180deg);
 	}
 
@@ -633,17 +642,6 @@ body.home.admin-bar .site-header.is-sticky {
 		padding-right: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
 	}
 
-	/*
-	 * Полосы бургера и крестика тоньше: в телефонных пиктограммах
-	 * (3291:29095 — menu и x на 32) линия 2.5, тогда как на 1200
-	 * (2645:8776) она 3. Между точками значение тянется, чтобы на стыке
-	 * 699/700 толщина не менялась скачком.
-	 */
-	.burger::before,
-	.burger::after {
-		height: clamp(2.5px, calc(1.971px + 0.147vw), 3px);
-	}
-
 	.burger-menu {
 		/* Те же 52px сверху. Снизу 25px, а не 15: в макете 360 (2645:8838)
 		   блок меню кончается на 742 при высоте экрана 767. Боковые 15px —
@@ -717,7 +715,7 @@ body.home.admin-bar .site-header.is-sticky {
  * тапа и «залипают» до следующего касания.
  */
 @media (hover: hover) and (min-width: 1200px) {
-	.site-header__menu .menu-item-has-children:hover > .menu-trigger::after {
+	.site-header__menu .menu-item-has-children:hover .menu-trigger__chevron {
 		transform: rotate(180deg);
 	}
 
