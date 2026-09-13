@@ -99,7 +99,12 @@
 	}
 
 	.article-section > .article-heading--1 {
-		margin-bottom: 32px;
+		/*
+		 * 32 на 1199..700 и 16 на 360 — в макете политики 3139:9070
+		 * текст раздела стоит на 16 под его заголовком. Между точками
+		 * значение тянется, чтобы на стыке 700/699 не было скачка.
+		 */
+		margin-bottom: clamp(16px, calc(-0.9px + 4.7vw), 32px);
 	}
 
 	.article-content > .article-section + .article-section {

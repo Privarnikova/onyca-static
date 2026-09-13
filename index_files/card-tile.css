@@ -181,3 +181,39 @@
 	line-height: var(--line-height-b1);
 	color: var(--color-text-muted);
 }
+
+/*
+ * Узкая карточка (макеты 360: блог 2908:5635, проекты 3257:11801).
+ * Подпись перестаёт делиться на две колонки и идёт стопкой во всю
+ * ширину: у статьи дата, под ней через 10 название; у проекта название,
+ * под ним через 10 описание. От обложки до подписи 12, между
+ * карточками 48.
+ *
+ * Порог тот же 569, на котором подпись выходит из картинки у карточки
+ * проекта (card-project.css): это одна и та же граница «узкой
+ * карточки» — в двух колонках по 156 подпись уже рвётся.
+ */
+@media (max-width: 569px) {
+	.card-grid {
+		row-gap: 48px;
+	}
+
+	.card-post__link,
+	.card-case__link {
+		row-gap: 12px;
+	}
+
+	.card-post__text,
+	.card-case__text,
+	.card-post--wide .card-post__text,
+	.card-case--wide .card-case__text {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 10px;
+	}
+
+	/* Широкая карточка тоже стопкой — своей колонки у подписи больше нет */
+	.card-post--wide .card-post__title,
+	.card-case--wide .card-case__text-summary {
+		grid-column: 1;
+	}
+}
