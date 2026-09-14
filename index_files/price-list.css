@@ -1,11 +1,13 @@
 /**
- * Страница «Прайс-лист» — Figma 1302:2031 (десктоп 1920).
+ * Страница «Прайс-лист» — Figma 1302:2031 (десктоп 1920), 2922:6165
+ * (телефон 360, мобильный блок внизу файла).
  *
  * Заголовок с примечанием и датой актуальности, дальше секции
  * направлений: название со стрелкой и таблица услуг. Таблица дизайн-
  * поддержки шире на одну колонку — там «Профиль / Час / Месяц».
  *
- * ВНИМАНИЕ: свёрстано под 1920, макетов остальных разрешений пока нет.
+ * ВНИМАНИЕ: между 1920 и телефонным порогом (1600/1200/700) макетов
+ * пока нет.
  */
 
 .price-list {
@@ -174,5 +176,155 @@
 	.price-table__row.is-active .price-table__preview {
 		opacity: 1;
 		transform: translate(0, -50%) scale(1);
+	}
+}
+
+/*
+ * Стрелка-подсказка после цены — вместо наведения, которого на
+ * телефоне нет. Компонент .icon по умолчанию рисует пиктограмму 24×24
+ * (components/icon.css); здесь нужны свои 14, поэтому размер и толщина
+ * линии переопределены через контекст (.price-table__arrow .icon) —
+ * это сильнее голого класса .icon и не зависит от порядка подключения
+ * файлов.
+ */
+.price-table__arrow {
+	display: none;
+	flex: none;
+}
+
+.price-table__arrow .icon {
+	width: 14px;
+	height: 14px;
+	color: var(--color-text);
+}
+
+/* .icon path{stroke-width:var(--icon-stroke-24)} (icon.css) иначе перебивает */
+.price-table__arrow .icon path {
+	stroke-width: 1.25;
+}
+
+/*
+ * Телефон — макет 2922:6165 («360x640 - Прайс-лист»).
+ *
+ * Раскладка полностью другая, не сжатая десктопная: заголовок и
+ * примечание стопкой, секции идут с шагом 78 (тот же шаг, что между
+ * заголовком и первой секцией), у каждой секции заголовок отдельно от
+ * таблицы на 32, а не на 48. Строка услуги — не 6-колоночная сетка, а
+ * гибкая «название / цена [/ цена в месяц]»: имя занимает всё
+ * свободное место и переносится, цены встают вплотную к правому краю.
+ */
+@media (max-width: 699px) {
+	.price-list {
+		row-gap: 78px;
+		padding-bottom: 78px;
+	}
+
+	.price-list__header {
+		display: block;
+	}
+
+	.price-list__title {
+		margin: 0 0 32px;
+	}
+
+	/*
+	 * На десктопе это чёрная пилюля с датой; на телефоне — обычный серый
+	 * текст, без фона и паддингов, и он идёт ПЕРЕД примечанием (макет
+	 * 3252:7485), а не после. column-reverse переставляет визуально, не
+	 * трогая разметку: дата — последний ребёнок в DOM.
+	 */
+	.price-list__info {
+		flex-direction: column-reverse;
+		align-items: flex-start;
+		gap: 12px;
+	}
+
+	.price-list__date {
+		padding: 0;
+		border-radius: 0;
+		background: none;
+		font-size: var(--font-size-b1);
+		font-weight: var(--font-weight-body);
+		line-height: var(--line-height-b1);
+		color: var(--color-text-muted);
+		white-space: normal;
+	}
+
+	.price-section {
+		row-gap: 32px;
+	}
+
+	/* 24 вместо 32 и зазор до текста 10 вместо 16 — свой размер на телефоне */
+	.price-section__title .link-arrow {
+		gap: 10px;
+	}
+
+	.price-section__title .icon--32 {
+		width: 24px;
+		height: 24px;
+	}
+
+	/*
+	 * Колонки заголовка и колонки значений — один и тот же шаблон,
+	 * фиксированными ширинами, а не auto: с auto каждая строка (и
+	 * заголовок) считает ширину своих колонок отдельно, по СВОЕМУ
+	 * содержимому — у одной строки «Стоимость» уже, у другой цена шире,
+	 * и колонки расходятся. Ширина 130 — по самому длинному значению
+	 * цены на сайте («индивидуально», 124px при 16px Medium).
+	 *
+	 * Третья колонка — под стрелку-подсказку, тоже фиксированная: с auto
+	 * пустая колонка в заголовке (стрелки там нет) схлопывалась в 0,
+	 * первая колонка (1fr) забирала освободившееся место, и вторая
+	 * колонка уезжала на 14px правее, чем в строке — там же колонка
+	 * занята иконкой и остаётся 14px шириной.
+	 */
+	.price-table__head,
+	.price-table__link {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 130px 24px;
+		column-gap: 16px;
+	}
+
+	.price-table__head .price-table__cell:first-child,
+	.price-table__name {
+		grid-column: auto;
+	}
+
+	.price-table__head .price-table__cell,
+	.price-table__name,
+	.price-table__price {
+		text-align: left;
+	}
+
+	.price-table__head {
+		margin-bottom: 10px;
+		color: var(--color-text-muted);
+	}
+
+	/*
+	 * Дизайн-поддержка — третья колонка тоже значение («Месяц»), не
+	 * стрелка, и тоже должна стоять на месте от строки к строке: тут уже
+	 * не auto, а своя фиксированная ширина. 90 под «Час» (до 88px),
+	 * 100 под «Месяц» (до 99px) — с запасом.
+	 */
+	.price-table--monthly .price-table__head,
+	.price-table--monthly .price-table__link {
+		grid-template-columns: minmax(0, 1fr) 90px 100px;
+	}
+
+	.price-table__row {
+		font-size: var(--font-size-b1);
+		font-weight: var(--font-weight-body);
+		line-height: var(--line-height-b1);
+	}
+
+	.price-table__link {
+		align-items: center;
+		padding: 32px 0;
+	}
+
+	.price-table__arrow {
+		display: flex;
+		align-items: center;
 	}
 }
