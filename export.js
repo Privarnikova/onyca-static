@@ -287,6 +287,18 @@ async function collectPagination( page, url, prefix ) {
   for (const page of pages) {
     let html = rewrite(page.html, './index_files/');
 
+    /*
+     * Копия — демо для показа заказчику, а не сайт: индексировать её
+     * нельзя, иначе в поиске окажутся две версии одних и тех же
+     * страниц. Меняем разрешающую директиву на запрет прямо в
+     * разметке — в самом WordPress индексация включена для боевого
+     * сайта.
+     */
+    html = html.replace(
+      /<meta name=(['"])robots\1 content=(['"])[^'"]*\2\s*\/?>/i,
+      '<meta name="robots" content="noindex, nofollow" />'
+    );
+
     html = html.replace(/<script id="wp-emoji-settings"[^>]*>[\s\S]*?<\/script>\s*/g, '');
     html = html.replace(/<script[^>]*>(?:(?!<\/script>)[\s\S])*?_wpemojiSettings[\s\S]*?<\/script>\s*/g, '');
     html = html.replace(/<script[^>]*wp-emoji-release[^>]*><\/script>\s*/g, '');
