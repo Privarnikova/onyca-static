@@ -16,19 +16,35 @@
 }
 
 .breadcrumbs__link {
+	flex-shrink: 0;
 	color: var(--color-text);
 	text-decoration: none;
 }
 
 .breadcrumbs__dot {
+	flex-shrink: 0;
 	width: 4px;
 	height: 4px;
 	border-radius: 50%;
 	background-color: var(--color-text-disclaimer);
 }
 
+/*
+ * Текущая страница — в макете (и десктоп 2118:14820, и телефон
+ * 3237:14828) всегда одна строка, whitespace-nowrap. У статьи в этом
+ * месте стоит название записи — оно может быть длиннее «Статьи»-
+ * заглушки из макета и без этого правила перенеслось бы на вторую
+ * строку, а точка-разделитель встала по центру уже не одной, а двух
+ * строк и крошки выглядели сломанными. min-width: 0 разрешает крошке
+ * сжаться внутри флекса меньше своего текста — без него text-overflow
+ * не сработает.
+ */
 .breadcrumbs__current {
+	overflow: hidden;
+	min-width: 0;
 	color: var(--color-text-disclaimer);
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 /*

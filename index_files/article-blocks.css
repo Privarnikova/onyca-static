@@ -513,4 +513,27 @@
 	.article-page:not(.article-page--service):not(.article-page--project) .article-theses__item {
 		row-gap: 12px;
 	}
+
+	/*
+	 * Таблица: с minmax(0, 1fr) колонки сжимались до нуля вместе с
+	 * текстом внутри них — на телефоне таблица становилась нечитаемым
+	 * столбиком. У колонки есть предел, ниже которого она не сжимается,
+	 * а если все колонки вместе шире экрана — таблица скроллится вбок,
+	 * как любая другая на маленьком экране (макета этого состояния нет,
+	 * это защита от переполнения, а не число из Figma). 130px — та же
+	 * ширина колонки, что и в прайс-листе.
+	 */
+	.article-section__body .wp-block-table {
+		overflow-x: auto;
+	}
+
+	.article-section__body .wp-block-table tr {
+		grid-template-columns: repeat(var(--table-columns), 130px);
+		width: max-content;
+		min-width: 100%;
+	}
+
+	.article-section__body .wp-block-table:has(tr > :nth-child(2):last-child) tr {
+		grid-template-columns: repeat(3, 130px);
+	}
 }
