@@ -83,6 +83,11 @@
 	grid-column: 4 / 5;
 }
 
+/* Стрелка-подсказка — только на телефоне, см. мобильный блок ниже */
+.service-list__arrow {
+	display: none;
+}
+
 /*
  * Наведение на услугу (1789:4076): список уходит в серый, строка под
  * курсором остаётся чёрной, справа в пятой–шестой колонках появляется
@@ -348,5 +353,131 @@
 @media (max-width: 699px) {
 	.numbers__list {
 		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+/*
+ * Телефон — макеты «360x640» направлений (Брендинг 2937:7571, UX/UI
+ * 3257:9395, CG & Motion 3257:10111). Расстояние между всеми крупными
+ * блоками страницы (первый экран, услуги, кейс, этапы, проекты студии,
+ * сотрудничество, цифры, форма, до подвала) на телефоне одно и то же —
+ * 148 вместо 188.
+ */
+@media (max-width: 699px) {
+	.specialization {
+		row-gap: 148px;
+		padding-bottom: 148px;
+	}
+}
+
+/*
+ * Первый экран направления и кейс внутри него — те же side-by-side
+ * колонки, что и у остальных блоков ниже 1200: своего макета для
+ * 700/1200 нет, поэтому здесь общий принцип (тянем вёрстку, пока
+ * физически не сломается) — заголовок и ролик друг под другом. Число
+ * 52 — с телефонного макета, но подходит и как временное для планшета:
+ * лучше единообразный отступ, чем разъехавшиеся колонки.
+ */
+@media (max-width: 1199px) {
+	.specialization-hero {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 52px;
+	}
+
+	.specialization-hero__title,
+	.specialization-hero__media {
+		grid-column: 1;
+	}
+
+	.specialization-case__title {
+		margin-bottom: 52px;
+	}
+}
+
+/*
+ * Этапы работы ниже 1200 — тот же общий принцип: колонки схлопываются в
+ * одну, номер и название остаются в строке, описание — под ними.
+ * Числа макета для 700/1200 нет, взяты те же, что у телефона.
+ */
+@media (max-width: 1199px) {
+	.work-stages__item {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: 32px;
+		padding-bottom: 52px;
+	}
+
+	.work-stages__text {
+		grid-column: 1;
+	}
+}
+
+/*
+ * Телефон точно по макету 3237:14676 (тот же приём, что у этапов в
+ * статье, article-stages): номер в своей колонке, а название и
+ * описание — во второй, вровень друг с другом. Иначе слева от каждого
+ * абзаца описания зря пустовала бы колонка номера.
+ */
+@media (max-width: 699px) {
+	.work-stages__item {
+		grid-template-columns: 42px minmax(0, 1fr);
+		column-gap: 5px;
+		row-gap: 32px;
+		align-items: start;
+		padding-bottom: 52px;
+	}
+
+	.work-stages__heading {
+		display: contents;
+	}
+
+	.work-stages__number {
+		grid-column: 1;
+		grid-row: 1;
+		flex: none;
+	}
+
+	.work-stages__title {
+		grid-column: 2;
+		grid-row: 1;
+		flex: none;
+	}
+
+	.work-stages__text {
+		grid-column: 2;
+		grid-row: 2;
+	}
+}
+
+/*
+ * Список услуг на телефоне (3257:8524): имя слева, цена и
+ * стрелка-подсказка справа — тот же приём и те же числа, что у строки
+ * прайс-листа (price-list.css): hover на телефоне не работает, стрелка
+ * заменяет превью ролика. Колонка стрелки фиксированная 24px, сама
+ * иконка в ней 14px.
+ */
+@media (max-width: 699px) {
+	.service-list__row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 130px 24px;
+		column-gap: 16px;
+		align-items: center;
+		padding: 32px 0;
+	}
+
+	.service-list__name,
+	.service-list__price {
+		/* Десктопное .service-list__price{grid-column:4/5} не подходит к
+		   трёхколоночной мобильной сетке — без сброса цена уезжала на
+		   свою строку */
+		grid-column: auto;
+	}
+
+	.service-list__price {
+		text-align: left;
+	}
+
+	.service-list__arrow {
+		display: flex;
+		align-items: center;
 	}
 }
