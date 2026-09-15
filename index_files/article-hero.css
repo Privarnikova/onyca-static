@@ -110,9 +110,31 @@
 	}
 }
 
+/*
+ * Телефон — макет «Шаблон статьи» 3237:14676 (360). От крошек до
+ * заголовка 12 вместо 18, обложка отбивается от блока с фактами не
+ * общим шагом 32, а отдельными 78 (46 сверх row-gap, который уже даёт
+ * 32). «Тема статьи» и «Опубликовано» встают в две колонки, как на
+ * планшете, а не складываются в одну, как было раньше «на глаз».
+ *
+ * Тот же .article-hero (без модификатора) стоит и у кейса, и у услуги —
+ * для них макета 360 ещё нет, поэтому правила исключают
+ * .article-page--project и .article-page--service, пока не дойдёт
+ * очередь и до них.
+ */
 @media (max-width: 699px) {
-	.article-hero__facts {
-		grid-template-columns: minmax(0, 1fr);
+	.article-page:not(.article-page--service):not(.article-page--project) .article-hero {
+		margin-top: 12px;
+	}
+
+	.article-page:not(.article-page--service):not(.article-page--project) .article-hero__cover {
+		/* 78 = 32 (row-gap) + 46 — обложка отбивается сильнее соседей */
+		margin-top: 46px;
+	}
+
+	.article-page:not(.article-page--service):not(.article-page--project) .article-hero__facts {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		column-gap: var(--grid-gap);
 		row-gap: 32px;
 	}
 }

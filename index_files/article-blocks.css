@@ -477,3 +477,40 @@
 .article-section__body .wp-block-table td {
 	color: var(--color-text);
 }
+
+/*
+ * Телефон — макет «Шаблон статьи» 3237:14676 (360). Отступы внутри
+ * текста мельче: H2 отбивается на 32 вместо 64, этапы — на 16 вместо
+ * 38. Цифры и тезисы складываются в одну колонку (article-page.css), и
+ * между строками остаётся 32 — не общий зазор сетки, а свой отступ;
+ * внутри каждой подпись отбивается на 12, а не 16. Цитата тоже теснее —
+ * 12 между кавычкой и текстом вместо 16.
+ *
+ * Эти же блоки редактор собирает и в кейсе, и в услуге
+ * (article-page__body у обеих тоже article-content), но для них макета
+ * 360 ещё нет — правила отдельно исключают .article-page--project и
+ * .article-page--service, чтобы не подменить непроверенные отступы.
+ */
+@media (max-width: 699px) {
+	.article-page:not(.article-page--service):not(.article-page--project) .article-quote {
+		gap: 12px;
+	}
+
+	.article-page:not(.article-page--service):not(.article-page--project) .article-section__body > .article-heading--2 {
+		margin-top: 32px;
+	}
+
+	.article-page:not(.article-page--service):not(.article-page--project) .article-section__body > .article-stages {
+		margin-top: 16px;
+	}
+
+	.article-page:not(.article-page--service):not(.article-page--project) .article-numbers,
+	.article-page:not(.article-page--service):not(.article-page--project) .article-theses {
+		row-gap: 32px;
+	}
+
+	.article-page:not(.article-page--service):not(.article-page--project) .article-numbers__item,
+	.article-page:not(.article-page--service):not(.article-page--project) .article-theses__item {
+		row-gap: 12px;
+	}
+}

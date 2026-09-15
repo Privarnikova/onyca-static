@@ -192,10 +192,41 @@
 	}
 }
 
+/*
+ * Телефон — макет «Шаблон статьи» 3237:14676 (360): от обложки до
+ * текста 100 (не 52, как на планшете), «Другие статьи» отбиваются на
+ * 148 (не 78) и заголовок от карточек — на 32 (не 38), карточки между
+ * собой — на 48 (стопкой в одну колонку). Стрелка у заголовка мельче —
+ * та же иконка, что у «Смотреть все» в прайс-листе.
+ *
+ * Значения — только у обычной статьи: у кейса и услуги (те же
+ * --article-page--project и --service) макета для 360 ещё нет, и они
+ * держат общий планшетный отступ, пока не дойдёт очередь и до них. Блок
+ * «Другие проекты» кейса (other-projects.php) использует тот же класс
+ * .other-articles, что и «Другие статьи» — без исключения его сетка
+ * тоже сдвинулась бы, а высота страницы кейса поехала.
+ */
 @media (max-width: 699px) {
+	.article-page:not(.article-page--service):not(.article-page--project) .article-page__body {
+		--article-body-gap: 100px;
+	}
+
+	.other-articles:not(.other-projects) {
+		margin-top: 148px;
+		row-gap: 32px;
+	}
+
+	.other-articles:not(.other-projects) .other-articles__link .icon--32 {
+		width: 24px;
+		height: 24px;
+	}
+
 	.other-articles__grid {
 		grid-template-columns: minmax(0, 1fr);
-		row-gap: 32px;
+	}
+
+	.other-articles:not(.other-projects) .other-articles__grid {
+		row-gap: 48px;
 	}
 
 	.article-numbers,
