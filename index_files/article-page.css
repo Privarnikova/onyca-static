@@ -223,6 +223,8 @@
 
 	.other-articles__grid {
 		grid-template-columns: minmax(0, 1fr);
+		/* Прежнее значение — держит кейс, пока для него нет макета 360 */
+		row-gap: 32px;
 	}
 
 	.other-articles:not(.other-projects) .other-articles__grid {

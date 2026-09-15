@@ -219,7 +219,7 @@ async function collectPagination( page, url, prefix ) {
 
     page.on('response', async r => {
       const u = r.url();
-      if (!/\.(css|js|svg|woff2?|ttf|png|jpe?g)(\?|$)/i.test(u)) return;
+      if (!/\.(css|js|svg|woff2?|ttf|png|jpe?g|webp|gif|mp4|webm)(\?|$)/i.test(u)) return;
       if (u.includes('wp-emoji')) return;
       if (assets.has(u)) return;
       try { assets.set(u, await r.body()); } catch (e) {}
