@@ -113,4 +113,9 @@
 	.project-team__summary {
 		grid-column: 1 / -1;
 	}
+
+	/* Карточки в столбик — макет 3258:13635: между ними 32, не 48 */
+	.project-team__list {
+		row-gap: 32px;
+	}
 }

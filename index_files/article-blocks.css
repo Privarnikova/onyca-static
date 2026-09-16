@@ -479,38 +479,37 @@
 }
 
 /*
- * Телефон — макет «Шаблон статьи» 3237:14676 (360). Отступы внутри
- * текста мельче: H2 отбивается на 32 вместо 64, этапы — на 16 вместо
- * 38. Цифры и тезисы складываются в одну колонку (article-page.css), и
+ * Телефон — те же числа подтверждены на всех трёх макетах, где редактор
+ * собирает эти блоки: «Шаблон статьи» 3237:14676, «Шаблон услуги»
+ * 3257:10904, «Шаблон проекта» 3258:13635. H2 отбивается на 32 вместо
+ * 64. Этапы — на 48 (как таблица, цифры, тезисы, цитата и шоурил, а не
+ * на 16: 16 — это отступ у обычного абзаца и буллет-списка, этапы с
+ * ними рядом в разметке макета и легко спутать при чтении координат).
+ * Цифры и тезисы складываются в одну колонку (article-page.css), и
  * между строками остаётся 32 — не общий зазор сетки, а свой отступ;
  * внутри каждой подпись отбивается на 12, а не 16. Цитата тоже теснее —
  * 12 между кавычкой и текстом вместо 16.
- *
- * Эти же блоки редактор собирает и в кейсе, и в услуге
- * (article-page__body у обеих тоже article-content), но для них макета
- * 360 ещё нет — правила отдельно исключают .article-page--project и
- * .article-page--service, чтобы не подменить непроверенные отступы.
  */
 @media (max-width: 699px) {
-	.article-page:not(.article-page--service):not(.article-page--project) .article-quote {
+	.article-quote {
 		gap: 12px;
 	}
 
-	.article-page:not(.article-page--service):not(.article-page--project) .article-section__body > .article-heading--2 {
+	.article-section__body > .article-heading--2 {
 		margin-top: 32px;
 	}
 
-	.article-page:not(.article-page--service):not(.article-page--project) .article-section__body > .article-stages {
-		margin-top: 16px;
+	.article-section__body > .article-stages {
+		margin-top: 48px;
 	}
 
-	.article-page:not(.article-page--service):not(.article-page--project) .article-numbers,
-	.article-page:not(.article-page--service):not(.article-page--project) .article-theses {
+	.article-numbers,
+	.article-theses {
 		row-gap: 32px;
 	}
 
-	.article-page:not(.article-page--service):not(.article-page--project) .article-numbers__item,
-	.article-page:not(.article-page--service):not(.article-page--project) .article-theses__item {
+	.article-numbers__item,
+	.article-theses__item {
 		row-gap: 12px;
 	}
 
