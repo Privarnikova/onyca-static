@@ -1514,13 +1514,16 @@
 		}
 
 		/*
-		 * Разворот видео — кадры десктопного макета (975:2391). Ниже
-		 * 1200 его нет: первый экран там не занимает окно целиком и к
-		 * его низу не привязан, а видео стоит на своём месте. Раньше
-		 * рост выключался сам собой только на телефоне, где видео и так
-		 * во всю ширину, и между 700 и 1199 всё ещё раскрывался.
+		 * Разворот видео — кадры десктопного макета (975:2391). На 1200
+		 * и ниже его нет: макет 3372:11995 показывает видео статичным,
+		 * на своём месте, а первый экран не занимает окно целиком и к
+		 * его низу не привязан. Порог — строго выше 1200, а не «от»
+		 * 1200: раньше граница совпадала с CSS-переключением шапки на
+		 * бургер (1200 включительно = уже планшет), и на самой границе
+		 * анимация ещё запускалась и раздувала видео поверх статичной
+		 * вёрстки.
 		 */
-		if ( ! window.matchMedia( '(min-width: 1200px)' ).matches ) {
+		if ( ! window.matchMedia( '(min-width: 1201px)' ).matches ) {
 			return;
 		}
 
@@ -2449,6 +2452,72 @@
 		} );
 	}
 
+	/*
+	 * Сетка блога: ниже 1600 в макете не три карточки в ряд, а две —
+	 * своя раскладка (data-blog-layout-narrow), не растянутая версия
+	 * широкой. Переключение — не по фиксированной точке 1600/1200, а по
+	 * тому, влезает ли ещё тройка (макет 3625:9332): держим широкую
+	 * раскладку, пока карточка в ней не уже ~400px, и только тогда
+	 * переключаемся — см. CSS card-tile.css, тот же порог.
+	 *
+	 * Независимо от initCardFilter/initBlogFilter ниже: тот меняет
+	 * классы размера только по клику на фильтр и всегда по широкому
+	 * массиву. Если после фильтра на узком экране раскладка на миг
+	 * вернётся к широкой — это и есть тот редкий случай, не критично.
+	 */
+	function initResponsiveBlogLayout() {
+		var grid = document.querySelector( '[data-blog-grid]' );
+
+		if ( ! grid ) {
+			return;
+		}
+
+		var wide = ( grid.getAttribute( 'data-blog-layout' ) || '' ).split( ',' ).filter( Boolean );
+		var narrow = ( grid.getAttribute( 'data-blog-layout-narrow' ) || '' ).split( ',' ).filter( Boolean );
+
+		if ( ! narrow.length ) {
+			return;
+		}
+
+		var allSizes = wide.concat( narrow ).filter( function ( name, index, list ) {
+			return list.indexOf( name ) === index;
+		} );
+
+		/*
+		 * Ниже 1200 уже своя, давно работающая раскладка (card-tile.css,
+		 * одна карточка в ряд из трёх колонок) — узкую сетку 1200 в неё
+		 * не пускаем, только диапазон 1200–1300.
+		 */
+		var mq = window.matchMedia( '(min-width: 1200px) and (max-width: 1300px)' );
+
+		function apply() {
+			var layout = mq.matches ? narrow : wide;
+			var shown = 0;
+
+			grid.querySelectorAll( '.card-post' ).forEach( function ( card ) {
+				if ( card.hidden ) {
+					return;
+				}
+
+				var size = layout[ shown % layout.length ];
+
+				allSizes.forEach( function ( name ) {
+					card.classList.toggle( 'card-post--' + name, name === size );
+				} );
+
+				shown++;
+			} );
+		}
+
+		apply();
+
+		if ( mq.addEventListener ) {
+			mq.addEventListener( 'change', apply );
+		} else {
+			mq.addListener( apply );
+		}
+	}
+
 	/** Блог: один набор табов — темы статей */
 	function initBlogFilter() {
 		initCardFilter( {
@@ -2613,6 +2682,7 @@
 		initCounters();
 		initLoadMore();
 		initBlogFilter();
+		initResponsiveBlogLayout();
 		initProjectFilter();
 		initFaq();
 		initShowreelWatch();

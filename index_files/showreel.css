@@ -32,8 +32,10 @@
  * кнопке не обязаны: достаточно пометить шоурил атрибутом
  * data-showreel-watch.
  *
- * Своего макета на других разрешениях нет — круг просто уменьшается
- * вместе с шириной окна.
+ * На 1600 (макет «Анимация наведения на шоурил» 3545:29050) круг — 88,
+ * не чистая доля от 99 (та давала бы 82.5): растянуто по прямой между
+ * 1600 и 1920. Ниже 1600 своего макета по-прежнему нет — держит 88;
+ * наведения там всё равно нет (см. min-width:1200 ниже).
  */
 .showreel__watch {
 	/*
@@ -48,8 +50,9 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: clamp(64px, 5.156vw, 99px);
-	height: clamp(64px, 5.156vw, 99px);
+	/* 99 на 1920, 88 на 1600 */
+	width: clamp(88px, calc(33px + 3.4375vw), 99px);
+	height: clamp(88px, calc(33px + 3.4375vw), 99px);
 	border-radius: var(--radius-pill);
 	background-color: var(--color-white);
 	color: var(--color-text);

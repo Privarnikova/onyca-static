@@ -13,8 +13,13 @@
 .specialization {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	row-gap: 188px;
-	padding-bottom: 188px;
+	/*
+	 * 188 на 1920, 160 на 1600 (макеты 3474:14390, 3486:13103,
+	 * 3486:14680, 3486:16291, 3506:14081, 3506:14860) — тот же шаг, что
+	 * и у главной (front-page.css), тянется по той же формуле.
+	 */
+	row-gap: clamp(160px, calc(20px + 8.75vw), 188px);
+	padding-bottom: clamp(160px, calc(20px + 8.75vw), 188px);
 }
 
 /* Первый экран (1159:1354): заголовок слева, ролик в правой половине */
@@ -153,7 +158,8 @@
 .specialization-case__title {
 	/* 1220px в макете — колонки 1–4 */
 	max-width: 1220px;
-	margin: 0 0 78px;
+	/* 78 на 1920, 66 на 1600 (макет 3474:14594 и другие направления) */
+	margin: 0 0 clamp(66px, calc(6px + 3.75vw), 78px);
 	font-size: var(--font-size-h2);
 }
 
@@ -170,7 +176,8 @@
  */
 .work-stages__list {
 	display: grid;
-	row-gap: 52px;
+	/* 52 на 1920, 44 на 1600 (макет 3474:14747) */
+	row-gap: clamp(44px, calc(4px + 2.5vw), 52px);
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -180,7 +187,8 @@
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);
-	padding-bottom: 78px;
+	/* 78 на 1920, 66 на 1600 */
+	padding-bottom: clamp(66px, calc(6px + 3.75vw), 78px);
 	border-bottom: 1px solid var(--color-divider);
 }
 
@@ -235,8 +243,8 @@
  */
 .collaboration {
 	display: grid;
-	/* 52px от заголовка до тезисов — зазор сетки, а не маргин заголовка */
-	row-gap: 52px;
+	/* 52 на 1920, 44 на 1600 (макет 3474:14893) — зазор сетки, а не маргин заголовка */
+	row-gap: clamp(44px, calc(4px + 2.5vw), 52px);
 }
 
 .collaboration__title {
@@ -249,7 +257,8 @@
 	/* Общая сетка страницы: тезис занимает две колонки — 600px на 1920 */
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);
-	row-gap: 52px;
+	/* Та же формула, что у заголовка выше */
+	row-gap: clamp(44px, calc(4px + 2.5vw), 52px);
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -257,7 +266,8 @@
 
 .collaboration__item {
 	grid-column: span 2;
-	padding-bottom: 32px;
+	/* 32 на 1920, 27 на 1600 */
+	padding-bottom: clamp(27px, calc(2px + 1.5625vw), 32px);
 	border-bottom: 1px solid var(--color-divider);
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
@@ -388,14 +398,14 @@
 }
 
 /*
- * Первый экран направления и кейс внутри него — те же side-by-side
- * колонки, что и у остальных блоков ниже 1200: своего макета для
- * 700/1200 нет, поэтому здесь общий принцип (тянем вёрстку, пока
- * физически не сломается) — заголовок и ролик друг под другом. Число
- * 52 — с телефонного макета, но подходит и как временное для планшета:
- * лучше единообразный отступ, чем разъехавшиеся колонки.
+ * Первый экран направления на 1200 — макет 3625:18524 (и такой же
+ * «UX/UI»/«CG & Motion»): заголовок и ролик друг под другом, а не
+ * side-by-side, как раньше здесь стояло по общему принципу (граница
+ * была 1199, а макет подтверждает, что стопка нужна уже на самом 1200).
+ * Отступ между ними в макете — 66, но своих чисел для 700–1199 по-
+ * прежнему нет — там остаётся 52 с телефонного макета, отдельно ниже.
  */
-@media (max-width: 1199px) {
+@media (max-width: 1200px) {
 	.specialization-hero {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 52px;
@@ -405,18 +415,42 @@
 	.specialization-hero__media {
 		grid-column: 1;
 	}
+}
 
+@media (min-width: 1200px) and (max-width: 1200px) {
+	.specialization-hero {
+		row-gap: 66px;
+	}
+}
+
+/*
+ * Строка списка услуг — 32 на 1920, 26.5 на 1200 (макет 3625:18524:
+ * высота строки 79 при том же контенте, что и сейчас — 90 живьём).
+ * Заперто в min-width:700, чтобы не тронуть тот же компонент на
+ * телефоне (там сейчас те же флоские 32, отдельного фикса не было).
+ */
+@media (min-width: 700px) {
+	.service-list__row {
+		padding: clamp(26.5px, calc(17.33px + 0.764vw), 32px) 0;
+	}
+}
+
+@media (max-width: 1199px) {
 	.specialization-case__title {
 		margin-bottom: 52px;
 	}
 }
 
 /*
- * Этапы работы ниже 1200 — тот же общий принцип: колонки схлопываются в
- * одну, номер и название остаются в строке, описание — под ними.
- * Числа макета для 700/1200 нет, взяты те же, что у телефона.
+ * Этапы работы на 1200 и ниже — та же граница 1199→1200, что и у
+ * первого экрана направления (макет 3625:18524 и другие направления:
+ * высота компонента 1236, а десктопная раскладка на самом 1200 давала
+ * 1471 — текст ещё в узких колонках 4–6 переносился по-другому).
+ * Колонки схлопываются в одну, номер и название остаются в строке,
+ * описание — под ними. Своих чисел для 700/1200 нет — взяты те же,
+ * что у телефона.
  */
-@media (max-width: 1199px) {
+@media (max-width: 1200px) {
 	.work-stages__item {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 32px;

@@ -10,8 +10,9 @@
 .career-page {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	row-gap: 188px;
-	padding-bottom: 188px;
+	/* 188 на 1920, 160 на 1600 (макет 3506:14860) — та же формула, что у главной */
+	row-gap: clamp(160px, calc(20px + 8.75vw), 188px);
+	padding-bottom: clamp(160px, calc(20px + 8.75vw), 188px);
 }
 
 /*

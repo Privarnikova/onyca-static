@@ -9,8 +9,8 @@
  */
 
 .project-team {
-	/* 188 от текста кейса до команды — как между крупными блоками страницы */
-	margin-top: 188px;
+	/* 188 на 1920, 160 на 1600 (макет 3545:24218) — как у остальных крупных блоков страниц */
+	margin-top: clamp(160px, calc(20px + 8.75vw), 188px);
 	display: grid;
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);

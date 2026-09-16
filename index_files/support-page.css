@@ -12,9 +12,9 @@
 .support-page {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
-	/* 186 между всеми блоками страницы — ритм один на всю полосу */
-	row-gap: 186px;
-	padding-bottom: 186px;
+	/* 186 на 1920, 160 на 1600 (макет 3486:16291) */
+	row-gap: clamp(160px, calc(30px + 8.125vw), 186px);
+	padding-bottom: clamp(160px, calc(30px + 8.125vw), 186px);
 }
 
 /*

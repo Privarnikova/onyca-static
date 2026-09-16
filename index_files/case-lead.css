@@ -114,11 +114,28 @@
 	color: var(--color-surface-alt);
 }
 
-/* Кнопка лежит выше растянутой ссылки, иначе клик по ней открывал бы поп-ап */
-.case-lead__close {
+/*
+ * Обёртка кнопок — третья колонка сетки, как раньше был один «Закрыть».
+ * Лежит выше растянутой ссылки, иначе клик по кнопкам открывал бы
+ * поп-ап через неё же.
+ */
+.case-lead__actions {
 	position: relative;
 	z-index: 1;
+	display: flex;
+	align-items: center;
 	justify-self: end;
+}
+
+/* Свойство сохранено и здесь — раньше стояло прямо на кнопке, менять
+   принятый computed style на десктопе незачем */
+.case-lead__close {
+	position: relative;
+}
+
+/* На десктопе видна только «Закрыть» — «Обсудить проект» только на телефоне */
+.case-lead__discuss {
+	display: none;
 }
 
 /*
@@ -175,15 +192,30 @@
 		border-radius: 0;
 	}
 
+	/*
+	 * Вся полоса как ссылка — приём для десктопа, где нет отдельной
+	 * кнопки «Обсудить проект» рядом с «Закрыть». На телефоне обе кнопки
+	 * есть явно (Figma 3545:30092), а нажатие рядом с текстом не должно
+	 * само открывать поп-ап — иначе не совпадает с тем, что видно.
+	 */
+	.case-lead__link::after {
+		content: none;
+	}
+
 	.case-lead__link {
 		font-size: var(--font-size-h5);
 	}
 
-	.case-lead__close {
+	.case-lead__actions {
 		/* 24 от текста: 12 из row-gap и столько же здесь */
 		margin-top: 12px;
 		justify-self: stretch;
+		justify-content: space-between;
 		width: 100%;
+	}
+
+	.case-lead__discuss {
+		display: inline-flex;
 	}
 }
 

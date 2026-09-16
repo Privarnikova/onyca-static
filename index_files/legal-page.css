@@ -28,14 +28,19 @@
  * которой раздел начинается (раздел 5), встаёт вровень с заголовком
  * раздела: раньше правило срабатывало и тут и перебивало общее «первый
  * блок раздела без отступа».
+ *
+ * На 1600 (макеты 3513:17526, 3534:18377) оба отступа — 68, не 80:
+ * между всеми парами разделов подряд разница одна и та же по всему
+ * документу. Растянуто по прямой между 1600 и 1920, ниже макета нет —
+ * держит те же 68.
  */
 .legal-page .article-content > .article-section + .article-section {
-	margin-top: 80px;
+	margin-top: clamp(68px, calc(8px + 3.75vw), 80px);
 }
 
 .legal-page .article-section__body > * + .wp-block-table,
 .legal-page .article-section__body > .wp-block-table + :is(.article-heading--2, .article-heading--3, p, ul) {
-	margin-top: 80px;
+	margin-top: clamp(68px, calc(8px + 3.75vw), 80px);
 }
 
 /*

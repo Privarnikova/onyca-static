@@ -176,7 +176,15 @@ img.site-header__logo-icon {
 	transition: transform 0.15s ease;
 }
 
-.menu-trigger__chevron--14 {
+/*
+ * Два класса в селекторе, а не один: components/icon.css подключается
+ * позже и с той же специфичностью правило .icon--sm { width: 14px }
+ * перебивало формулу ниже — стрелка никогда не сжималась на 1600,
+ * держалась плоских 14 везде. Раньше это не было заметно (разница
+ * 14 и 12 на глаз мелкая), пока не пришёл макет «Пиктограммы» 3545:29207
+ * и не подтвердил формулу числом.
+ */
+.menu-trigger .menu-trigger__chevron--14 {
 	width: var(--header-chevron-size);
 	height: var(--header-chevron-size);
 }
@@ -188,6 +196,9 @@ img.site-header__logo-icon {
  */
 .menu-trigger .menu-trigger__chevron--32 {
 	display: none;
+	/* Пин размера сильнее общего .icon--32 — см. .burger__icon выше */
+	width: 32px;
+	height: 32px;
 }
 
 
@@ -342,6 +353,17 @@ body.home .site-header.is-sticky {
 .burger__icon {
 	display: block;
 	color: var(--color-black);
+}
+
+/*
+ * Бургер виден только ниже 1200, а .icon--32 (icon.css, подключается
+ * позже) ниже 1600 держит плато 27 — бургеру там нужно остаться 32.
+ * Два класса в селекторе, чтобы обойти общий .icon--32 независимо от
+ * порядка подключения файлов.
+ */
+.icon.burger__icon {
+	width: 32px;
+	height: 32px;
 }
 
 /*
