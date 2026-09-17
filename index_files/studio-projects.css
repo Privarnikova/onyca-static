@@ -59,6 +59,7 @@
 	gap: 32px;
 }
 
+
 .studio-projects__list .card-project {
 	position: sticky;
 	/* 90px — карточка 900 в окне 1080 встаёт по центру */
@@ -127,5 +128,38 @@
 @media (max-width: 569px) {
 	.studio-projects__list .card-project {
 		background-color: var(--color-white);
+	}
+}
+
+/*
+ * Ниже 1920 блок сжимается — числа из макетов 3474:14777 (1600) и
+ * 3625:18540 (1200):
+ *   зазор карточек и отступ до кнопки  32 → 27 (одинаково на 1600 и 1200);
+ *   от шапки до первой карточки        38 → 35 (1600) → 31 (1200);
+ *   шапка на 1200 выравнивается по верху, а не по базовой линии: в
+ *   макете 1200 подпись и заголовок оба начинаются с нуля, тогда как
+ *   на 1600 подпись ещё опущена на 17 под базовую линию заголовка.
+ *
+ * Блок стоит в конце файла намеренно: у правил та же специфичность,
+ * что у базовых, и порядок решает. Ниже 813 не трогаем — там своя
+ * раскладка шапки стопкой и свои телефонные числа.
+ */
+@media (min-width: 813px) {
+	.studio-projects__head {
+		margin-bottom: clamp(31px, calc(19.33px + 0.9722vw), 38px);
+	}
+
+	.studio-projects__list {
+		gap: clamp(27px, calc(2px + 1.5625vw), 32px);
+	}
+
+	.studio-projects__all {
+		margin-top: clamp(27px, calc(2px + 1.5625vw), 32px);
+	}
+}
+
+@media (min-width: 813px) and (max-width: 1200px) {
+	.studio-projects__head {
+		align-items: start;
 	}
 }

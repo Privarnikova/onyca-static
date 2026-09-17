@@ -106,3 +106,17 @@
 .field.is-error label {
 	color: var(--color-error);
 }
+
+/*
+ * Планшет: интерлиньяж поля берётся из --field-line, а не из общего
+ * --line-height-b1 — на 1200 строка поля ниже (18 против 21, макет
+ * 3673:19532). Вне этого участка значения совпадают, поэтому принятые
+ * 1920/1600/360 не меняются.
+ */
+@media (min-width: 701px) and (max-width: 1600px) {
+	.field label,
+	.field input,
+	.field textarea {
+		line-height: var(--field-line);
+	}
+}

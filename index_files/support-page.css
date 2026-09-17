@@ -219,10 +219,18 @@
 	grid-template-columns: repeat(6, minmax(0, 1fr));
 	column-gap: var(--grid-gap);
 	align-items: center;
-	/* 238 — высота строки в макете */
-	min-height: 238px;
+	/* 238 на 1920, 204 на 1600 (макет 3486:16291) */
+	min-height: clamp(204px, calc(34px + 10.625vw), 238px);
 	border-bottom: 1px solid var(--color-divider);
 }
+
+/* 204 на 1600 → 192 на 1200 (макет 3641:22934) */
+@media (max-width: 1599px) {
+	.support-profiles__item {
+		min-height: clamp(192px, calc(156px + 3vw), 204px);
+	}
+}
+
 
 .support-profiles__name {
 	grid-column: 1 / 5;
@@ -365,5 +373,123 @@
 	.support-process__row {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 8px;
+	}
+}
+
+/*
+ * Имя направления — самый крупный текст сайта, и ниже 1920 он сжимается
+ * заметно быстрее, чем давала чистая доля окна: 94 на 1920 и 70 на 1200
+ * (макеты 3486:16291 и 3641:22934), то есть 83 на 1600. Прежняя формула
+ * `clamp(46px, 4.896vw, 94px)` давала на 1200 всего 59.
+ *
+ * Только с 1200: ниже строка перестраивается в столбик (правило выше),
+ * и там работает прежняя кривая с её нижней точкой 46.
+ *
+ * Блок в конце файла намеренно: у правил та же специфичность, что у
+ * базовых, и порядок решает.
+ */
+@media (min-width: 1200px) {
+	.support-profiles__name {
+		font-size: clamp(70px, calc(30px + 3.3333vw), 94px);
+	}
+}
+
+/*
+ * Ровно на 1200 (макет 3641:22934) страница живёт по другой схеме, чем
+ * на 1600 (3486:16291): не шесть колонок с тезисами парами, а две
+ * половины по три колонки — заголовок слева, всё содержимое справа от
+ * 609. Ниже 1200 блоки складываются в столбик правилом выше, поэтому
+ * запрос однопиксельный.
+ */
+@media (min-width: 1200px) and (max-width: 1200px) {
+	/* Первый экран: описание во всю правую половину, до ролика 80 */
+	.support-hero {
+		row-gap: 80px;
+	}
+
+	.support-hero__lead {
+		grid-column: 4 / -1;
+	}
+
+	/* Заголовки блоков занимают левую половину */
+	.support-team__title,
+	.support-advantages__title {
+		grid-column: 1 / 4;
+		max-width: 498px;
+	}
+
+	.support-process__title {
+		grid-column: 1 / 4;
+		max-width: 326px;
+	}
+
+	/* «Ваша внешняя дизайн-команда»: тезисы столбиком справа, между ними 52 */
+	.support-team {
+		row-gap: 52px;
+	}
+
+	.support-team__item {
+		grid-column: 4 / -1;
+		/* 66 от текста до линии вместо 78 */
+		padding-bottom: 66px;
+	}
+
+	/* «Почему мы»: все шесть тезисов одним столбцом справа, между ними 44 */
+	.support-advantages {
+		row-gap: 44px;
+	}
+
+	.support-advantages__item:nth-child(odd),
+	.support-advantages__item:nth-child(even) {
+		grid-column: 4 / -1;
+	}
+
+	.support-advantages__item {
+		/* 48 от текста до линии вместо 56 */
+		padding-bottom: 48px;
+	}
+
+	/*
+	 * Перенос в «Руководитель / проекта» расставлен вручную под 1920; на
+	 * 1200 строка помещается целиком (в макете имя в одну строку), и
+	 * ручной перенос убираем. Пробел после <br> в разметке есть — на
+	 * 1920 он схлопывается в начале строки, здесь склеивает слова.
+	 */
+	.support-team__item:first-child .support-team__name br {
+		display: none;
+	}
+
+	/* От названия тезиса до описания 14, а не 16 */
+	.support-team__name,
+	.support-advantages__name {
+		margin-bottom: 14px;
+	}
+
+	/*
+	 * «Каждая задача под контролем»: карточки по три колонки, то есть по
+	 * две в ряд, первая — справа от заголовка. Визуал становится ниже:
+	 * 566×415 вместо 600×500.
+	 */
+	.support-process {
+		row-gap: 44px;
+	}
+
+	.support-process__item {
+		grid-column: span 3;
+	}
+
+	.support-process__media {
+		aspect-ratio: 566 / 415;
+		/* 14 от визуала до подписи */
+		margin-bottom: 14px;
+	}
+
+	/*
+	 * Описание направления у правого края и уже, чем две колонки сетки:
+	 * 274 — ровно половина правой половины, как у цифр и тезисов.
+	 */
+	.support-profiles__text {
+		justify-self: end;
+		max-width: 274px;
 	}
 }

@@ -118,6 +118,19 @@
 	column-gap: var(--grid-gap);
 }
 
+/*
+ * «Другие статьи»/«Другие проекты» — та же сетка «по два в ряд» на
+ * 1200–1300, что и у блога/архива проектов (карточки здесь без
+ * фильтра, размер у всех «regular» из PHP, поэтому JS не нужен —
+ * достаточно раздвинуть колонку).
+ */
+@media (min-width: 1200px) and (max-width: 1300px) {
+	.other-articles__grid .card-post:not(.card-post--wide),
+	.other-articles__grid .card-case:not(.card-case--wide) {
+		grid-column: span 3;
+	}
+}
+
 /* В «Других статьях» карточки скругляются на 35 — как маленькие в блоге */
 @media (hover: hover) and (min-width: 1200px) {
 	.other-articles .card-post__link:hover .card-post__cover {
@@ -276,6 +289,19 @@
 	 * grid-column: колонок у самой ленты текста нет, их держат разделы.
 	 */
 	max-width: calc(4 * (100% - 5 * var(--grid-gap)) / 6 + 3 * var(--grid-gap));
+}
+
+/*
+ * На 1200 (макет «Шаблон проекта» 3641:21754) четыре колонки дают 761
+ * вместо почти полной ширины (1148 в макете) — заголовок ещё не
+ * упирается в границы разделов, ширину незачем сужать так рано. Гаснет
+ * к формуле выше ровно на 1600 (там своего макета нет — натуральный
+ * расчёт по токенам сетки), без скачка на стыке.
+ */
+@media (min-width: 1200px) and (max-width: 1599px) {
+	.article-page--project .article-content > .article-heading--1 {
+		max-width: calc(1570.4px - 35.2vw);
+	}
 }
 
 /*

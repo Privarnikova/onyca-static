@@ -101,29 +101,37 @@ body.error404 {
 	 * viewport-fit=cover, чтобы синий фон уходил под них, и без этой
 	 * добавки текст залезал бы под статус-бар и домашний индикатор.
 	 */
+	/*
+	 * 148 сверху и 237 снизу на 1920, 116/163 на 1600 (3513:16839),
+	 * 70/111 на 1200 (3673:16326) — между 1920 и 1600 одна прямая, между
+	 * 1600 и 1200 другая (блок ниже), скачка на стыке нет.
+	 */
 	padding-block:
-		calc(clamp(77px, 7.7083vw, 148px) + env(safe-area-inset-top, 0px))
-		calc(clamp(123px, 12.3438vw, 237px) + env(safe-area-inset-bottom, 0px));
+		calc(clamp(116px, calc(-44px + 10vw), 148px) + env(safe-area-inset-top, 0px))
+		calc(clamp(163px, calc(-207px + 23.125vw), 237px) + env(safe-area-inset-bottom, 0px));
 }
 
 .page-404__face {
-	width: clamp(104px, 10.376vw, 199.219px);
+	/* 199 на 1920, 170 на 1600 и на 1200 — ниже 1600 «:(» не меняется */
+	width: clamp(170px, calc(23.9px + 9.1309vw), 199.219px);
 	height: auto;
 }
 
 .page-404__title {
-	/* 78px от «:(» до заголовка на 1920 */
-	margin: clamp(41px, 4.0625vw, 78px) 0 0;
-	max-width: 491px;
+	/* 78 от «:(» до заголовка на 1920, 66 на 1600 */
+	margin: clamp(66px, calc(6px + 3.75vw), 78px) 0 0;
+	/* 491 на 1920, 448 на 1600 — ширина решает, где ломается строка */
+	max-width: clamp(448px, calc(233px + 13.4375vw), 491px);
 	font-size: clamp(28px, 2.8125vw, 54px);
 	font-weight: var(--font-weight-heading);
 	line-height: var(--line-height-heading);
 }
 
 .page-404__text {
-	/* 15px от заголовка до текста на 1920 */
-	margin: clamp(12px, 0.78125vw, 15px) 0 0;
-	max-width: 600px;
+	/* 15 от заголовка на 1920, 14 на 1600 и ниже */
+	margin: clamp(14px, calc(9px + 0.3125vw), 15px) 0 0;
+	/* 600 на 1920, 503 на 1600 */
+	max-width: clamp(503px, calc(18px + 30.3125vw), 600px);
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
 	line-height: var(--line-height-b1);
@@ -138,11 +146,17 @@ body.error404 {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	/* 32px от текста до кнопки на 1920 */
-	margin-top: clamp(24px, 1.6667vw, 32px);
+	/* 32 от текста до кнопки на 1920, 27 на 1600 и на 1200 */
+	margin-top: clamp(27px, calc(2px + 1.5625vw), 32px);
 	min-width: clamp(118px, 7.0833vw, 136px);
-	/* 22px по бокам — из ширины кнопки в макете (136 при тексте 92) */
-	padding: 16px clamp(18px, 1.1458vw, 22px) 18px;
+	/*
+	 * 22px по бокам — из ширины кнопки в макете (136 при тексте 92).
+	 * По вертикали — та же кривая, что у остальных кнопок ЦД
+	 * (components/buttons.css): 16/18 на 1920, 15/16 с 1600 и ниже, то
+	 * есть высота 52 на десктопе и 48 на планшете, как в макетах.
+	 */
+	padding-block: clamp(15px, calc(10px + 0.3125vw), 16px) clamp(16px, calc(6px + 0.625vw), 18px);
+	padding-inline: clamp(18px, 1.1458vw, 22px);
 	border-radius: 999px;
 	background-color: var(--color-white);
 	color: var(--color-text);
@@ -166,6 +180,55 @@ body.error404 {
 }
 
 /*
+ * Участок 1600 → 1200 (макеты 3513:16839 и 3673:16326). Своя прямая:
+ * поля страницы сжимаются быстрее, чем между 1920 и 1600, «404»
+ * уменьшается до 591 видимых пикселей, а содержимое слева стоит на 35 —
+ * так в обоих макетах, это не поле контейнера (40 на 1600, 25 на 1200).
+ *
+ * Порог 1600, а не 1599: сам 1600 — реальная точка макета, и поле 35 на
+ * нём тоже. Формулы участка на 1600 дают ровно те же значения, что общие
+ * правила выше, поэтому ничего больше не меняется.
+ */
+@media (max-width: 1600px) {
+	.page-404__inner {
+		padding-inline: 35px;
+		padding-block:
+			calc(clamp(70px, calc(-68px + 11.5vw), 116px) + env(safe-area-inset-top, 0px))
+			calc(clamp(111px, calc(-45px + 13vw), 163px) + env(safe-area-inset-bottom, 0px));
+	}
+
+	.page-404__title {
+		/* 66 от «:(» на 1600, 54 на 1200 */
+		margin-top: clamp(54px, calc(18px + 3vw), 66px);
+	}
+
+	/*
+	 * Картинка «404»: 807 видимых цифр на 1600 и 591 на 1200 (при том же
+	 * поле 312/1575 под размытие) — отсюда ширина файла 1338 и 980.
+	 * Верх цифр при этом идёт со 110 на 70, поэтому сдвиг картинки
+	 * перестал быть постоянным и тоже считается прямой.
+	 */
+	.page-404__code {
+		--code-width: calc(-94px + 89.5vw);
+		top: calc(-37.2px - 2.1125vw);
+	}
+}
+
+/*
+ * Ровно с 1200 и ниже заголовок встаёт в одну строку, а текст под ним
+ * ломается на две: в макете 1200 коробка заголовка 677, текста — 556.
+ */
+@media (max-width: 1200px) {
+	.page-404__title {
+		max-width: 677px;
+	}
+
+	.page-404__text {
+		max-width: 556px;
+	}
+}
+
+/*
  * С 1000 и ниже — макет 3132:8378 (360): синее полотно без размытого
  * «404», сверху «:(», под ним текстовый блок и кнопка.
  *
@@ -181,20 +244,27 @@ body.error404 {
 	}
 
 	.page-404__inner {
-		/* 78 сверху и снизу на 360, плюс системные поля iPhone */
+		/* Ниже 1000 поля снова по контейнеру, как на остальных страницах */
+		padding-inline: var(--container-padding);
+		/* 78 сверху и снизу на 360, на 1000 — те же 70/85, что на границе */
 		padding-block:
-			calc(clamp(77px, calc(78.6px - 0.157vw), 78px) + env(safe-area-inset-top, 0px))
-			calc(clamp(77px, calc(78.6px - 0.157vw), 78px) + env(safe-area-inset-bottom, 0px));
+			calc(clamp(70px, calc(82.5px - 1.2519vw), 78px) + env(safe-area-inset-top, 0px))
+			calc(clamp(78px, calc(74.1px + 1.08vw), 85px) + env(safe-area-inset-bottom, 0px));
 	}
 
 	.page-404__face {
-		/* 159 на 360, 104 на 1000 — та же ширина, что была на границе */
-		width: clamp(104px, calc(190px - 8.61vw), 159px);
+		/* 159 на 360, 170 на 1000 — та же ширина, что была на границе */
+		width: clamp(159px, calc(152.8px + 1.7214vw), 170px);
+	}
+
+	.page-404__text {
+		/* 12 от заголовка на 360, 14 на 1000 */
+		margin-top: clamp(12px, calc(10.87px + 0.313vw), 14px);
 	}
 
 	.page-404__title {
-		/* 52 от «:(» на 360, 41 на 1000 */
-		margin-top: clamp(41px, calc(63.6px - 3.24vw), 52px);
+		/* 52 от «:(» на 360, 54 на 1000 */
+		margin-top: clamp(52px, calc(50.87px + 0.313vw), 54px);
 		/*
 		 * 32 на 360 (H1 телефона из макета) и 28 на 1000 — там же, где
 		 * кончается общая кривая заголовка 404. Своя формула, потому что
@@ -204,9 +274,19 @@ body.error404 {
 	}
 
 	.page-404__button {
-		/* 32 от текста на 360, 24 на 1000 — как в общем правиле выше */
-		margin-top: clamp(24px, calc(36.5px - 1.25vw), 32px);
+		/* 32 от текста на 360, 27 на 1000 — как в общем правиле выше */
+		margin-top: clamp(27px, calc(34.8px - 0.7825vw), 32px);
 		/* 22 по бокам на 360 — с ними кнопка выходит 136, как в макете */
 		padding-inline: clamp(18px, calc(24.25px - 0.625vw), 22px);
+	}
+}
+
+/*
+ * Телефон: кнопка снова 52 высоты — та же интерполяция 700 → 360, что у
+ * .btn--cta (макет «Форма. Телефон» 2568:1599).
+ */
+@media (max-width: 699px) {
+	.page-404__button {
+		padding-block: clamp(15px, calc(17.06px - 0.2941vw), 16px) clamp(16px, calc(20.12px - 0.5882vw), 18px);
 	}
 }

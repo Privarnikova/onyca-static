@@ -2453,27 +2453,28 @@
 	}
 
 	/*
-	 * Сетка блога: ниже 1600 в макете не три карточки в ряд, а две —
-	 * своя раскладка (data-blog-layout-narrow), не растянутая версия
-	 * широкой. Переключение — не по фиксированной точке 1600/1200, а по
-	 * тому, влезает ли ещё тройка (макет 3625:9332): держим широкую
-	 * раскладку, пока карточка в ней не уже ~400px, и только тогда
-	 * переключаемся — см. CSS card-tile.css, тот же порог.
+	 * Сетка блога и «Проектов»: ниже 1600 в макете не три карточки в
+	 * ряд, а две — своя раскладка (data-*-layout-narrow), не растянутая
+	 * версия широкой. Переключение — не по фиксированной точке
+	 * 1600/1200, а по тому, влезает ли ещё тройка (макеты 3625:9332 и
+	 * 3641:21277): держим широкую раскладку, пока карточка в ней не
+	 * уже ~400px, и только тогда переключаемся — см. CSS card-tile.css,
+	 * тот же порог.
 	 *
-	 * Независимо от initCardFilter/initBlogFilter ниже: тот меняет
-	 * классы размера только по клику на фильтр и всегда по широкому
-	 * массиву. Если после фильтра на узком экране раскладка на миг
-	 * вернётся к широкой — это и есть тот редкий случай, не критично.
+	 * Независимо от initCardFilter/initBlogFilter/initProjectFilter:
+	 * те меняют классы размера только по клику на фильтр и всегда по
+	 * широкому массиву. Если после фильтра на узком экране раскладка на
+	 * миг вернётся к широкой — это и есть тот редкий случай, не критично.
 	 */
-	function initResponsiveBlogLayout() {
-		var grid = document.querySelector( '[data-blog-grid]' );
+	function initResponsiveCardLayout( gridSelector, cardSelector, sizePrefix, layoutAttr, layoutAttrNarrow ) {
+		var grid = document.querySelector( gridSelector );
 
 		if ( ! grid ) {
 			return;
 		}
 
-		var wide = ( grid.getAttribute( 'data-blog-layout' ) || '' ).split( ',' ).filter( Boolean );
-		var narrow = ( grid.getAttribute( 'data-blog-layout-narrow' ) || '' ).split( ',' ).filter( Boolean );
+		var wide = ( grid.getAttribute( layoutAttr ) || '' ).split( ',' ).filter( Boolean );
+		var narrow = ( grid.getAttribute( layoutAttrNarrow ) || '' ).split( ',' ).filter( Boolean );
 
 		if ( ! narrow.length ) {
 			return;
@@ -2494,7 +2495,7 @@
 			var layout = mq.matches ? narrow : wide;
 			var shown = 0;
 
-			grid.querySelectorAll( '.card-post' ).forEach( function ( card ) {
+			grid.querySelectorAll( cardSelector ).forEach( function ( card ) {
 				if ( card.hidden ) {
 					return;
 				}
@@ -2502,7 +2503,7 @@
 				var size = layout[ shown % layout.length ];
 
 				allSizes.forEach( function ( name ) {
-					card.classList.toggle( 'card-post--' + name, name === size );
+					card.classList.toggle( sizePrefix + name, name === size );
 				} );
 
 				shown++;
@@ -2516,6 +2517,14 @@
 		} else {
 			mq.addListener( apply );
 		}
+	}
+
+	function initResponsiveBlogLayout() {
+		initResponsiveCardLayout( '[data-blog-grid]', '.card-post', 'card-post--', 'data-blog-layout', 'data-blog-layout-narrow' );
+	}
+
+	function initResponsiveProjectLayout() {
+		initResponsiveCardLayout( '[data-card-grid]', '.card-case', 'card-case--', 'data-grid-layout', 'data-grid-layout-narrow' );
 	}
 
 	/** Блог: один набор табов — темы статей */
@@ -2684,6 +2693,7 @@
 		initBlogFilter();
 		initResponsiveBlogLayout();
 		initProjectFilter();
+		initResponsiveProjectLayout();
 		initFaq();
 		initShowreelWatch();
 		initStackedProjects();

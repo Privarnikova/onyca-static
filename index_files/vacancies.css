@@ -178,3 +178,27 @@
 		margin-left: 0;
 	}
 }
+
+/*
+ * Ровно на 1200 (макет 3669:16168 в составе 3669:9586): строки списка
+ * плотнее, чем вопросы в FAQ, — от заголовка до первой 44, между
+ * строками 27 (вместо 32), кнопка отклика через 44. Текст вакансии
+ * остаётся в колонках 4–6, как на десктопе.
+ */
+@media (min-width: 1200px) and (max-width: 1200px) {
+	.vacancies {
+		row-gap: 44px;
+	}
+
+	.vacancies .faq__question {
+		padding-block: 27px;
+	}
+
+	.vacancies .faq__details.is-open .faq__question {
+		padding-bottom: 27px;
+	}
+
+	.vacancies__apply {
+		margin-top: 44px;
+	}
+}
