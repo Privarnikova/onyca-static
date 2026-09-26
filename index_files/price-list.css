@@ -70,10 +70,18 @@
 	color: var(--color-text);
 }
 
-/* Чёрная плашка с датой — та же пилюля, что у кнопок-табов */
+/*
+ * Чёрная плашка с датой — та же пилюля, что у кнопок-табов. На 1200
+ * плашка меньше: 124×38 при тексте 13 (макет 3625:10711) — по бокам 13,
+ * сверху и снизу по 12. К принятым 13/16/16 на 1920 значения тянутся
+ * прямыми, без скачка на стыке.
+ */
 .price-list__date {
 	margin: 0;
-	padding: 13px 16px 16px;
+	padding:
+		clamp(12px, calc(10.33px + 0.1389vw), 13px)
+		clamp(13px, calc(8px + 0.4167vw), 16px)
+		clamp(12px, calc(5.33px + 0.5556vw), 16px);
 	border-radius: var(--radius-pill);
 	background-color: var(--color-black);
 	font-size: var(--font-size-button-sm);
@@ -368,5 +376,27 @@
 	.price-table__arrow {
 		display: flex;
 		align-items: center;
+	}
+}
+
+/*
+ * Ровно на 1200 (макет 3625:10711) таблица стоит по «четвертям» сетки, а
+ * не по шести колонкам: услуга — первые две четверти (566), цена (или
+ * «Час») — третья, «Месяц» у дизайн-поддержки — четвёртая. Из-за этого
+ * «Месяц» уезжает с 804 на 901, как в макете. Четыре колонки по 274 с
+ * зазором 18 дают ровно 1150.
+ *
+ * Блок в конце файла намеренно: у правил та же специфичность, что у
+ * базовых, и порядок решает.
+ */
+@media (min-width: 1200px) and (max-width: 1200px) {
+	.price-table__head,
+	.price-table__link {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	.price-table__head .price-table__cell:first-child,
+	.price-table__name {
+		grid-column: 1 / 3;
 	}
 }

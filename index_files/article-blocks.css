@@ -321,17 +321,23 @@
 /*
  * Цитата стоит слева от колонки текста и встаёт вровень с блоком, рядом
  * с которым её поставил редактор (в макете — вровень с верхом второго
- * шоурила). В потоке она не участвует, иначе текст разъезжался бы
- * вокруг неё, а отступ сверху берёт такой же, как у следующего блока.
+ * шоурила). Строку текста она не двигает: её коробка целиком левее
+ * колонки, и строки в неё не упираются.
+ *
+ * Это float, а не position: absolute, как было раньше. У абсолютной
+ * коробки высоты для раздела нет, и длинная цитата на узкой колонке
+ * (274 на 1200) вылезала за низ раздела — её обрезала заливка кейса.
+ * Плавающая коробка раздел растягивает: раздел — ячейка грида, то есть
+ * сам себе контекст форматирования, и float внутри него учитывается.
  */
 .article-section__body > .article-quote {
-	position: absolute;
+	float: left;
 	/*
 	 * Левый край цитаты — левый край сетки: две колонки с зазорами
 	 * левее колонки текста. Ширина, как у заголовка раздела, — полторы
 	 * колонки (455 при колонке 290).
 	 */
-	left: calc(-2 * (var(--article-column) + var(--grid-gap)));
+	margin-left: calc(-2 * (var(--article-column) + var(--grid-gap)));
 	width: calc(1.5 * var(--article-column) + var(--grid-gap));
 }
 
@@ -556,5 +562,125 @@
 
 	.article-section__body .wp-block-table:has(tr > :nth-child(2):last-child) tr {
 		grid-template-columns: repeat(3, 130px);
+	}
+}
+
+/*
+ * Планшет (макет «Шаблон проекта» 3641:21754, тело кейса на 1200):
+ *   этапы — между пунктами 20 вместо 24, от заголовка до описания 14
+ *   вместо 16, от описания до линии 20 вместо 24;
+ *   таблица — 20 от текста до линии и от линии до следующей строки
+ *   вместо 24.
+ * Все четыре величины тянутся к принятым 24/16 на 1920, без скачка на
+ * стыке. Ниже 1200 остаются десктопные: там принят 360.
+ */
+@media (min-width: 1200px) {
+	.article-stages {
+		row-gap: clamp(20px, calc(13.33px + 0.5556vw), 24px);
+	}
+
+	.article-stages__item {
+		row-gap: clamp(14px, calc(10.67px + 0.2778vw), 16px);
+		padding-bottom: clamp(20px, calc(13.33px + 0.5556vw), 24px);
+	}
+
+	.article-section__body .wp-block-table tr {
+		padding-bottom: clamp(20px, calc(13.33px + 0.5556vw), 24px);
+	}
+
+	.article-section__body .wp-block-table tbody tr + tr {
+		padding-top: clamp(20px, calc(13.33px + 0.5556vw), 24px);
+	}
+}
+
+/*
+ * Ровно на 1200 заголовок этапа набран H4 (21), а не H5 (18) — в макете
+ * строка «01 Lorem ipsum» высотой 25. Вместе с кеглем растёт и колонка
+ * номера: 48 вместо 42. То же решение, что у нумерованного списка в
+ * components/steps.css.
+ */
+@media (min-width: 1200px) and (max-width: 1200px) {
+	.article-stages__item {
+		grid-template-columns: calc(2.35 * var(--font-size-h4)) minmax(0, 1fr);
+	}
+
+	.article-stages__heading,
+	.article-stages__number,
+	.article-stages__title {
+		font-size: var(--font-size-h4);
+	}
+}
+
+/*
+ * Цитата на планшете. Её левый край считается от колонки текста («две
+ * колонки влево»), но между 1600 и 1200 сама колонка едет влево и
+ * расширяется (article-page.css, блок 1200–1599) — отсчёт от неё
+ * промахивался, и цитата уезжала за левый край страницы: на 1400 её
+ * край оказывался на −113, на 1200 — на −267.
+ *
+ * Здесь край и ширина заданы прямо: левый край цитаты совпадает с левым
+ * краем сетки, ширина — как у поля заголовка (376 на 1600, 274 на 1200,
+ * макеты 3641:21754 и 3625:10508). Обе прямые проходят через реальные
+ * точки, поэтому на стыке 1600/1599 разрыва нет.
+ */
+@media (min-width: 1200px) and (max-width: 1599px) {
+	.article-section__body > .article-quote {
+		margin-left: calc(369.97px - 55.164vw);
+		width: calc(25.375vw - 30.5px);
+	}
+}
+
+/*
+ * Отбивки блоков тела статьи и кейса на планшете (макеты 3625:10014 и
+ * 3641:21754): всё плотнее, чем на 1920, кроме этапов — они, наоборот,
+ * встают вровень с крупными блоками.
+ *
+ *                     1920   1200
+ *   текст, буллеты      16     14
+ *   H2                  64     54
+ *   H3                  32     27
+ *   таблица, цифры,
+ *   тезисы, фото        48     40
+ *   этапы               38     40
+ *   подпись к фото      16     14
+ *
+ * Ниже 1200 остаются десктопные: там принят 360.
+ */
+@media (min-width: 1200px) {
+	.article-section__body > * {
+		margin-top: clamp(14px, calc(10.67px + 0.2778vw), 16px);
+	}
+
+	.article-section__body > .article-heading--2 {
+		margin-top: clamp(54px, calc(37.33px + 1.3889vw), 64px);
+	}
+
+	.article-section__body > .article-heading--3 {
+		margin-top: clamp(27px, calc(18.67px + 0.6944vw), 32px);
+	}
+
+	.article-section__body > .wp-block-table,
+	.article-section__body > .article-numbers,
+	.article-section__body > .article-theses,
+	.article-section__body > .article-media,
+	.article-section__body > .article-quote:has(+ .wp-block-table),
+	.article-section__body > .article-quote:has(+ .article-numbers),
+	.article-section__body > .article-quote:has(+ .article-theses),
+	.article-section__body > .article-quote:has(+ .article-media) {
+		margin-top: clamp(40px, calc(26.67px + 1.1111vw), 48px);
+	}
+
+	.article-section__body > .article-stages,
+	.article-section__body > .article-quote:has(+ .article-stages) {
+		margin-top: clamp(38px, calc(43.33px - 0.2778vw), 40px);
+	}
+
+	.article-media__caption {
+		margin-top: clamp(14px, calc(10.67px + 0.2778vw), 16px);
+	}
+
+	/* Первый блок раздела своего отступа по-прежнему не добавляет */
+	.article-section__body > :first-child {
+		margin-top: 0;
 	}
 }

@@ -268,3 +268,82 @@
 		row-gap: 32px;
 	}
 }
+
+/*
+ * Ровно на 1200 (макет 3669:8689). На 1600 страница принята десктопной,
+ * ниже 1200 колонки складываются правилом выше, поэтому запрос
+ * однопиксельный.
+ *
+ * Первый экран перекомпонован так же, как на главной (3669:8692):
+ * заголовок сверху во всю ширину до 645, под ним через 32 тезис в
+ * правой половине, ещё через 66 — шоурил во всю ширину.
+ *
+ * Блок в конце файла намеренно: у правил та же специфичность, что у
+ * базовых, и порядок решает.
+ */
+@media (min-width: 1200px) and (max-width: 1200px) {
+	.studio-hero {
+		row-gap: 0;
+	}
+
+	.studio-hero__title {
+		grid-column: 1 / -1;
+		/* 645 в макете — ширина текстового блока заголовка */
+		max-width: 645px;
+	}
+
+	.studio-hero__lead {
+		grid-column: 4 / -1;
+		margin-top: 32px;
+	}
+
+	.studio-hero__media {
+		margin-top: 66px;
+	}
+
+	/*
+	 * «Мы воспринимаем дизайн как систему»: текст в левой половине, до
+	 * абзаца 44, а визуал стал карточкой кейса 566×415 вместо полотна
+	 * 909×445 — так же, как в «Нашей философии» на «Карьере».
+	 */
+	.studio-system__text {
+		grid-column: 1 / 4;
+		width: auto;
+	}
+
+	.studio-system__body {
+		margin-top: 44px;
+		/* 515 в макете: строка короче колонки */
+		max-width: 515px;
+	}
+
+	.studio-system__media {
+		aspect-ratio: 566 / 415;
+	}
+
+	/* «Бизнес меняется»: заголовок 498 в две строки, до текста 44, до кругов 27 */
+	.studio-circles__title {
+		grid-column: 1 / 4;
+		max-width: 498px;
+	}
+
+	.studio-circles__text {
+		grid-column: 1 / 5;
+		margin-top: 44px;
+		max-width: 578px;
+	}
+
+	.studio-circles__figure {
+		margin-top: 27px;
+	}
+
+	/* «Почему мы»: между блоками 44, текст у картинки и не шире 498 */
+	.studio-features {
+		row-gap: 44px;
+	}
+
+	.studio-feature--left .studio-feature__text,
+	.studio-feature--right .studio-feature__text {
+		max-width: 498px;
+	}
+}

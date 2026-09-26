@@ -189,8 +189,9 @@
 	}
 
 	.article-section__body > .article-quote {
-		position: static;
+		float: none;
 		width: auto;
+		margin-left: 0;
 		margin-top: 48px;
 	}
 
@@ -361,4 +362,68 @@
  */
 .article-page--project .article-section__body > :first-child {
 	margin-top: 0;
+}
+
+/*
+ * Кейс на 1200 (макет 3641:21754):
+ *   от крупного заголовка до раздела 68 вместо 80 — тянется к принятым
+ *   80 на 1920;
+ *   «Другие проекты» — 32 от заголовка до карточек вместо 38 и зазор
+ *   рядов 44, как в общей сетке карточек (до этого у сетки блока
+ *   вертикального зазора не было вовсе: на 1920 карточки в один ряд, и
+ *   это не всплывало, а на 1200 их два ряда — второй лип к первому).
+ *
+ * Ниже 1200 всё прежнее: там принят 360.
+ *
+ * Блок в конце файла намеренно: у правил та же специфичность, что у
+ * базовых, и порядок решает.
+ */
+@media (min-width: 1200px) {
+	.article-page--project .article-content > .article-heading--1:not(:first-child),
+	.article-page--project .article-content > .article-heading--1 + .article-section {
+		margin-top: clamp(68px, calc(48px + 1.6667vw), 80px);
+	}
+
+	.other-articles {
+		row-gap: clamp(32px, calc(22px + 0.8333vw), 38px);
+	}
+
+	.other-articles__grid {
+		row-gap: clamp(44px, calc(4px + 2.5vw), 52px);
+	}
+}
+
+/*
+ * «Другие статьи» и «Другие проекты» на планшете (макеты 3625:10508 и
+ * 3641:22387): карточек по-прежнему три, но раскладка другая — две
+ * обычные в первом ряду и одна ШИРОКАЯ во всю сетку во втором. В PHP
+ * все три приходят обычными (на 1920 они стоят в один ряд), поэтому
+ * третью разворачиваем здесь, в том же диапазоне, где сетка идёт по две
+ * в ряд.
+ */
+@media (min-width: 1200px) and (max-width: 1300px) {
+	.other-articles__grid > .card-post:nth-child(3),
+	.other-articles__grid > .card-case:nth-child(3) {
+		grid-column: 1 / -1;
+	}
+
+	.other-articles__grid > :nth-child(3) .card-post__cover,
+	.other-articles__grid > :nth-child(3) .card-case__cover {
+		/* Та же пропорция, что у широкой карточки в списках: 1150×562 */
+		aspect-ratio: 1840 / 899;
+	}
+
+	/* Подпись — по четвертям сетки, как у широких карточек в списках */
+	.other-articles__grid > :nth-child(3) .card-post__text,
+	.other-articles__grid > :nth-child(3) .card-case__text {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	.other-articles__grid > :nth-child(3) .card-post__title {
+		grid-column: 3;
+	}
+
+	.other-articles__grid > :nth-child(3) .card-case__text-summary {
+		grid-column: 3 / -1;
+	}
 }
