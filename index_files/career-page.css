@@ -170,11 +170,6 @@
  * ряд, а на телефоне — по одному.
  */
 @media (max-width: 1199px) {
-	.career-page {
-		row-gap: 78px;
-		padding-bottom: 78px;
-	}
-
 	.career-hero__title,
 	.career-hero__lead,
 	.career-idea__text,
@@ -261,6 +256,35 @@
 	}
 
 	.career-qualities__item {
+		padding-bottom: 27px;
+		background-size: 100% 1px;
+	}
+}
+
+/*
+ * Расстояние между блоками: 160 держится от 1200 до 700 (макеты 1200 и
+ * 700 дают одно и то же), телефонные 78 начинаются с 699.
+ */
+@media (max-width: 699px) {
+	.career-page {
+		row-gap: 78px;
+		padding-bottom: 78px;
+	}
+}
+
+/*
+ * Ровно на 700 (макет 3922:12009) «Личностные качества» идут по одному в
+ * ряд во всю ширину: 44 от заголовка и между рядами, от текста до линии
+ * 27.
+ */
+@media (min-width: 700px) and (max-width: 700px) {
+	.career-qualities,
+	.career-qualities__list {
+		row-gap: 44px;
+	}
+
+	.career-qualities__item {
+		grid-column: 1 / -1;
 		padding-bottom: 27px;
 		background-size: 100% 1px;
 	}

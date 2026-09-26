@@ -220,11 +220,6 @@
  * складываются: текст и изображение идут друг под другом.
  */
 @media (max-width: 1199px) {
-	.studio-page {
-		row-gap: 78px;
-		padding-bottom: 78px;
-	}
-
 	.studio-hero__title,
 	.studio-hero__lead,
 	.studio-system__text,
@@ -345,5 +340,53 @@
 	.studio-feature--left .studio-feature__text,
 	.studio-feature--right .studio-feature__text {
 		max-width: 498px;
+	}
+}
+
+/*
+ * Расстояние между блоками: 160 держится от 1200 до 700 (макеты 1200 и
+ * 700 дают одно и то же), телефонные 78 начинаются с 699.
+ */
+@media (max-width: 699px) {
+	.studio-page {
+		row-gap: 78px;
+		padding-bottom: 78px;
+	}
+}
+
+/*
+ * Ровно на 700 (макет 3904:27814):
+ *   первый экран — 32 от заголовка до тезиса и 78 до шоурила;
+ *   «Мы воспринимаем дизайн как систему» — текст во всю ширину, 44 до
+ *   абзаца и 44 до полотна;
+ *   «Почему мы» — 27 от картинки до подписи, 44 между блоками.
+ */
+@media (min-width: 700px) and (max-width: 700px) {
+	.studio-hero {
+		row-gap: 32px;
+	}
+
+	.studio-hero__media {
+		margin-top: 46px;
+	}
+
+	.studio-system {
+		row-gap: 44px;
+	}
+
+	.studio-system__text {
+		width: auto;
+	}
+
+	.studio-system__body {
+		margin-top: 44px;
+	}
+
+	.studio-features {
+		row-gap: 44px;
+	}
+
+	.studio-feature {
+		row-gap: 27px;
 	}
 }

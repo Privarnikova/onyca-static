@@ -183,7 +183,7 @@
  * — светлого варианта: подпись теперь на белом, инверсия от обложки
  * (.is-on-dark) здесь не нужна.
  */
-@media (max-width: 569px) {
+@media (max-width: 700px) {
 	.card-project {
 		aspect-ratio: auto;
 		overflow: visible;
@@ -193,7 +193,8 @@
 	.card-project__link {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		/* 14 от картинки до названия на 700 (макет 3805:26019) */
+		gap: 14px;
 		height: auto;
 	}
 
@@ -216,13 +217,15 @@
 	.card-project__content,
 	.card-project--bottom .card-project__content {
 		position: static;
-		gap: 12px;
+		/* 14 от названия до меток на 700 */
+		gap: 14px;
 		max-width: none;
 	}
 
 	.card-project__title,
 	.card-project.is-on-dark .card-project__title {
-		font-size: var(--font-size-h5);
+		/* Под картинкой название набрано H3 — 31 в макете 700 */
+		font-size: var(--font-size-h3);
 		color: var(--color-text);
 	}
 
@@ -246,5 +249,22 @@
 	/* В «Проектах студии» на телефоне только название, без меток */
 	.studio-projects .card-project__tags {
 		display: none;
+	}
+}
+
+/*
+ * Телефон (макеты 2861:7333 и 2908:5608): зазоры теснее планшетных — 12
+ * вместо 14, и название набрано H5, а не H3.
+ */
+@media (max-width: 569px) {
+	.card-project__link,
+	.card-project__content,
+	.card-project--bottom .card-project__content {
+		gap: 12px;
+	}
+
+	.card-project__title,
+	.card-project.is-on-dark .card-project__title {
+		font-size: var(--font-size-h5);
 	}
 }

@@ -124,7 +124,7 @@
  * фильтра, размер у всех «regular» из PHP, поэтому JS не нужен —
  * достаточно раздвинуть колонку).
  */
-@media (min-width: 1200px) and (max-width: 1300px) {
+@media (min-width: 701px) and (max-width: 1300px) {
 	.other-articles__grid .card-post:not(.card-post--wide),
 	.other-articles__grid .card-case:not(.card-case--wide) {
 		grid-column: span 3;
@@ -161,7 +161,11 @@
  */
 @media (max-width: 1199px) {
 	.article-page__body {
-		--article-body-gap: 52px;
+		/*
+		 * 100 от первого экрана до текста — так и на 1200 (3641:21754),
+		 * и на 700 (3931:33196). Телефонные 52 возвращает блок ниже.
+		 */
+		--article-body-gap: 100px;
 	}
 
 	/* Полей слева нет — заголовок раздела и цитата идут в общем потоке */
@@ -205,9 +209,6 @@
 		padding-bottom: 78px;
 	}
 
-	.other-articles__grid {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-	}
 }
 
 /*
@@ -229,6 +230,10 @@
  * числа разные.
  */
 @media (max-width: 699px) {
+	.article-page__body {
+		--article-body-gap: 52px;
+	}
+
 	.article-page__body {
 		--article-body-gap: 100px;
 	}
@@ -378,7 +383,7 @@
  * Блок в конце файла намеренно: у правил та же специфичность, что у
  * базовых, и порядок решает.
  */
-@media (min-width: 1200px) {
+@media (min-width: 700px) {
 	.article-page--project .article-content > .article-heading--1:not(:first-child),
 	.article-page--project .article-content > .article-heading--1 + .article-section {
 		margin-top: clamp(68px, calc(48px + 1.6667vw), 80px);
@@ -401,7 +406,7 @@
  * третью разворачиваем здесь, в том же диапазоне, где сетка идёт по две
  * в ряд.
  */
-@media (min-width: 1200px) and (max-width: 1300px) {
+@media (min-width: 701px) and (max-width: 1300px) {
 	.other-articles__grid > .card-post:nth-child(3),
 	.other-articles__grid > .card-case:nth-child(3) {
 		grid-column: 1 / -1;
@@ -425,5 +430,26 @@
 
 	.other-articles__grid > :nth-child(3) .card-case__text-summary {
 		grid-column: 3 / -1;
+	}
+}
+
+/*
+ * С 700 карточки «Других статей» и «Других проектов» идут по одной в
+ * ряд во всю ширину (макеты 3931:31389 и 3931:31...): сетка блока
+ * сжимается в одну колонку.
+ */
+@media (max-width: 700px) {
+	.other-articles__grid {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+/*
+ * На 700 крупный заголовок кейса идёт во всю ширину (макет 3903:24378 —
+ * 650), а не в четыре колонки: четырёх колонок там уже нет.
+ */
+@media (min-width: 700px) and (max-width: 700px) {
+	.article-page--project .article-content > .article-heading--1 {
+		max-width: none;
 	}
 }

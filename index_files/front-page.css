@@ -167,53 +167,62 @@
 	}
 
 	/*
-	 * Новая компоновка верхнего текста (макет 3669:8692 взамен прежнего
-	 * 3372:11995): заголовок сверху и во всю ширину до 645, под ним
-	 * через 32 тезисы в правой половине, ещё через 66 — шоурил во всю
-	 * ширину, а не в правой половине. Четыре строки вместо трёх с
-	 * распоркой: тезисы больше не привязаны к верху видео.
+	 * Раскладка первого экрана на 1200 — макет «1200x700 — Главная»
+	 * (3372:11995): заголовок в пять колонок (782 в макете), тезисы
+	 * фиксированной ширины 274 у своих краёв, шоурил в правой половине,
+	 * нижний тезис вровень с его верхом. Распорка между строками
+	 * фиксированная — 243 (684 высоты минус 165 заголовка минус 276
+	 * видео).
+	 *
+	 * Прежде здесь стояла раскладка со «Студии» (3669:8692) — у неё
+	 * заголовок во всю ширину и шоурил под текстом. Это была моя ошибка:
+	 * тот узел принадлежит странице «Студия», у главной свой макет.
 	 */
 	.home-hero__inner {
-		grid-template-rows: repeat(4, auto);
+		grid-template-rows: auto 243px auto;
 	}
 
 	.home-hero__title {
+		/*
+		 * Строка задана явно: верхний тезис занимает в первой строке
+		 * колонки 4–6, и без grid-row заголовок шириной в пять колонок
+		 * уезжал в следующую строку — в распорку.
+		 */
 		grid-row: 1;
-		grid-column: 1 / -1;
-		/* Довесок в один зазор нужен только десктопной раскладке */
+		grid-column: 1 / 6;
 		width: 100%;
-		/* 645 в макете — ширина текстового блока заголовка */
-		max-width: 645px;
+		max-width: 782px;
 	}
 
-	.home-hero__note {
-		grid-column: 4 / -1;
-		max-width: none;
-		justify-self: auto;
+	.home-hero__note--top,
+	.home-hero__note--bottom {
+		max-width: 274px;
 	}
 
 	.home-hero__note--top {
-		grid-row: 2;
-		/* 32 от заголовка */
-		margin-top: 32px;
+		grid-column: 4 / -1;
+		/* Ширина капается max-width выше — в макете тезис прижат правым
+		   краем к краю страницы */
+		justify-self: end;
 	}
 
-	/* Второй тезис идёт следом, отбитый пустой строкой */
 	.home-hero__note--bottom {
-		grid-row: 3;
-		grid-column: 4 / -1;
-		margin-top: calc(var(--font-size-b1) * var(--line-height-b1));
+		grid-column: 1 / 4;
+		margin-top: 0;
 	}
 
 	.home-hero__showreel {
-		grid-row: 4;
-		grid-column: 1 / -1;
-		/* 66 от текста до шоурила */
-		margin-top: 66px;
+		margin-top: 0;
 	}
 }
 
-@media (max-width: 699px) {
+/*
+ * Порог 700, а не 699: на 700 (макет 3792:24982) первый экран уже
+ * стопкой — заголовок, тезис, шоурил, второй тезис, и отбивки те же
+ * 32/78/52, что на телефоне. Отличаются только ширины тезисов, их
+ * задаёт блок ниже.
+ */
+@media (max-width: 700px) {
 	.home-hero__title,
 	.home-hero__note--top,
 	.home-hero__note--bottom,
@@ -221,9 +230,13 @@
 		grid-column: 1 / -1;
 	}
 
-	/* Снимает планшетную ширину заголовка и отступ шоурила: на телефоне
-	   заголовок во всю ширину, а между ним и видео стоит распорка 78 */
-	.home-hero__title {
+	/* Снимает планшетные ширины заголовка и тезисов и отступ шоурила: с
+	   700 и ниже заголовок во всю ширину, тезисы — по половине сетки
+	   (700) или во всю ширину (телефон), а между текстом и видео стоит
+	   распорка 78 */
+	.home-hero__title,
+	.home-hero__note--top,
+	.home-hero__note--bottom {
 		max-width: none;
 	}
 
@@ -287,8 +300,23 @@
  * ними: иначе курсор, проходя по зазору, выходил за пределы ссылки и
  * подсветка обрывалась. Верхняя часть отступа у первой строки не нужна.
  */
+/*
+ * Полоса над названием: 50 на 1920, 44 на 1200 (макет 3372:11995 —
+ * строка 119), 40 на 700 (3792:25205 — строка 111). Одна прямая через
+ * все три точки.
+ */
 .home-services__item + .home-services__item .home-services__link {
-	padding-top: 50px;
+	padding-top: clamp(40px, calc(34.26px + 0.8197vw), 50px);
+}
+
+/*
+ * С 1200 и ниже полоса сверху есть и у первой строки — в макетах все
+ * строки одной высоты. Выше 1200 первая строка прижата к верху блока.
+ */
+@media (max-width: 1200px) {
+	.home-services__item:first-child .home-services__link {
+		padding-top: clamp(40px, calc(34.26px + 0.8197vw), 44px);
+	}
 }
 
 .home-services__link {
@@ -296,7 +324,8 @@
 	align-items: flex-start;
 	justify-content: space-between;
 	gap: var(--grid-gap);
-	padding-bottom: 50px;
+	/* Полоса под названием: 50 на 1920, 44 на 1200, 40 на 700 */
+	padding-bottom: clamp(40px, calc(34.26px + 0.8197vw), 50px);
 	border-bottom: 1px solid var(--color-divider);
 	color: var(--color-text);
 	text-decoration: none;
@@ -375,7 +404,8 @@
 
 /* Последняя работа (860:2182): заголовок и под ним карточка проекта */
 .home-latest__title {
-	margin: 0 0 38px;
+	/* 38 на 1920, 32 на 1200 и на 700 (макеты 3372:11995 и 3805:26031) */
+	margin: 0 0 clamp(32px, calc(22px + 0.8333vw), 38px);
 	font-size: var(--font-size-h2);
 }
 
@@ -402,8 +432,20 @@
 
 @media (max-width: 1599px) {
 	.home-telegram__inner {
-		/* 748 на 1600, 562 на 1200 — ниже макета нет, держит 562 */
+		/* 748 на 1600, 562 на 1200 */
 		min-height: clamp(562px, calc(4px + 46.5vw), 748px);
+	}
+}
+
+/*
+ * Ниже 1200 плашка снова растёт: на 700 она уже не полоса, а почти
+ * квадрат 650×900 (макет 3830:26191) — текст сверху, кнопка внизу. К 360
+ * высота опять садится до 550 (2861:3955). Обе прямые проходят через
+ * реальные точки, на стыке 700/699 разрыва нет.
+ */
+@media (max-width: 1200px) {
+	.home-telegram__inner {
+		min-height: clamp(562px, calc(1373.2px - 67.6vw), 900px);
 	}
 }
 
@@ -504,6 +546,18 @@
 	}
 }
 
+/*
+ * Нижняя полоса строки на планшете идёт не вниз, а обратно вверх: 44 на
+ * 1200 и снова 52 на 700 (макет 3792:26214 — строка 233 при контенте
+ * 137). Верхняя при этом остаётся 44.
+ */
+@media (min-width: 700px) and (max-width: 1199px) {
+	.home-blog__item {
+		padding-bottom: calc(63.2px - 1.6vw);
+	}
+}
+
+
 .home-blog__date {
 	grid-column: 1 / 2;
 	font-size: var(--font-size-b1);
@@ -520,6 +574,13 @@
 	align-items: flex-start;
 	/* 32px от названия до кнопки */
 	gap: 32px;
+}
+
+/* 32 на 1920, 27 на 1200 и на 700 — на телефоне остаются 32 (принято) */
+@media (min-width: 700px) {
+	.home-blog__content {
+		gap: clamp(27px, calc(-14.67px + 3.4722vw), 32px);
+	}
 }
 
 .home-blog__post-title {
@@ -628,18 +689,16 @@
 
 	/*
 	 * Специализации: строка 93 — над названием 31, под ним до линии 32.
-	 * У первой строки своя полоса сверху тоже есть.
+	 * Тянется от 40 на 700 (макет 3792:25205), у первой строки полоса
+	 * сверху такая же, как у остальных.
 	 */
 	.home-services__link {
-		padding-bottom: clamp(32px, calc(12.94px + 5.294vw), 50px);
+		padding-bottom: clamp(32px, calc(23.53px + 2.353vw), 40px);
 	}
 
-	.home-services__item + .home-services__item .home-services__link {
-		padding-top: clamp(31px, calc(10.88px + 5.588vw), 50px);
-	}
-
+	.home-services__item + .home-services__item .home-services__link,
 	.home-services__item:first-child .home-services__link {
-		padding-top: clamp(0px, calc(63.82px - 9.118vw), 31px);
+		padding-top: clamp(31px, calc(21.47px + 2.647vw), 40px);
 	}
 
 	/*
@@ -651,14 +710,9 @@
 		margin-right: clamp(0px, calc(-8.47px + 2.353vw), 8px);
 	}
 
-	/* Последняя работа: от заголовка до карточки 38 → 32 */
-	.home-latest__title {
-		margin-bottom: clamp(32px, calc(25.65px + 1.765vw), 38px);
-	}
-
-	/* Telegram: плашка 562 (не 748 — см. 1200-1600 выше) → 550 на 360 */
+	/* Telegram: 900 на 700 → 550 на 360 (макеты 3830:26191 и 2861:3955) */
 	.home-telegram__inner {
-		min-height: clamp(550px, calc(537.3px + 3.529vw), 562px);
+		min-height: clamp(550px, calc(179.4px + 102.94vw), 900px);
 	}
 
 	/* v700 — от 14 (плато с 1600), а не от десктопных 16 — иначе скачок на стыке 699/700 */
@@ -667,7 +721,7 @@
 	}
 
 	.home-telegram__actions {
-		gap: clamp(10px, calc(5.76px + 1.176vw), 14px);
+		gap: 10px;
 	}
 
 	/*
@@ -741,6 +795,21 @@
  * где правая половина плашки (три колонки сетки) становится уже 290 —
  * ширины текста в макете: это около 644.
  */
+/*
+ * Ровно на 700 тезисы занимают по половине сетки: верхний слева,
+ * нижний справа (макет 3792:24982 — 316 и 316 на 25 и 359). Ниже 700
+ * они идут во всю ширину, как в телефонном макете 2861:3955.
+ */
+@media (min-width: 700px) and (max-width: 700px) {
+	.home-hero__note--top {
+		grid-column: 1 / 4;
+	}
+
+	.home-hero__note--bottom {
+		grid-column: 4 / -1;
+	}
+}
+
 @media (max-width: 644px) {
 	.home-telegram__inner {
 		align-content: stretch;
@@ -779,5 +848,77 @@
 	.home-telegram__arrow:hover {
 		background-color: var(--color-black);
 		color: var(--color-white);
+	}
+}
+
+/*
+ * С 1200 и ниже колонка названия статьи занимает всю правую половину:
+ * 566 на 1200 и 316 на 700 (макеты 3372:11995 и 3830:26239). В двух
+ * колонках название ломалось на лишние строки.
+ *
+ * Блок в конце файла намеренно: у правила та же специфичность, что у
+ * базового `.home-blog__content`, и порядок решает.
+ */
+@media (min-width: 700px) and (max-width: 1200px) {
+	.home-blog__content,
+	.home-blog__all {
+		grid-column: 4 / -1;
+	}
+}
+
+/*
+ * Telegram на 1200 (макет 3404:13545): заголовок набран H2 и стоит в
+ * 274, описание в 478, круглая стрелка 48 вместо 52.
+ */
+@media (min-width: 701px) and (max-width: 1200px) {
+	.home-telegram__title {
+		max-width: 274px;
+		font-size: var(--font-size-h2);
+	}
+
+	.home-telegram__text {
+		max-width: 478px;
+	}
+
+	.home-telegram__arrow {
+		width: 48px;
+		height: 48px;
+	}
+}
+
+/*
+ * Telegram на 700 (макет 3830:26191): текст уже не в правой половине, а
+ * во всю плашку с полем 20, кнопка прижата к низу и растянута на всю
+ * ширину за вычетом стрелки, между ними 10.
+ */
+@media (max-width: 700px) {
+	.home-telegram__inner {
+		align-content: stretch;
+		padding: 20px;
+	}
+
+	.home-telegram__content {
+		grid-column: 1 / -1;
+		display: flex;
+		flex-direction: column;
+		max-width: none;
+	}
+
+	.home-telegram__title {
+		max-width: none;
+	}
+
+	.home-telegram__text {
+		/* 480 в макете — строка короче плашки */
+		max-width: 480px;
+	}
+
+	.home-telegram__actions {
+		gap: 10px;
+		margin-top: auto;
+	}
+
+	.home-telegram__actions .btn {
+		flex: 1 1 auto;
 	}
 }

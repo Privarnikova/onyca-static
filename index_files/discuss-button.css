@@ -117,3 +117,14 @@
 		transform: none;
 	}
 }
+
+/*
+ * От низа окна до кнопки: 40 на 1920, 25 на 1200 и на 700 (макеты
+ * 3673:21533 и 3927:24132) — между ними плато. Ниже 700 остаются 20:
+ * там принят 360.
+ */
+@media (min-width: 700px) {
+	.discuss-button {
+		--discuss-bottom: calc(clamp(25px, 2.0833vw, 40px) + env(safe-area-inset-bottom, 0px));
+	}
+}

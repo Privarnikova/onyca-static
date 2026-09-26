@@ -148,3 +148,24 @@
 		grid-column: 4 / -1;
 	}
 }
+
+/*
+ * На 700 (макет 3903:24793) нижняя строка перестраивается: дата и срок
+ * встают по половинам сетки, описание уходит под них во всю ширину.
+ */
+@media (min-width: 700px) and (max-width: 700px) {
+	.project-team__fact--release {
+		grid-column: 1 / 4;
+		width: auto;
+	}
+
+	.project-team__fact--duration {
+		grid-column: 4 / -1;
+		justify-self: start;
+		width: auto;
+	}
+
+	.project-team__summary {
+		grid-column: 1 / -1;
+	}
+}

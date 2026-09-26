@@ -400,3 +400,27 @@
 		grid-column: 1 / 3;
 	}
 }
+
+/*
+ * Ровно на 700 (макет 3886:18204): плашка с датой остаётся в строке
+ * заголовка у правого края, а примечание уходит под заголовок во всю
+ * ширину — в правой половине оно бы ломалось на четыре строки.
+ */
+@media (min-width: 700px) and (max-width: 700px) {
+	.price-list__info {
+		display: contents;
+	}
+
+	.price-list__date {
+		grid-column: 6;
+		grid-row: 1;
+		justify-self: end;
+	}
+
+	.price-list__note {
+		grid-column: 1 / -1;
+		grid-row: 2;
+		/* 32 от заголовка */
+		margin-top: 32px;
+	}
+}

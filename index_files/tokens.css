@@ -300,9 +300,13 @@
 	}
 }
 
+/*
+ * От 1200 до 700 строка поля держится на 18: макет 700 (2626:8992) даёт
+ * то же поле 32, что и 1200.
+ */
 @media (min-width: 701px) and (max-width: 1199px) {
 	:root {
-		--field-line: clamp(18px, calc(25.2px - 0.6vw), 21px);
+		--field-line: 18px;
 	}
 }
 
@@ -352,7 +356,8 @@
 		--font-size-b1: clamp(15px, calc(18.89px - 0.5556vw), 16px);
 		--line-height-b1: clamp(21px, calc(24.89px - 0.5556vw), 22px);
 		/* Строка подписи идёт за строкой текста — тот же стиль B1 */
-		--field-line: clamp(21px, calc(24.89px - 0.5556vw), 22px);
+		/* 18 на 700 (макет 2626:8992), 22 на 360 */
+		--field-line: clamp(18px, calc(26.24px - 1.1765vw), 22px);
 	}
 }
 

@@ -404,7 +404,7 @@
  * 21 на 1600 и на 700, 18 на 1200 (макет 3673:19532). Значения на концах
  * участка совпадают с общей формулой, скачка на стыках нет.
  */
-@media (min-width: 701px) and (max-width: 1600px) {
+@media (min-width: 700px) and (max-width: 1600px) {
 	.contact-form__label {
 		line-height: var(--field-line);
 	}

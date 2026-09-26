@@ -196,11 +196,21 @@
  * Блок в конце файла намеренно: у правил та же специфичность, что у
  * базовых, и порядок решает.
  */
-@media (min-width: 1200px) and (max-width: 1200px) {
+/*
+ * От заголовка блока до первого вопроса 32 и ответ во всю ширину — так и
+ * на 1200 (3641:22959), и на 700 (3903:25762).
+ */
+@media (min-width: 700px) and (max-width: 1200px) {
 	.faq {
 		row-gap: 32px;
 	}
 
+	.faq__answer {
+		max-width: none;
+	}
+}
+
+@media (min-width: 1200px) and (max-width: 1200px) {
 	.faq__question {
 		padding-block: 32px 27px;
 	}
@@ -209,11 +219,18 @@
 		padding-bottom: 14px;
 	}
 
-	.faq__answer {
-		max-width: none;
-	}
-
 	.faq__answer-inner {
 		padding-bottom: 27px;
+	}
+}
+
+/*
+ * Ровно на 700 вопрос занимает всю ширину строки, а не три колонки: в
+ * 316 он ломается на две строки, и строка вместо 57 становится 115
+ * (макет 3903:25762).
+ */
+@media (min-width: 700px) and (max-width: 700px) {
+	.faq__text {
+		flex: 1 1 auto;
 	}
 }

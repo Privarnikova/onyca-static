@@ -312,11 +312,6 @@
  * что на статье и специализации.
  */
 @media (max-width: 1199px) {
-	.support-page {
-		row-gap: 78px;
-		padding-bottom: 78px;
-	}
-
 	.support-hero {
 		row-gap: 52px;
 	}
@@ -492,4 +487,73 @@
 		justify-self: end;
 		max-width: 274px;
 	}
+}
+
+/*
+ * Расстояние между блоками: 160 держится от 1200 до 700 (макеты 1200 и
+ * 700 дают одно и то же), телефонные 78 начинаются с 699.
+ */
+@media (max-width: 699px) {
+	.support-page {
+		row-gap: 78px;
+		padding-bottom: 78px;
+	}
+}
+
+/*
+ * Ровно на 700 (макет 3903:25169 и его блоки):
+ *   «Каждая задача под контролем» — карточки по две в ряд (316), между
+ *   рядами 44; визуал остаётся 600×500;
+ *   «Ваша внешняя дизайн-команда» — от текста до линии 48, между
+ *   тезисами 32;
+ *   строки направлений — имя кеглем 48, до описания 24, поля 52 сверху
+ *   и снизу.
+ */
+@media (min-width: 700px) and (max-width: 700px) {
+	.support-process__item {
+		grid-column: span 3;
+	}
+
+	.support-process {
+		row-gap: 44px;
+	}
+
+	/*
+	 * От заголовка до карточек 52, а между рядами 44 — разницу добирает
+	 * сам заголовок, зазор строк у грида один на всех.
+	 */
+	.support-process__title {
+		margin-bottom: 8px;
+	}
+
+	.support-team {
+		row-gap: 32px;
+	}
+
+	/* От заголовка до тезисов 52 при зазоре строк 32 */
+	.support-team__title {
+		margin-bottom: 20px;
+	}
+
+	/*
+	 * Ручной перенос в «Руководитель / проекта» на 700 тоже не нужен:
+	 * имя помещается в строку, как и на 1200.
+	 */
+	.support-team__item:first-child .support-team__name br {
+		display: none;
+	}
+
+	.support-team__item {
+		padding-bottom: 48px;
+	}
+
+	.support-profiles__item {
+		row-gap: 24px;
+		padding-block: 52px;
+	}
+
+	.support-profiles__name {
+		font-size: 48px;
+	}
+
 }

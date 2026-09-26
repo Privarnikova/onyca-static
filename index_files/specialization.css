@@ -352,7 +352,8 @@
 	}
 }
 
-@media (max-width: 699px) {
+/* С 700 тезисы идут по одному в ряд (макет 3894:26829) */
+@media (max-width: 700px) {
 	.collaboration__list {
 		grid-template-columns: minmax(0, 1fr);
 	}
@@ -446,7 +447,9 @@
 	}
 }
 
-@media (min-width: 1200px) and (max-width: 1200px) {
+/* 66 от заголовка до шоурила держится от 1200 до 700 (макеты
+   3625:18524 и 3891:19408), ниже 700 остаются 52 */
+@media (min-width: 700px) and (max-width: 1200px) {
 	.specialization-hero {
 		row-gap: 66px;
 	}
@@ -497,7 +500,7 @@
  * описание — во второй, вровень друг с другом. Иначе слева от каждого
  * абзаца описания зря пустовала бы колонка номера.
  */
-@media (max-width: 699px) {
+@media (max-width: 700px) {
 	.work-stages__item {
 		grid-template-columns: 42px minmax(0, 1fr);
 		column-gap: 5px;
@@ -559,5 +562,36 @@
 	.service-list__arrow {
 		display: flex;
 		align-items: center;
+	}
+}
+
+/*
+ * Ровно на 700 (макет 3891:19405 и его компоненты):
+ *   кейс направления — 65 от заголовка до полотна вместо 52;
+ *   «Цифры» — 66 от заголовка до сетки и число кеглем 55, как на 1200;
+ *   «Этапы работы» — колонка номера шире (41 + 20 против 42 + 5), от
+ *   названия до описания 14 вместо 32, от текста до линии 66 вместо 52.
+ *
+ * Запрос однопиксельный: ниже 700 у всех трёх блоков свои принятые
+ * телефонные числа, выше — раскладка 1200.
+ */
+@media (min-width: 700px) and (max-width: 700px) {
+	.specialization-case__title {
+		margin-bottom: 65px;
+	}
+
+	.numbers__title {
+		margin-bottom: 66px;
+	}
+
+	.numbers__value {
+		font-size: var(--font-size-number-inline);
+	}
+
+	.work-stages__item {
+		grid-template-columns: 41px minmax(0, 1fr);
+		column-gap: 20px;
+		row-gap: 14px;
+		padding-bottom: 66px;
 	}
 }
