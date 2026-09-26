@@ -336,7 +336,7 @@ img.popup__logo-icon {
 	}
 }
 
-@media (min-width: 1200px) and (max-width: 1200px) {
+@media (min-width: 701px) and (max-width: 1200px) {
 	.popup__note-text {
 		max-width: 566px;
 	}

@@ -79,7 +79,7 @@
  * Ниже 1200 макетов нет: блоки фильтров встают друг под друга, иначе
  * кнопки не помещаются в свою половину.
  */
-@media (max-width: 1199px) {
+@media (max-width: 700px) {
 	.projects-page__filters {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 12px;
@@ -99,7 +99,7 @@
  * Блок в конце файла намеренно: у правила та же специфичность, что у
  * базового, и порядок решает.
  */
-@media (min-width: 1200px) {
+@media (min-width: 700px) {
 	.projects-page__filter {
 		gap: clamp(12px, calc(17.33px - 0.2778vw), 14px) clamp(10px, calc(6.67px + 0.2778vw), 12px);
 	}
@@ -113,5 +113,16 @@
 @media (min-width: 700px) and (max-width: 700px) {
 	.projects-page__filters {
 		row-gap: 32px;
+	}
+}
+
+/*
+ * Ниже 700 зазор между кнопками возвращается к телефонным 12 не
+ * скачком, а прямой: 10 на 700 (там же, где кончается планшетная
+ * кривая выше) и 12 на 360.
+ */
+@media (max-width: 699px) {
+	.projects-page__filter {
+		column-gap: clamp(10px, calc(14.12px - 0.5882vw), 12px);
 	}
 }

@@ -169,7 +169,7 @@
  * Ниже 1200 макетов нет: колонки складываются, тезисы идут по два в
  * ряд, а на телефоне — по одному.
  */
-@media (max-width: 1199px) {
+@media (max-width: 700px) {
 	.career-hero__title,
 	.career-hero__lead,
 	.career-idea__text,
@@ -206,7 +206,7 @@
  * Блок в конце файла намеренно: у правил та же специфичность, что у
  * базовых, и порядок решает.
  */
-@media (min-width: 1200px) and (max-width: 1200px) {
+@media (min-width: 701px) and (max-width: 1200px) {
 	/* Первый экран: описание во всю правую половину, до шоурила 160 */
 	.career-hero {
 		row-gap: 160px;

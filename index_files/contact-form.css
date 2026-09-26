@@ -87,10 +87,17 @@
 
 .contact-form__fields {
 	display: grid;
-	grid-template-columns:
-		clamp(370px, calc(-5px + 23.4375vw), 445px)
-		clamp(370px, calc(-5px + 23.4375vw), 445px);
-	column-gap: clamp(16px, calc(-4px + 1.25vw), 20px);
+	/*
+	 * Поля делят ширину формы пополам, а не стоят фиксированной парой:
+	 * на 1920 это ровно 445 + 20 + 445 = 910, на 1600 — 364 + 18 + 364 =
+	 * 746, как в макетах. Прежняя пара фиксированных 370 на 1600 вылезала
+	 * за форму на 10, а ниже 1599 то же правило auto-fit давало 364 — и
+	 * на стыке поле прыгало. Формула одна на весь диапазон: третья
+	 * колонка при минимуме в 45% не помещается по определению.
+	 */
+	grid-template-columns: repeat(auto-fit, minmax(max(200px, 45%), 1fr));
+	/* 20 на 1920, 18 на 1600 — тот же зазор сетки */
+	column-gap: clamp(18px, calc(8px + 0.625vw), 20px);
 	row-gap: clamp(69px, calc(54px + 0.9375vw), 72px);
 	margin-top: clamp(69px, calc(54px + 0.9375vw), 72px);
 }

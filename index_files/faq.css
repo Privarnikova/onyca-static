@@ -210,7 +210,7 @@
 	}
 }
 
-@media (min-width: 1200px) and (max-width: 1200px) {
+@media (min-width: 701px) and (max-width: 1200px) {
 	.faq__question {
 		padding-block: 32px 27px;
 	}

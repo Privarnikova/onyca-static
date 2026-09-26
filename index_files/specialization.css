@@ -311,6 +311,9 @@
 }
 
 .numbers__value {
+	/* Число всегда в одну строку: перенос цифр читается как две разные */
+	white-space: nowrap;
+
 	margin: 0;
 	/*
 	 * Ниже 1920 макета нет, а число в четырёх колонках перестаёт
@@ -342,7 +345,7 @@
  * по одному: две колонки из шести там уже уже экрана и растягивают
  * страницу. Своего макета у блока на этих ширинах нет.
  */
-@media (max-width: 1199px) {
+@media (max-width: 700px) {
 	.collaboration__list {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
@@ -371,7 +374,7 @@
  * а ниже 1199 действует своё правило ниже — там заголовок уходит над
  * списком, и кегль 55 в одну-две колонки телефона не нужен.
  */
-@media (min-width: 1200px) and (max-width: 1200px) {
+@media (min-width: 701px) and (max-width: 1200px) {
 	.numbers__title {
 		/* Строка «Растем с каждым» — 427, в две колонки (371) не влезает */
 		grid-column: 1 / 4;
@@ -386,6 +389,10 @@
 	.numbers__value {
 		font-size: var(--font-size-number-inline);
 	}
+
+	.numbers__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
 }
 
 /*
@@ -394,7 +401,13 @@
  * на этих ширинах нет — задача правила только в том, чтобы блок не
  * разъезжался.
  */
-@media (max-width: 1199px) {
+/*
+ * Раскладка 1200 (список в правой половине, две колонки) держится, пока
+ * в колонку влезает само число: самое длинное в контенте — 203 при
+ * кегле 55, а колонка в половине сетки доходит до этих 203 на окне 911.
+ * Ниже список встаёт во всю ширину под заголовок, как в макете 700.
+ */
+@media (max-width: 910px) {
 	.numbers__list {
 		grid-column: 1 / -1;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -407,7 +420,13 @@
 	}
 }
 
-@media (max-width: 699px) {
+/*
+ * В столбик — только когда в половину перестаёт влезать само число: оно
+ * не переносится, и колонка у́же 204 его режет. Две колонки требуют 426
+ * рабочей области, это окно 468. Раньше список складывался на 699, хотя
+ * места там ещё хватало.
+ */
+@media (max-width: 467px) {
 	.numbers__list {
 		grid-template-columns: minmax(0, 1fr);
 	}
@@ -467,7 +486,7 @@
 	}
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 700px) {
 	.specialization-case__title {
 		margin-bottom: 52px;
 	}
@@ -584,14 +603,21 @@
 		margin-bottom: 66px;
 	}
 
-	.numbers__value {
-		font-size: var(--font-size-number-inline);
-	}
-
 	.work-stages__item {
 		grid-template-columns: 41px minmax(0, 1fr);
 		column-gap: 20px;
 		row-gap: 14px;
 		padding-bottom: 66px;
+	}
+}
+
+/*
+ * Кегль числа в «Цифрах» направления: 55 на 700 (макеты 3891:19405 и
+ * соседние) и 32 на 360. Раньше 55 стояли ровно на 700, а на 699 кегль
+ * срывался на 32 — скачок почти вдвое.
+ */
+@media (max-width: 700px) {
+	.numbers__value {
+		font-size: clamp(32px, calc(7.65px + 6.7647vw), 55px);
 	}
 }

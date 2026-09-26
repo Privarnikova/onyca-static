@@ -160,12 +160,14 @@
 
 
 /*
- * Ниже 1200 макетов нет. Чтобы сетка не разъезжалась, карточка занимает
- * одну колонку: в две она шире экрана и появляется прокрутка вбок.
+ * Ниже 1200 сетка из двух колонок (blog.css, projects-page.css), и
+ * обычная карточка занимает одну из них: в две она шире экрана и
+ * появляется прокрутка вбок. Широкая при этом остаётся во всю ширину —
+ * как и на 1200, иначе на 1199 она вдвое у́же самой себя.
  */
 @media (max-width: 1199px) {
-	.card-post,
-	.card-case {
+	.card-post:not(.card-post--wide),
+	.card-case:not(.card-case--wide) {
 		grid-column: span 1;
 	}
 }
@@ -197,7 +199,7 @@
  * правила блок оставался трёхколоночной десктопной сеткой, и пагинация
  * сжималась в узкую первую колонку — переносила круги в столбик.
  */
-@media (max-width: 699px) {
+@media (max-width: 608px) {
 	.card-grid-footer {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 32px;
@@ -278,7 +280,7 @@
  * projects-page.css: выше 1300 карточки снова по три, и пропорция
  * возвращается к десктопной.
  */
-@media (min-width: 1200px) and (max-width: 1300px) {
+@media (min-width: 701px) and (max-width: 1300px) {
 	.card-post--tall .card-post__cover,
 	.card-case--tall .card-case__cover {
 		aspect-ratio: 566 / 415;
@@ -292,7 +294,7 @@
  * с четвёртой (566). Четыре колонки по 274 с зазором 18 дают ровно
  * 1150, поэтому сетка тут своя, а не общая шестиколоночная.
  */
-@media (min-width: 1200px) and (max-width: 1300px) {
+@media (min-width: 701px) and (max-width: 1300px) {
 	.card-post--wide .card-post__text,
 	.card-case--wide .card-case__text {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -313,13 +315,19 @@
  * помещается. Кнопка под сеткой при этом прижата к правому краю, а не
  * стоит по центру.
  */
-@media (min-width: 700px) and (max-width: 700px) {
+@media (min-width: 570px) and (max-width: 800px) {
 	.card-post__text,
 	.card-case__text {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 14px;
 	}
+}
 
+/*
+ * Кнопка под сеткой в узкой полосе прижата к правому краю, а не стоит по
+ * центру. Ниже 700 её место занимает телефонная стопка (блок выше).
+ */
+@media (min-width: 609px) and (max-width: 800px) {
 	.card-grid-footer {
 		grid-template-columns: 1fr auto;
 	}

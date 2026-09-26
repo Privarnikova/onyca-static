@@ -144,7 +144,7 @@
  * помещаются. Высота кнопки 52 плюс отступ 20 — на них полоса и
  * поднимается.
  */
-@media (max-width: 1199px) {
+@media (max-width: 800px) {
 	.case-lead {
 		--case-lead-lift: 72px;
 
@@ -289,7 +289,8 @@
  * На 700 (макет 3927:24175) текст полосы уже — 316, а не 570: справа
  * стоят сразу две кнопки, «Закрыть» и «Обсудить проект».
  */
-@media (min-width: 700px) and (max-width: 700px) {
+/* Узкая полоса кейса — с 800: текст не шире половины (316 на 700) */
+@media (min-width: 700px) and (max-width: 800px) {
 	.case-lead__inner {
 		grid-template-columns: minmax(0, 316px) 1fr auto;
 	}

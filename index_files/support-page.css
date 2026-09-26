@@ -311,7 +311,7 @@
  * переносятся по словам, а между блоками остаётся тот же отступ 78,
  * что на статье и специализации.
  */
-@media (max-width: 1199px) {
+@media (max-width: 700px) {
 	.support-hero {
 		row-gap: 52px;
 	}
@@ -346,25 +346,6 @@
 		padding-bottom: 32px;
 	}
 
-	/* Строка направления: название переносится, описание идёт под ним */
-	.support-profiles__item {
-		min-height: 0;
-		row-gap: 16px;
-		padding-block: 32px;
-	}
-
-	.support-profiles__name,
-	.support-profiles__item:nth-child(even) .support-profiles__name,
-	.support-profiles__text {
-		grid-column: 1 / -1;
-		white-space: normal;
-	}
-
-	/* Визуал показывается только при наведении, которого здесь нет */
-	.support-profiles__preview {
-		display: none;
-	}
-
 	.support-process__row {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 8px;
@@ -390,13 +371,24 @@
 }
 
 /*
+ * Ниже 1200 кегль идёт к 48 на 700 (макет 3903:25169) одной прямой:
+ * раньше 70 держались плоско до 700 и на 699 срывались на 48, а по
+ * дороге самое длинное название не влезало в свои три четверти.
+ */
+@media (max-width: 1200px) {
+	.support-profiles__name {
+		font-size: clamp(48px, calc(17.2px + 4.4vw), 70px);
+	}
+}
+
+/*
  * Ровно на 1200 (макет 3641:22934) страница живёт по другой схеме, чем
  * на 1600 (3486:16291): не шесть колонок с тезисами парами, а две
  * половины по три колонки — заголовок слева, всё содержимое справа от
  * 609. Ниже 1200 блоки складываются в столбик правилом выше, поэтому
  * запрос однопиксельный.
  */
-@media (min-width: 1200px) and (max-width: 1200px) {
+@media (min-width: 701px) and (max-width: 1200px) {
 	/* Первый экран: описание во всю правую половину, до ролика 80 */
 	.support-hero {
 		row-gap: 80px;
@@ -552,8 +544,61 @@
 		padding-block: 52px;
 	}
 
-	.support-profiles__name {
-		font-size: 48px;
+}
+
+/*
+ * Строка направления на планшете (макет 3641:22934, 1200): сетка там
+ * четвертная, а не из шести колонок. Название занимает три четверти
+ * (чётная строка — со второй), описание стоит в последней, 274 от 876.
+ * Раньше описание прижималось к правому краю через justify-self, и у
+ * строк с текстом разной длины левые края расходились.
+ */
+@media (min-width: 951px) and (max-width: 1200px) {
+	.support-profiles__item {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 
+	.support-profiles__name {
+		grid-column: 1 / 4;
+	}
+
+	.support-profiles__item:nth-child(even) .support-profiles__name {
+		grid-column: 2 / 4;
+	}
+
+	.support-profiles__text {
+		grid-column: 4 / -1;
+		justify-self: stretch;
+		max-width: none;
+	}
+}
+
+/*
+ * С 950 строка перестраивается по макету 700 (3903:25169): название
+ * переносится и идёт во всю ширину, описание — под ним. Раньше это
+ * начиналось только на 800, и название в одну строку успевало налезть
+ * на описание.
+ */
+@media (max-width: 950px) {
+	.support-profiles__item {
+		min-height: 0;
+		/* 16 на 950 и 24 на 700 (макет 3903:25169) — между ними считаем */
+		row-gap: clamp(16px, calc(46.4px - 3.2vw), 24px);
+		/* 32 на 950 и 52 на 700 */
+		padding-block: clamp(32px, calc(108px - 8vw), 52px);
+	}
+
+	.support-profiles__name,
+	.support-profiles__item:nth-child(even) .support-profiles__name,
+	.support-profiles__text {
+		grid-column: 1 / -1;
+		white-space: normal;
+		justify-self: stretch;
+		max-width: none;
+	}
+
+	/* Визуал показывается только при наведении, которого здесь нет */
+	.support-profiles__preview {
+		display: none;
+	}
 }

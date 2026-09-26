@@ -147,35 +147,71 @@
 }
 
 /*
- * Ниже 1200 макетов нет: формат работы уходит под название, чтобы
- * строка не сжималась в столбик из букв.
+ * Планшет — макеты 3669:16168 (1200) и 3972:38189 (700): строка делится
+ * пополам. Название в левой половине, формат работы начинается сразу за
+ * её серединой, стрелка у правого края. На 1200 это 566 и 584 (две
+ * четверти и третья), на 700 — 316 и 334 (две половины): одна и та же
+ * формула, потому что сетка там четвертная, а тут половинная.
+ *
+ * Раньше формат стоял в четвёртой колонке из шести (609 на 1200) и
+ * уходил под название сразу на 700.
  */
-@media (max-width: 1199px) {
+@media (max-width: 1200px) {
+	.vacancies__row {
+		grid-template-columns: calc(50% - 9px) minmax(0, 1fr) auto;
+	}
+
+	.vacancies__row .vacancies__name {
+		grid-column: 1;
+	}
+
+	.vacancies__row .vacancies__format {
+		grid-column: 2;
+	}
+
+	.vacancies__row .faq__icon {
+		grid-column: 3;
+		grid-row: 1;
+		justify-self: end;
+	}
+}
+
+/* На 1200 текст вакансии стоит в правой половине — 566 от 584 */
+@media (min-width: 801px) and (max-width: 1200px) {
+	.vacancies__body {
+		width: calc(50% - 9px);
+		margin-left: calc(50% + 9px);
+	}
+}
+
+/* С 800 текст идёт во всю ширину строки (макет 3972:38189) */
+@media (max-width: 800px) {
 	.vacancies__empty {
 		grid-column: 1 / -1;
 	}
 
+	.vacancies__body {
+		width: auto;
+		margin-left: 0;
+	}
+}
+
+/*
+ * Ниже 609 половина строки у́же четверти 274, и формат работы уходит под
+ * название — так на телефоне (макет «Карьера» 3128:1915).
+ */
+@media (max-width: 608px) {
 	.vacancies__row {
-		grid-template-columns: 1fr auto;
+		grid-template-columns: minmax(0, 1fr) auto;
 	}
 
-	.vacancies__row .vacancies__name {
-		grid-column: 1 / 2;
-	}
-
+	.vacancies__row .vacancies__name,
 	.vacancies__row .vacancies__format {
-		grid-column: 1 / 2;
+		grid-column: 1;
 	}
 
 	.vacancies__row .faq__icon {
 		grid-column: 2;
-		grid-row: 1;
-	}
-
-	/* Ниже 1200 текст идёт во всю ширину: колонок под него не остаётся */
-	.vacancies__body {
-		width: auto;
-		margin-left: 0;
 	}
 }
 
@@ -185,7 +221,7 @@
  * строками 27 (вместо 32), кнопка отклика через 44. Текст вакансии
  * остаётся в колонках 4–6, как на десктопе.
  */
-@media (min-width: 1200px) and (max-width: 1200px) {
+@media (min-width: 801px) and (max-width: 1200px) {
 	.vacancies {
 		row-gap: 44px;
 	}

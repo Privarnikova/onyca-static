@@ -134,6 +134,8 @@
 
 .article-numbers__value {
 	margin: 0;
+	/* Число всегда в одну строку: перенос цифр читается как две разные */
+	white-space: nowrap;
 	font-size: var(--font-size-number-inline);
 	font-weight: var(--font-weight-heading);
 	line-height: var(--line-height-heading);
@@ -240,7 +242,7 @@
  * клетка 3/6, только контент уже был у́же 566, max-width её не сузит.
  * Своего макета на 1600 нет — держит те же числа до 1920.
  */
-@media (min-width: 1200px) and (max-width: 1599px) {
+@media (min-width: 1201px) and (max-width: 1599px) {
 	.article-section__body {
 		/*
 		 * Клетка остаётся 3/6 (та же, что и на 1600/1920, без скачка на
@@ -360,14 +362,6 @@
 	margin-top: 38px;
 }
 
-/*
- * Первый блок раздела своего отступа не добавляет: раздел уже отбит от
- * предыдущего. Правило стоит последним, чтобы перебить типовые отступы
- * крупных блоков — они той же силы.
- */
-.article-section__body > :first-child {
-	margin-top: 0;
-}
 
 /*
  * Буллеты (1548:2951): точка 6px в поле шириной 36, между пунктами 4.
@@ -507,61 +501,104 @@
 }
 
 /*
- * Телефон — те же числа подтверждены на всех трёх макетах, где редактор
- * собирает эти блоки: «Шаблон статьи» 3237:14676, «Шаблон услуги»
- * 3257:10904, «Шаблон проекта» 3258:13635. H2 отбивается на 32 вместо
- * 64. Этапы — на 48 (как таблица, цифры, тезисы, цитата и шоурил, а не
- * на 16: 16 — это отступ у обычного абзаца и буллет-списка, этапы с
- * ними рядом в разметке макета и легко спутать при чтении координат).
- * Цифры и тезисы складываются в одну колонку (article-page.css), и
- * между строками остаётся 32 — не общий зазор сетки, а свой отступ;
- * внутри каждой подпись отбивается на 12, а не 16. Цитата тоже теснее —
- * 12 между кавычкой и текстом вместо 16.
+ * От 700 к 360 отбивки не переключаются на 699, а вычисляются: на
+ * каждом конце стоит своё число из макета, между ними прямая.
+ *
+ *                      700    360
+ *   текст, буллеты      14     16
+ *   H2                  54     32
+ *   H3                  27     32
+ *   таблица, цифры,
+ *   тезисы, фото        40     48
+ *   этапы               40     48
+ *   подпись к фото      14     16
+ *   цитата (зазор)      16     12
+ *
+ * 700 — макеты «Шаблон проекта» 3903:24374 и его соседи по секции
+ * «Tablet 700х1200»; 360 — «Шаблон статьи» 3237:14676, «Шаблон услуги»
+ * 3257:10904, «Шаблон проекта» 3258:13635. Этапы на телефоне идут на 48
+ * (как таблица, цифры, тезисы, цитата и шоурил, а не на 16: 16 — это
+ * отступ обычного абзаца и буллет-списка, этапы с ними рядом в разметке
+ * макета и легко спутать при чтении координат).
  */
 @media (max-width: 699px) {
 	.article-quote {
-		gap: 12px;
+		/* 16 на 700, 12 на 360 */
+		gap: clamp(12px, calc(7.76px + 1.1765vw), 16px);
+	}
+
+	.article-section__body > * {
+		/* 14 на 700, 16 на 360 */
+		margin-top: clamp(14px, calc(18.12px - 0.5882vw), 16px);
 	}
 
 	.article-section__body > .article-heading--2 {
-		margin-top: 32px;
+		/* 54 на 700, 32 на 360 */
+		margin-top: clamp(32px, calc(8.7px + 6.4706vw), 54px);
 	}
 
-	.article-section__body > .article-stages {
-		margin-top: 48px;
+	.article-section__body > .article-heading--3 {
+		/* 27 на 700, 32 на 360 */
+		margin-top: clamp(27px, calc(37.3px - 1.4706vw), 32px);
 	}
 
-	.article-numbers,
-	.article-theses {
-		row-gap: 32px;
+	.article-section__body > .wp-block-table,
+	.article-section__body > .article-numbers,
+	.article-section__body > .article-theses,
+	.article-section__body > .article-media,
+	.article-section__body > .article-stages,
+	.article-section__body > .article-quote:has(+ .wp-block-table),
+	.article-section__body > .article-quote:has(+ .article-numbers),
+	.article-section__body > .article-quote:has(+ .article-theses),
+	.article-section__body > .article-quote:has(+ .article-media),
+	.article-section__body > .article-quote:has(+ .article-stages) {
+		/* 40 на 700, 48 на 360 */
+		margin-top: clamp(40px, calc(56.48px - 2.3529vw), 48px);
 	}
 
-	.article-numbers__item,
-	.article-theses__item {
-		row-gap: 12px;
+	.article-media__caption {
+		/* 14 на 700, 16 на 360 */
+		margin-top: clamp(14px, calc(18.12px - 0.5882vw), 16px);
 	}
 
 	/*
-	 * Таблица: с minmax(0, 1fr) колонки сжимались до нуля вместе с
-	 * текстом внутри них — на телефоне таблица становилась нечитаемым
-	 * столбиком. У колонки есть предел, ниже которого она не сжимается,
-	 * а если все колонки вместе шире экрана — таблица скроллится вбок,
-	 * как любая другая на маленьком экране (макета этого состояния нет,
-	 * это защита от переполнения, а не число из Figma). 130px — та же
-	 * ширина колонки, что и в прайс-листе.
+	 * Таблица: у неё своя минимальная ширина — 504. Это три колонки по
+	 * 156 с зазором 18; в два столбца строка делится на те же три доли,
+	 * так что число одно на оба вида. Пока тело страницы шире 504,
+	 * колонки остаются долями и тянутся вместе с ним — раскладка 700 не
+	 * ломается на первом же пикселе ниже. Когда экран у́же, таблица
+	 * перестаёт сжиматься и прокручивается вбок внутри своей обёртки.
 	 */
 	.article-section__body .wp-block-table {
 		overflow-x: auto;
 	}
 
-	.article-section__body .wp-block-table tr {
-		grid-template-columns: repeat(var(--table-columns), 130px);
-		width: max-content;
-		min-width: 100%;
+	.article-section__body .wp-block-table table {
+		min-width: 504px;
+	}
+}
+
+/*
+ * Цифры и тезисы: телефонные отбивки внутри блока включаются там же,
+ * где блок становится стопкой (см. components/article-page.css) — 32
+ * между строками стопки и 12 от числа до подписи.
+ */
+@media (max-width: 1200px) {
+	@container (max-width: 563px) {
+		.article-theses {
+			row-gap: 32px;
+		}
+
+		.article-numbers__item,
+		.article-theses__item {
+			row-gap: 12px;
+		}
 	}
 
-	.article-section__body .wp-block-table:has(tr > :nth-child(2):last-child) tr {
-		grid-template-columns: repeat(3, 130px);
+	@container (max-width: 425px) {
+		.article-numbers {
+			row-gap: 32px;
+		}
 	}
 }
 
@@ -574,7 +611,7 @@
  * Все четыре величины тянутся к принятым 24/16 на 1920, без скачка на
  * стыке. Ниже 1200 остаются десктопные: там принят 360.
  */
-@media (min-width: 1200px) {
+@media (min-width: 801px) {
 	.article-stages {
 		row-gap: clamp(20px, calc(13.33px + 0.5556vw), 24px);
 	}
@@ -599,7 +636,7 @@
  * номера: 48 вместо 42. То же решение, что у нумерованного списка в
  * components/steps.css.
  */
-@media (min-width: 1200px) and (max-width: 1200px) {
+@media (min-width: 801px) and (max-width: 1200px) {
 	.article-stages__item {
 		grid-template-columns: calc(2.35 * var(--font-size-h4)) minmax(0, 1fr);
 	}
@@ -623,7 +660,7 @@
  * макеты 3641:21754 и 3625:10508). Обе прямые проходят через реальные
  * точки, поэтому на стыке 1600/1599 разрыва нет.
  */
-@media (min-width: 1200px) and (max-width: 1599px) {
+@media (min-width: 1201px) and (max-width: 1599px) {
 	.article-section__body > .article-quote {
 		margin-left: calc(369.97px - 55.164vw);
 		width: calc(25.375vw - 30.5px);
@@ -679,9 +716,65 @@
 	.article-media__caption {
 		margin-top: clamp(14px, calc(10.67px + 0.2778vw), 16px);
 	}
+}
 
-	/* Первый блок раздела своего отступа по-прежнему не добавляет */
+/*
+ * Первый блок раздела встаёт вровень с заголовком и своего отступа не
+ * добавляет — но только пока заголовок стоит СЛЕВА от текста. Так на
+ * десктопе и на всём планшетном диапазоне: четвертная сетка раздела
+ * держится до 701.
+ *
+ * Ниже заголовок встаёт НАД телом, и отбивку берёт на себя первый блок,
+ * а не заголовок: в макетах 700 «Шаблон статьи» 3886:15397, «Шаблон
+ * услуги» 3898:28665 и «Шаблон проекта» 3903:24374 заголовок раздела
+ * стоит вплотную к телу, а первый H2 отбит на свои 54 — ровно столько
+ * же, сколько любой следующий. Раньше сброс работал и там, поэтому
+ * первый блок прилипал к заголовку, а на 699 отступ появлялся скачком.
+ *
+ * Правило стоит последним: у него та же сила, что у типовых отступов
+ * блоков, и решает порядок.
+ */
+@media (min-width: 801px) {
 	.article-section__body > :first-child {
 		margin-top: 0;
+	}
+}
+
+/*
+ * Планшетный раздел (макеты «Шаблон услуги» 3641:20751 и «Шаблон
+ * статьи» 3625:10014, 1200): страница делится не на шесть колонок, а на
+ * четыре четверти по 274 с зазором 18. Заголовок раздела занимает
+ * первую четверть, тело — три остальных (858 от 317), цитата уходит в
+ * поле заголовка.
+ *
+ * До этого раскладка 1200 держалась ровно на 1200, а на 1199 тело
+ * прыгало в десктопную клетку 3/6 — 566 вместо 858. Теперь четверти
+ * тянутся вниз до 701, где начинается стопка из макетов 700.
+ *
+ * Числа на стыке совпадают с формулами выше: на 1200 четверть даёт те
+ * же 274 и 858, что и сдвиг десктопной клетки, поэтому на 1200/1201
+ * разрыва нет.
+ */
+@media (min-width: 801px) and (max-width: 1200px) {
+	.article-section {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	.article-section > .article-heading--1,
+	.article-page--project .article-section > .article-heading--2 {
+		grid-column: 1;
+		max-width: none;
+	}
+
+	.article-section__body {
+		grid-column: 2 / -1;
+		margin-left: 0;
+		width: auto;
+	}
+
+	/* Цитата — в поле заголовка: ширина четверти, край у левого края сетки */
+	.article-section__body > .article-quote {
+		margin-left: calc(-1 * (var(--article-column) + var(--grid-gap)));
+		width: var(--article-column);
 	}
 }

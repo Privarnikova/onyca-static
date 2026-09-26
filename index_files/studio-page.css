@@ -219,7 +219,7 @@
  * Ниже 1200 макетов нет. Чтобы страница не разъезжалась, колонки
  * складываются: текст и изображение идут друг под другом.
  */
-@media (max-width: 1199px) {
+@media (max-width: 700px) {
 	.studio-hero__title,
 	.studio-hero__lead,
 	.studio-system__text,
@@ -276,7 +276,7 @@
  * Блок в конце файла намеренно: у правил та же специфичность, что у
  * базовых, и порядок решает.
  */
-@media (min-width: 1200px) and (max-width: 1200px) {
+@media (min-width: 701px) and (max-width: 1200px) {
 	.studio-hero {
 		row-gap: 0;
 	}
