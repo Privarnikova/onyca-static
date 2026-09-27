@@ -34,25 +34,33 @@
 
 .steps__item {
 	border-bottom: 1px solid var(--color-divider);
-	/* 24 от текста до линии */
-	padding-bottom: 24px;
+	/* От текста до линии 24 на 1920 и 20 на 1600 (3545:21671) */
+	padding-bottom: clamp(20px, calc(1.25vw), 24px);
 }
 
+/*
+ * Название этапа: 20 на 1920 (2042:5330 — строка 24) и 21 на 1600
+ * (3545:21673 — стиль H4 SemiBold 21). Кегль в макетах идёт не по одному
+ * стилю, поэтому здесь своя кривая, а не токен: между точками разница в
+ * один пиксель, ниже 700 она уходит к 18 (макет 360 — 3271:15597).
+ */
 .steps__heading {
 	display: flex;
 	margin: 0;
-	font-size: var(--font-size-h5);
+	font-size: clamp(20px, calc(26px - 0.3125vw), 21px);
 }
 
 .steps__number {
-	/* Номер и название на своих местах: 47 от номера до текста */
+	/* Номер и название на своих местах: 47 от номера до текста на 1920,
+	   48 на 1600 (номер 28 плюс зазор 20) */
 	flex: none;
-	width: 47px;
+	width: clamp(47px, calc(53px - 0.3125vw), 48px);
 }
 
 .steps__text {
-	/* Описание выровнено по названию, а не по номеру */
-	margin: 16px 0 0 47px;
+	/* Описание выровнено по названию, а не по номеру.
+	   От названия до описания 16 на 1920 и 14 на 1600 */
+	margin: clamp(14px, calc(4px + 0.625vw), 16px) 0 0 clamp(47px, calc(53px - 0.3125vw), 48px);
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
 	line-height: var(--line-height-b1);
@@ -68,6 +76,31 @@
 
 	.steps {
 		row-gap: 32px;
+	}
+
+	/*
+	 * К 360 название этапа возвращается к 18, от названия до описания
+	 * остаётся 12, а до линии — 24 (макет 3271:15596).
+	 */
+	.steps__heading {
+		font-size: clamp(18px, calc(14.82px + 0.8824vw), 21px);
+	}
+
+	.steps__text {
+		margin-top: clamp(12px, calc(9.88px + 0.5882vw), 14px);
+	}
+
+	.steps__item {
+		padding-bottom: clamp(20px, calc(28.24px - 1.1765vw), 24px);
+	}
+
+	/* Колонка номера у́же: 33 на 360 (номер 28 плюс зазор 5) вместо 48 */
+	.steps__number {
+		width: clamp(33px, calc(17.12px + 4.4118vw), 48px);
+	}
+
+	.steps__text {
+		margin-left: clamp(33px, calc(17.12px + 4.4118vw), 48px);
 	}
 }
 

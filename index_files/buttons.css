@@ -166,9 +166,15 @@
 	padding: 24px 40px 26px;
 }
 
-/* Тип 2 — второстепенная/таб. Padding подтверждён точными значениями Figma */
+/*
+ * Тип 2 — второстепенная/таб. Поля подтверждены точными значениями Figma:
+ * 16/22/18 на 1920 и 15/18/16 на 1600 (I3486:5939;2362:5351) — те же
+ * вертикальные поля, что у кнопки ЦД, поэтому в ряду обе кнопки одной
+ * высоты (48 на 1600). От 1600 до 700 значения держатся, ниже 700 свой
+ * блок возвращает их к 16/22/18 на 360.
+ */
 .btn--secondary {
-	padding: clamp(15px, calc(14.22px + 0.1111vw), 16px) clamp(18px, calc(14.89px + 0.4444vw), 22px) clamp(16px, calc(14.44px + 0.2222vw), 18px);
+	padding: clamp(15px, calc(10px + 0.3125vw), 16px) clamp(18px, calc(-2px + 1.25vw), 22px) clamp(16px, calc(6px + 0.625vw), 18px);
 	font-size: var(--font-size-button);
 	background-color: var(--color-surface);
 	color: var(--color-text);
@@ -226,6 +232,16 @@
 			clamp(15px, calc(17.06px - 0.2941vw), 16px)
 			clamp(18px, calc(26.24px - 1.1765vw), 22px)
 			clamp(16px, calc(20.12px - 0.5882vw), 18px);
+	}
+
+	/*
+	 * У кнопки во всю ширину своя пара: 60 на 700 (21 и 22 при строке
+	 * 16.5) и 52 на 360. Раньше ниже 700 она брала поля обычной кнопки
+	 * ЦД и разом худела с 60 до 48.
+	 */
+	.btn--cta--wide {
+		padding-top: clamp(16px, calc(10.71px + 1.4706vw), 21px);
+		padding-bottom: clamp(18px, calc(13.76px + 1.1765vw), 22px);
 	}
 
 	.btn--secondary {

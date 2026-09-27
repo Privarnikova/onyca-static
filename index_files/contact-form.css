@@ -75,7 +75,7 @@
 	margin: 0 0 clamp(14px, calc(4px + 0.625vw), 16px);
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-heading);
-	line-height: var(--line-height-b1);
+	line-height: var(--field-line);
 	color: var(--color-text);
 }
 
@@ -407,12 +407,7 @@
  */
 
 /*
- * Подпись блока («Проекты», «Бюджет») живёт по той же строке, что и поле:
- * 21 на 1600 и на 700, 18 на 1200 (макет 3673:19532). Значения на концах
- * участка совпадают с общей формулой, скачка на стыках нет.
+ * Подпись блока («Ваш проект», «Бюджет») живёт по той же строке, что и
+ * поле, — 120% кегля: 18 на 1600 (макет I3486:5939;2447:7759, подпись 18
+ * и табы на 32), 19.2 на 1920 и на 360.
  */
-@media (min-width: 700px) and (max-width: 1600px) {
-	.contact-form__label {
-		line-height: var(--field-line);
-	}
-}

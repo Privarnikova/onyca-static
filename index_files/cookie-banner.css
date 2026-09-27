@@ -20,7 +20,8 @@
 .cookie-banner {
 	position: fixed;
 	z-index: 200;
-	bottom: clamp(15px, 2.0833vw, 40px);
+	/* 40 на 1920, 35 на 1600 (макет 3561:28487) — то же поле, что у сетки */
+	bottom: clamp(15px, calc(10px + 1.5625vw), 40px);
 	/*
 	 * Баннер стоит по той же сетке, что и контент: выше 1920 контейнер
 	 * перестаёт растягиваться и центруется, поэтому левый край баннера
@@ -29,17 +30,19 @@
 	 * которое дальше от края экрана.
 	 */
 	left: max(
-		clamp(15px, 2.0833vw, 40px),
+		clamp(15px, calc(10px + 1.5625vw), 40px),
 		calc(50vw - var(--container-max-width) / 2 + var(--container-padding))
 	);
-	right: clamp(15px, 2.0833vw, 40px);
-	max-width: 600px;
+	right: clamp(15px, calc(10px + 1.5625vw), 40px);
+	/* 600 на 1920, 498 на 1600 (макет 3561:28487) */
+	max-width: clamp(498px, calc(-12px + 31.875vw), 600px);
 	/* Grey-30 #F7F7F7 — по макету 1969:6089 (не Grey-50, как было) */
 	background-color: var(--color-surface-alt);
 }
 
 .cookie-banner__inner {
-	padding: clamp(20px, 1.4583vw, 28px);
+	/* 28 на 1920, 24 на 1600 */
+	padding: clamp(20px, calc(4px + 1.25vw), 28px);
 }
 
 .cookie-banner__title {
@@ -70,7 +73,21 @@
 
 .cookie-banner__accept {
 	/* 28px от текста до кнопки (112 − 84 в макете) */
-	margin-top: clamp(20px, 1.4583vw, 28px);
+	margin-top: clamp(20px, calc(4px + 1.25vw), 28px);
+}
+
+/*
+ * 92×43 на 1920 и 84×40 на 1600 (макет 3561:28487): у кнопки куки свои
+ * поля, поэтому они не берутся у таба целиком. Только с 1200: ниже у
+ * баннера своя раскладка и свои принятые размеры.
+ */
+@media (min-width: 1200px) {
+	.cookie-banner__accept {
+		padding:
+			clamp(12px, calc(7px + 0.3125vw), 13px)
+			clamp(14.5px, calc(7px + 0.46875vw), 16px)
+			clamp(14px, calc(9px + 0.3125vw), 15px);
+	}
 }
 
 /*

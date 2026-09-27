@@ -656,9 +656,14 @@
 	var refreshMagneticButtons = function () {};
 
 	function initMagneticButtons() {
-		// Тач и «уменьшить движение» — без магнита: там тянуть нечем и незачем.
-		var enabled = window.matchMedia( '(hover: hover)' ).matches &&
-			! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+		/*
+		 * Магнит — часть наведения, а наведения в проекте нет ниже 1200 и
+		 * нет на тач-экранах: планшету тянуть кнопку нечем. Условие то же,
+		 * что у заливки в components/buttons.css, чтобы они включались и
+		 * выключались вместе. Плюс «уменьшить движение» в системе.
+		 */
+		var hoverQuery = window.matchMedia( '(hover: hover) and (min-width: 1200px)' );
+		var motionOk = ! window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
 		var items = [];
 
@@ -703,15 +708,35 @@
 		collect();
 		refreshMagneticButtons = collect;
 
-		if ( ! enabled ) {
+		if ( ! motionOk ) {
 			return;
 		}
 
 		var ticking = false;
 		var pointer = { x: 0, y: 0 };
 
+		/* Окно сузили до планшетного — снимаем сдвиг, иначе кнопка застынет притянутой */
+		function release() {
+			items.forEach( function ( item ) {
+				item.el.style.transform = '';
+				item.text.style.transform = '';
+			} );
+		}
+
+		if ( hoverQuery.addEventListener ) {
+			hoverQuery.addEventListener( 'change', function ( event ) {
+				if ( ! event.matches ) {
+					release();
+				}
+			} );
+		}
+
 		function update() {
 			ticking = false;
+
+			if ( ! hoverQuery.matches ) {
+				return;
+			}
 
 			items.forEach( function ( item ) {
 				var rect = item.el.getBoundingClientRect();
@@ -1976,6 +2001,175 @@
 		} );
 	}
 
+	/*
+	 * Полноразмерный просмотр ролика (ТЗ, «Анимация наведения на шоурил»,
+	 * референс celerart.com): по клику на шоурил его ролик открывается
+	 * поверх страницы во весь экран — со звуком и с управлением.
+	 *
+	 * Кнопка «Смотреть» есть только с 1200 и только там, где работает
+	 * наведение (initShowreelWatch), а сам клик работает везде: на
+	 * планшете и телефоне ролик тоже нужно уметь посмотреть.
+	 */
+	function initShowreelPlayer() {
+		var blocks = document.querySelectorAll( '[data-showreel-watch]' );
+
+		if ( ! blocks.length ) {
+			return;
+		}
+
+		var overlay = null;
+		var frame = null;
+		/* Ролик, который играл на странице: на время просмотра ставим на паузу */
+		var background = null;
+
+		function lockScroll() {
+			var scrollbar = window.innerWidth - document.documentElement.clientWidth;
+
+			document.documentElement.style.overflow = 'hidden';
+
+			if ( scrollbar > 0 ) {
+				document.documentElement.style.paddingRight = scrollbar + 'px';
+			}
+		}
+
+		function unlockScroll() {
+			document.documentElement.style.overflow = '';
+			document.documentElement.style.paddingRight = '';
+		}
+
+		function close() {
+			if ( ! overlay || ! overlay.classList.contains( 'is-open' ) ) {
+				return;
+			}
+
+			overlay.classList.remove( 'is-open' );
+			frame.innerHTML = '';
+			frame.style.removeProperty( '--showreel-ratio' );
+			unlockScroll();
+
+			if ( background ) {
+				var resume = background.play();
+
+				if ( resume && resume.catch ) {
+					resume.catch( function () {} );
+				}
+
+				background = null;
+			}
+		}
+
+		function build() {
+			overlay = document.createElement( 'div' );
+			overlay.className = 'showreel-player';
+			overlay.setAttribute( 'role', 'dialog' );
+			overlay.setAttribute( 'aria-modal', 'true' );
+			overlay.setAttribute( 'aria-label', 'Просмотр ролика' );
+
+			frame = document.createElement( 'div' );
+			frame.className = 'showreel-player__frame';
+
+			var button = document.createElement( 'button' );
+
+			button.type = 'button';
+			button.className = 'showreel-player__close';
+			button.setAttribute( 'aria-label', 'Закрыть' );
+			button.innerHTML = '<svg class="icon icon--32" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18" stroke="currentColor" stroke-linejoin="round"/><path d="M6 6L18 18" stroke="currentColor" stroke-linejoin="round"/></svg>';
+			button.addEventListener( 'click', close );
+
+			/* Щелчок мимо кадра закрывает просмотр */
+			overlay.addEventListener( 'click', function ( event ) {
+				if ( event.target === overlay ) {
+					close();
+				}
+			} );
+
+			overlay.appendChild( frame );
+			overlay.appendChild( button );
+			document.body.appendChild( overlay );
+
+			document.addEventListener( 'keydown', function ( event ) {
+				if ( event.key === 'Escape' ) {
+					close();
+				}
+			} );
+		}
+
+		function open( media ) {
+			if ( ! overlay ) {
+				build();
+			}
+
+			frame.innerHTML = '';
+
+			if ( media.tagName === 'VIDEO' ) {
+				var video = document.createElement( 'video' );
+
+				video.src = media.currentSrc || media.src;
+				video.poster = media.getAttribute( 'poster' ) || '';
+				video.controls = true;
+				video.autoplay = true;
+				video.playsInline = true;
+				/* Со звуком: это и есть «посмотреть ролик», а не фон */
+				video.muted = false;
+				frame.appendChild( video );
+
+				video.addEventListener( 'loadedmetadata', function () {
+					/* Продолжаем с того же места, где шёл фоновый ролик */
+					if ( media.currentTime ) {
+						video.currentTime = media.currentTime;
+					}
+
+					/* Кадр принимает пропорцию самого ролика */
+					if ( video.videoWidth && video.videoHeight ) {
+						frame.style.setProperty(
+							'--showreel-ratio',
+							video.videoWidth / video.videoHeight
+						);
+					}
+				} );
+
+				if ( ! media.paused ) {
+					media.pause();
+					background = media;
+				}
+			} else {
+				var iframe = document.createElement( 'iframe' );
+
+				iframe.src = media.getAttribute( 'src' );
+				iframe.setAttribute( 'allow', 'autoplay; fullscreen; picture-in-picture' );
+				iframe.setAttribute( 'allowfullscreen', '' );
+				frame.appendChild( iframe );
+			}
+
+			overlay.classList.add( 'is-open' );
+			lockScroll();
+		}
+
+		blocks.forEach( function ( block ) {
+			var media = block.querySelector( 'video, iframe' );
+
+			if ( ! media ) {
+				return;
+			}
+
+			block.classList.add( 'is-playable' );
+			block.setAttribute( 'role', 'button' );
+			block.setAttribute( 'tabindex', '0' );
+			block.setAttribute( 'aria-label', 'Смотреть ролик' );
+
+			block.addEventListener( 'click', function () {
+				open( media );
+			} );
+
+			block.addEventListener( 'keydown', function ( event ) {
+				if ( event.key === 'Enter' || event.key === ' ' ) {
+					event.preventDefault();
+					open( media );
+				}
+			} );
+		} );
+	}
+
 	function initShowreelWatch() {
 		var blocks = document.querySelectorAll( '[data-showreel-watch]' );
 
@@ -2697,6 +2891,7 @@
 		initResponsiveProjectLayout();
 		initFaq();
 		initShowreelWatch();
+		initShowreelPlayer();
 		initStackedProjects();
 		initClientLogos();
 	} );

@@ -21,7 +21,8 @@
 	);
 	/* Колонка сетки и отступ от низа — те же, что у кнопки «Обсудить проект» */
 	--col: calc((var(--work) - 5 * var(--grid-gap)) / 6);
-	--case-lead-bottom: clamp(20px, 2.0833vw, 40px);
+	/* 40 на 1920, 35 на 1600 (макет 3545:29017) — то же поле, что у сетки */
+	--case-lead-bottom: clamp(20px, calc(10px + 1.5625vw), 40px);
 	/* На сколько полоса поднята над кнопкой «Обсудить проект» */
 	--case-lead-lift: 0px;
 
@@ -83,8 +84,10 @@
 	grid-template-columns: calc(var(--col) - 25px) 1fr auto;
 	column-gap: var(--grid-gap);
 	align-items: center;
-	min-height: 52px;
-	padding: 6px 6px 6px 25px;
+	/* 52 на 1920, 48 на 1600 (макет 3545:29017) */
+	min-height: clamp(48px, calc(28px + 1.25vw), 52px);
+	/* 6 на 1920 (принято), 5 на 1600 — кнопка там мельче */
+	padding: clamp(5px, calc(1px + 0.3125vw), 6px) clamp(5px, calc(1px + 0.3125vw), 6px) clamp(5px, calc(1px + 0.3125vw), 6px) 25px;
 	border-radius: 100px;
 	background-color: var(--color-black);
 }
@@ -293,5 +296,20 @@
 @media (min-width: 700px) and (max-width: 800px) {
 	.case-lead__inner {
 		grid-template-columns: minmax(0, 316px) 1fr auto;
+	}
+}
+
+/*
+ * Кнопка полосы: 92×43 на 1920 и 82×38 на 1600 (макет 3545:29017) — у
+ * неё свои поля, поэтому они не берутся у кнопки ЦД целиком. Выше 1200:
+ * на самом 1200 и ниже у полосы своя раскладка и свои размеры из
+ * макета планшета.
+ */
+@media (min-width: 1201px) {
+	.case-lead .btn {
+		padding:
+			11px
+			clamp(13.5px, calc(1px + 0.78125vw), 16px)
+			clamp(13px, calc(8px + 0.3125vw), 14px);
 	}
 }

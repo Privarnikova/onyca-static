@@ -76,6 +76,19 @@ h1 + .case-media {
 }
 
 /*
+ * На 700 визуалы отбиваются от текста на 54 (макет 3903:24374), на 1200
+ * и выше — на 64. Между точками считается, ниже 700 остаются 54.
+ */
+@media (max-width: 1200px) {
+	.article-section + .case-media,
+	.case-media + .article-section,
+	.case-media + .article-heading--1,
+	h1 + .case-media {
+		margin-top: clamp(54px, calc(40px + 2vw), 64px);
+	}
+}
+
+/*
  * С 700 и ниже (макеты 3903:24374 и 3258:13635): пара визуалов рядом не
  * помещается — на 650 каждый был бы 316, на 330 и вовсе 156. В обоих
  * макетах они идут в столбик, каждый во всю ширину и со своими же
@@ -91,6 +104,16 @@ h1 + .case-media {
 	.case-media--fixed:has(.case-media__frame--two) {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: var(--case-media-seam);
+	}
+
+	/*
+	 * В столбик пропорция едет: на 700 каждый визуал 650×318 (макет
+	 * 3903:24374 — та же пропорция, что у одиночного полотна 1840×900),
+	 * на 360 — 330×203, свои 910×560 (макет 3258:13635). Между точками
+	 * считается, чтобы картинка не подпрыгивала по высоте.
+	 */
+	.case-media--fixed:has(.case-media__frame--two) .case-media__frame--two {
+		aspect-ratio: clamp(1.625, calc(2.0444 - (700px - 100vw) / 812px), 2.0444);
 	}
 
 	.case-media + .case-media--fixed,

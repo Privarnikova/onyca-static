@@ -92,3 +92,79 @@
 		transition: opacity 0.2s ease;
 	}
 }
+
+/*
+ * Полноразмерный просмотр ролика (ТЗ, «Анимация наведения на шоурил»,
+ * референс celerart.com): по клику на шоурил ролик открывается поверх
+ * страницы во весь экран — со звуком, с управлением и с крестиком в
+ * углу. Закрывается крестиком, щелчком по фону и клавишей Esc.
+ *
+ * Разметку строит JS (initShowreelPlayer, main.js): шаблонам достаточно
+ * того же атрибута data-showreel-watch, что и для кнопки «Смотреть».
+ */
+.showreel-player {
+	position: fixed;
+	inset: 0;
+	/* Выше всего, что есть на странице: шапки (100), полос (190/200) и
+	   поп-апов (300) — на время просмотра страницы не видно */
+	z-index: 400;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: clamp(15px, calc(4.12px + 2.24vw), 58px);
+	background-color: rgba(0, 0, 0, 0.92);
+}
+
+.showreel-player.is-open {
+	display: flex;
+}
+
+/*
+ * Кадр держит пропорцию ролика и не выходит ни за ширину, ни за высоту
+ * экрана: что меньше, то и ограничивает.
+ */
+.showreel-player__frame {
+	position: relative;
+	width: 100%;
+	/*
+	 * Пропорцию кадра ставит JS по самому ролику (--showreel-ratio):
+	 * вертикальное видео иначе легло бы в 16:9 с чёрными полями по
+	 * бокам. До загрузки метаданных держим 16:9.
+	 */
+	max-width: calc((100vh - 2 * clamp(15px, calc(4.12px + 2.24vw), 58px)) * var(--showreel-ratio, 1.7778));
+	aspect-ratio: var(--showreel-ratio, 1.7778);
+	background-color: var(--color-black);
+}
+
+.showreel-player__frame video,
+.showreel-player__frame iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: none;
+	/* Ролик показывается целиком, а не обрезается по кадру */
+	object-fit: contain;
+}
+
+/* Крестик у правого верхнего угла экрана, как в референсе */
+.showreel-player__close {
+	position: absolute;
+	top: clamp(15px, calc(4.12px + 2.24vw), 58px);
+	right: clamp(15px, calc(4.12px + 2.24vw), 58px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: none;
+	background: none;
+	color: var(--color-white);
+	cursor: pointer;
+}
+
+/* Размер и толщина — общие для крупной пиктограммы (components/icon.css) */
+
+/* Шоурил с роликом кликабелен — курсор об этом говорит */
+.showreel.is-playable {
+	cursor: pointer;
+}

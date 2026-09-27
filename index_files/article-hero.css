@@ -108,7 +108,8 @@
 	}
 
 	.article-hero--service {
-		row-gap: clamp(44px, calc(-46px + 7.5vw), 98px);
+		/* 98 на 1920 и на 1600 (макет 3545:23286), 44 на 1200 */
+		row-gap: clamp(44px, calc(-118px + 13.5vw), 98px);
 	}
 }
 
@@ -126,7 +127,7 @@
 		 * старая двухколоночная клетка на 1600 (натуральный расчёт от
 		 * тех же токенов сетки), поэтому на стыке 1599/1600 нет скачка.
 		 */
-		max-width: clamp(495px, calc(779px - 17.75vw), 566px);
+		max-width: clamp(498px, calc(770px - 17vw), 566px);
 	}
 }
 
@@ -182,10 +183,11 @@
 	.article-hero__cover,
 	.article-hero .showreel {
 		/*
-		 * Обложка отбивается сильнее соседей: всего 76 на 700 и 78 на
-		 * 360, из них 32 даёт row-gap, остальное — этот отступ.
+		 * Обложка отбивается сильнее соседей: всего 78 и на 700 (макеты
+		 * 3903:24374, 3886:15397, 3898:28665), и на 360 — из них 32 даёт
+		 * row-gap, остальное этот отступ.
 		 */
-		margin-top: clamp(44px, calc(48.12px - 0.5882vw), 46px);
+		margin-top: 46px;
 	}
 
 	.article-hero__facts {
@@ -207,11 +209,13 @@
 @media (min-width: 801px) {
 	.article-hero__summary,
 	.article-hero__facts {
-		row-gap: clamp(36px, calc(26px + 0.8333vw), 42px);
+		/* 42 на 1920, 36 на 1600 (макет 3547:23519) и на 1200 */
+		row-gap: clamp(36px, calc(6px + 1.875vw), 42px);
 	}
 
 	.article-hero__fact {
-		row-gap: clamp(10px, calc(6.67px + 0.2778vw), 12px);
+		/* 12 на 1920, 10 на 1600 и на 1200 */
+		row-gap: clamp(10px, calc(0.625vw), 12px);
 	}
 }
 
@@ -227,7 +231,7 @@
  */
 @media (min-width: 801px) and (max-width: 1599px) {
 	.article-hero__title {
-		max-width: calc(76px + 34.75vw);
+		max-width: calc(64px + 35.75vw);
 	}
 }
 

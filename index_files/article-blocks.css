@@ -662,8 +662,8 @@
  */
 @media (min-width: 1201px) and (max-width: 1599px) {
 	.article-section__body > .article-quote {
-		margin-left: calc(369.97px - 55.164vw);
-		width: calc(25.375vw - 30.5px);
+		margin-left: calc(380px - 56vw);
+		width: calc(26vw - 38px);
 	}
 }
 

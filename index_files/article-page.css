@@ -303,7 +303,7 @@
 		 * ниже 1200 перерастает ширину сетки — заголовок идёт во всю
 		 * ширину, как и в макете 700.
 		 */
-		max-width: calc(1570.4px - 35.2vw);
+		max-width: calc(1550px - 33.5vw);
 	}
 }
 
@@ -404,6 +404,7 @@
 @media (min-width: 700px) {
 	.article-page--project .article-content > .article-heading--1:not(:first-child),
 	.article-page--project .article-content > .article-heading--1 + .article-section {
+		/* 80 на 1920, 68 на 1200 */
 		margin-top: clamp(68px, calc(48px + 1.6667vw), 80px);
 	}
 
@@ -538,5 +539,17 @@
 	.article-page--project .article-section > .article-heading--2 {
 		grid-column: 1;
 		max-width: none;
+	}
+}
+
+/*
+ * От крупного заголовка кейса до раздела: 68 на 1200 и 54 на 700 (макет
+ * «Шаблон проекта» 3903:24374 — заголовок раздела стоит на 54 под H1).
+ * Между точками считается, ниже 700 остаются те же 54.
+ */
+@media (max-width: 1200px) {
+	.article-page--project .article-content > .article-heading--1:not(:first-child),
+	.article-page--project .article-content > .article-heading--1 + .article-section {
+		margin-top: clamp(54px, calc(34.4px + 2.8vw), 68px);
 	}
 }

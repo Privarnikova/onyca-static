@@ -114,13 +114,14 @@
 }
 
 .support-team__item {
-	/* 78 от текста до линии */
-	padding-bottom: 78px;
+	/* 78 от текста до линии на 1920, 66 на 1600 (макет 3486:16299) */
+	padding-bottom: clamp(66px, calc(6px + 3.75vw), 78px);
 }
 
 .support-team__name,
 .support-advantages__name {
-	margin: 0 0 16px;
+	/* От названия тезиса до описания 16 на 1920 и 14 на 1600 */
+	margin: 0 0 clamp(14px, calc(4px + 0.625vw), 16px);
 	font-size: var(--font-size-h3);
 }
 
@@ -134,15 +135,16 @@
 
 /*
  * «Почему мы» (2034:8328): шесть тезисов по две колонки в три ряда,
- * первый — справа от заголовка. Между рядами 52.
+ * первый — справа от заголовка. Между рядами 52 на 1920 и 44 на 1600
+ * (макет 3502:6508), дальше 44 держится до 1200.
  */
 .support-advantages {
-	row-gap: 52px;
+	row-gap: clamp(44px, calc(4px + 2.5vw), 52px);
 }
 
 .support-advantages__item {
-	/* 56 от текста до линии */
-	padding-bottom: 56px;
+	/* 56 от текста до линии на 1920, 48 на 1600 */
+	padding-bottom: clamp(48px, calc(8px + 2.5vw), 56px);
 }
 
 /*
@@ -165,10 +167,11 @@
 
 /*
  * «Каждая задача под контролем» (2042:5364): пять карточек по две
- * колонки, первая — справа от заголовка. Между рядами 52.
+ * колонки, первая — справа от заголовка. Между рядами 52 на 1920 и 44
+ * на 1600 (макет 3487:16705, ряды на 0 и 515 при карточке 471).
  */
 .support-process {
-	row-gap: 52px;
+	row-gap: clamp(44px, calc(4px + 2.5vw), 52px);
 }
 
 .support-process__item {
@@ -178,8 +181,8 @@
 .support-process__media {
 	/* 600×500 в макете */
 	aspect-ratio: 600 / 500;
-	/* 16 от визуала до подписи */
-	margin-bottom: 16px;
+	/* 16 от визуала до подписи на 1920, 14 на 1600 */
+	margin-bottom: clamp(14px, calc(4px + 0.625vw), 16px);
 }
 
 .support-process__row {
@@ -346,6 +349,15 @@
 		padding-bottom: 32px;
 	}
 
+	/*
+	 * От названия тезиса до описания: 14 держится с 1600 до 700, к 360
+	 * возвращается 16 — ступеньки на 700 больше нет.
+	 */
+	.support-team__name,
+	.support-advantages__name {
+		margin-bottom: clamp(14px, calc(18.12px - 0.5882vw), 16px);
+	}
+
 	.support-process__row {
 		grid-template-columns: minmax(0, 1fr);
 		row-gap: 8px;
@@ -501,7 +513,7 @@
  *   строки направлений — имя кеглем 48, до описания 24, поля 52 сверху
  *   и снизу.
  */
-@media (min-width: 700px) and (max-width: 700px) {
+@media (min-width: 609px) and (max-width: 700px) {
 	.support-process__item {
 		grid-column: span 3;
 	}
