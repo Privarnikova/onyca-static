@@ -280,6 +280,16 @@ async function collectPagination( page, url, prefix ) {
           el.removeAttribute('style');
         }
       });
+
+      /*
+       * Ролики к моменту снимка уже прокручены мимо экрана, и скрипт
+       * успел поставить им preload="auto". В копию они должны попасть
+       * такими же, как в шаблоне, иначе страница снова тянет все
+       * ролики сразу.
+       */
+      document.querySelectorAll('video[data-autoplay]').forEach(video => {
+        video.preload = 'none';
+      });
     });
 
     pages.push({ out: item.out, html: await page.content() });
