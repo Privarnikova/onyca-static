@@ -470,6 +470,8 @@
 
 	function setupForm( form ) {
 		var consentError = form.querySelector( '[data-consent-error]' );
+
+		initFormAttach( form );
 		/* У формы вакансии нет ни тегов услуг, ни бюджета */
 		var isCareer = form.classList.contains( 'contact-form--career' );
 
@@ -593,6 +595,205 @@
 			if ( event.target.closest( '.tab-pill' ) && form.querySelector( '.is-error' ) ) {
 				validate();
 			}
+		} );
+	}
+
+
+	/*
+	 * Максимальный размер прикладываемого файла — 15 МБ, форматы Word и
+	 * PDF. Требование заказчика; макета у этого состояния нет, поэтому
+	 * список имён собран из тех же величин, что и остальная форма.
+	 */
+	var ATTACH_MAX_SIZE = 15 * 1024 * 1024;
+	var ATTACH_TYPES = [ 'doc', 'docx', 'pdf' ];
+
+	/**
+	 * «Прикрепить файл»: системное поле выбора спрятано, клик по кнопке
+	 * открывает его, выбранные файлы встают списком с именами и крестиком.
+	 *
+	 * Список хранится в самом поле (input.files через DataTransfer), а не
+	 * рядом с ним: когда появится отправка, форма уйдёт как есть, без
+	 * отдельной сборки файлов.
+	 */
+	function initFormAttach( form ) {
+		var input = form.querySelector( '[data-attach-input]' );
+		var button = form.querySelector( '[data-attach]' );
+		var list = form.querySelector( '[data-attach-list]' );
+		var error = form.querySelector( '[data-attach-error]' );
+
+		if ( ! input || ! button || ! list ) {
+			return;
+		}
+
+		var chosen = [];
+
+		function fail( message ) {
+			if ( ! error ) {
+				return;
+			}
+
+			error.textContent = message;
+			error.hidden = false;
+		}
+
+		function clearError() {
+			if ( error ) {
+				error.hidden = true;
+			}
+		}
+
+		/*
+		 * Переносим выбранное обратно в поле: DataTransfer — единственный
+		 * способ собрать FileList вручную. Браузеры без него (очень
+		 * старые) просто оставят последний выбор — поведение по умолчанию.
+		 */
+		function sync() {
+			if ( typeof DataTransfer !== 'function' ) {
+				return;
+			}
+
+			var bag = new DataTransfer();
+
+			chosen.forEach( function ( file ) {
+				bag.items.add( file );
+			} );
+
+			input.files = bag.files;
+		}
+
+		function render() {
+			list.textContent = '';
+			list.hidden = chosen.length === 0;
+
+			chosen.forEach( function ( file, index ) {
+				var item = document.createElement( 'li' );
+				item.className = 'contact-form__attached-item';
+
+				var name = document.createElement( 'span' );
+				name.className = 'contact-form__attached-name';
+				name.textContent = file.name;
+
+				var remove = document.createElement( 'button' );
+				remove.type = 'button';
+				remove.className = 'contact-form__attached-remove';
+				remove.setAttribute( 'aria-label', 'Убрать файл ' + file.name );
+				remove.innerHTML = '<svg class="icon icon--x" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18" stroke="currentColor" stroke-linejoin="round"/><path d="M6 6L18 18" stroke="currentColor" stroke-linejoin="round"/></svg>';
+				remove.addEventListener( 'click', function () {
+					chosen.splice( index, 1 );
+					sync();
+					render();
+					clearError();
+				} );
+
+				item.appendChild( name );
+				item.appendChild( remove );
+				list.appendChild( item );
+			} );
+		}
+
+		button.addEventListener( 'click', function () {
+			input.click();
+		} );
+
+		input.addEventListener( 'change', function () {
+			var picked = Array.prototype.slice.call( input.files || [] );
+			var added = false;
+
+			picked.forEach( function ( file ) {
+				var dot = file.name.lastIndexOf( '.' );
+				var ext = dot === -1 ? '' : file.name.slice( dot + 1 ).toLowerCase();
+
+				if ( ATTACH_TYPES.indexOf( ext ) === -1 ) {
+					fail( 'Можно прикрепить файл Word или PDF' );
+					return;
+				}
+
+				if ( file.size > ATTACH_MAX_SIZE ) {
+					fail( 'Размер файла не более 15 МБ' );
+					return;
+				}
+
+				var already = chosen.some( function ( have ) {
+					return have.name === file.name && have.size === file.size;
+				} );
+
+				if ( already ) {
+					return;
+				}
+
+				chosen.push( file );
+				added = true;
+			} );
+
+			if ( added ) {
+				clearError();
+			}
+
+			sync();
+			render();
+		} );
+	}
+
+
+	/*
+	 * Ленивые ролики. В разметке полотна стоят с preload="none" и
+	 * data-autoplay вместо autoplay: иначе браузер тянет все ролики
+	 * страницы сразу — на кейсе их до десятка, и первый экран ждёт
+	 * чужие мегабайты.
+	 *
+	 * Ролик начинает грузиться и играть, когда подходит к экрану
+	 * (запас в пол-окна), и останавливается, когда уходит: это и трафик
+	 * бережёт, и процессор на телефоне.
+	 */
+	function initLazyVideo() {
+		var videos = document.querySelectorAll( 'video[data-autoplay]' );
+
+		if ( ! videos.length ) {
+			return;
+		}
+
+		function start( video ) {
+			if ( 'auto' !== video.preload ) {
+				video.preload = 'auto';
+			}
+
+			var started = video.play();
+
+			/* Браузер вправе отказать в автозапуске — тогда виден постер */
+			if ( started && started.catch ) {
+				started.catch( function () {} );
+			}
+		}
+
+		/* Без IntersectionObserver просто запускаем всё, как было раньше */
+		if ( ! ( 'IntersectionObserver' in window ) ) {
+			videos.forEach( start );
+			return;
+		}
+
+		var watcher = new IntersectionObserver(
+			function ( entries ) {
+				entries.forEach( function ( entry ) {
+					if ( entry.isIntersecting ) {
+						start( entry.target );
+						return;
+					}
+
+					/*
+					 * Ролик за экраном ставим на паузу, но только если
+					 * его уже запускали: у незагруженного pause() зря
+					 * дёргает сеть.
+					 */
+					if ( ! entry.target.paused ) {
+						entry.target.pause();
+					}
+				} );
+			},
+			{ rootMargin: '50% 0px' }
+		);
+
+		videos.forEach( function ( video ) {
+			watcher.observe( video );
 		} );
 	}
 
@@ -2876,6 +3077,7 @@
 		initMagneticButtons();
 		initPopup();
 		initContactForm();
+		initLazyVideo();
 		initMoscowClock();
 		initCoverContrast();
 		initDiscussButton();

@@ -153,6 +153,87 @@
 }
 
 /*
+ * Композиций две: широкая (1840×1337, круг дизайн-поддержки меньше
+ * остальных) и узкая (330×296, все круги равны и стоят плотнее — макет
+ * 3271:15773). Широкая идёт от 2560 до 609 в своём масштабе: макеты
+ * 3022:6585, 3545:22189, 3694:25593 и 3931:36573 — это она же при
+ * ширине сетки 1840, 1530, 1150 и 650. Узкая включается на телефоне.
+ */
+.studio-circles__figure {
+	position: relative;
+	/* Кегль подписи считается от ширины самой картинки */
+	container-type: inline-size;
+}
+
+.studio-circles__figure--narrow {
+	display: none;
+}
+
+.studio-circles__label {
+	position: absolute;
+	/*
+	 * Подпись стоит в центре своего круга. Кегль 32 при картинке 1840,
+	 * то есть 1.739% её ширины: на 2560 сетка та же 1840 и подпись
+	 * остаётся 32, на 1600 выходит 26.6, на 1200 — ровно 20 из макета.
+	 */
+	font-size: 1.7391cqw;
+	font-weight: var(--font-weight-heading);
+	line-height: var(--line-height-heading);
+	color: var(--color-text);
+	text-align: center;
+	transform: translate(-50%, -50%);
+}
+
+.studio-circles__figure--wide .studio-circles__label {
+	/*
+	 * Ширина рамки подписи — пятая часть картинки: на 1920 это 368, на
+	 * 1200 — 230, и все четыре подписи стоят в строку, как в макетах
+	 * 3022:6585 и 3694:25593.
+	 */
+	max-width: 20%;
+}
+
+.studio-circles__figure--narrow .studio-circles__label {
+	/* На узкой композиции рамка шире доли: 73 из 330 (макет 3271:15775) */
+	max-width: 22%;
+}
+
+/*
+ * Ниже 1200 кегль подписи перестаёт следовать за масштабом картинки:
+ * в макетах это 20 на 1200 и 18 на 700 (3931:36586), иначе на планшете
+ * подпись съёжилась бы до 11.
+ */
+@media (max-width: 1200px) {
+	.studio-circles__label {
+		font-size: clamp(18px, calc(15.2px + 0.4vw), 20px);
+	}
+
+	/*
+	 * Рамка подписи сужается быстрее картинки: 207 на 1200 (макет
+	 * 3694:25602 — 203, все подписи в строку) и 104 на 700 (3931:36573 —
+	 * 87…114, три подписи из четырёх ломаются на две строки).
+	 */
+	.studio-circles__figure--wide .studio-circles__label {
+		max-width: clamp(104px, calc(-40.2px + 20.6vw), 207px);
+	}
+}
+
+/* Телефон: узкая композиция и свой кегль — 14.5 на 360 (3271:15775) */
+@media (max-width: 608px) {
+	.studio-circles__figure--wide {
+		display: none;
+	}
+
+	.studio-circles__figure--narrow {
+		display: block;
+	}
+
+	.studio-circles__label {
+		font-size: clamp(14.5px, calc(9.42px + 1.4113vw), 18px);
+	}
+}
+
+/*
  * Три блока с картинками (2264:3636): изображение в трёх колонках,
  * текст — в трёх соседних. Стороны чередуются.
  */
@@ -256,7 +337,13 @@
 	.studio-feature--right .studio-feature__media,
 	.studio-feature__text,
 	.studio-feature--left .studio-feature__text,
-	.studio-feature--right .studio-feature__text {
+	.studio-feature--right .studio-feature__text,
+	/*
+	 * Описание блока тоже во всю ширину: своя ширина в две колонки
+	 * осталась от десктопа и на телефоне резала текст справа (макет
+	 * 3271:15356 — описание занимает все 330).
+	 */
+	.studio-feature__body {
 		grid-column: 1 / -1;
 		grid-row: auto;
 		justify-self: stretch;

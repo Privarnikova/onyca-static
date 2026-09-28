@@ -380,20 +380,38 @@
 .article-section__body ul.wp-block-list > li {
 	position: relative;
 	/* 36px при кегле 16 — 2.25em, дальше растёт вместе с текстом */
-	padding-left: 2.25em;
+	--bullet-indent: 2.25em;
+	padding-left: var(--bullet-indent);
 }
 
 .article-section__body ul.wp-block-list > li::before {
 	content: "";
 	position: absolute;
-	/* Центр точки на 18px от края: 1.125em минус её радиус */
-	left: 0.9375em;
-	/* Середина первой строки минус радиус */
-	top: calc(var(--line-height-b1) / 2 * 1em - 0.1875em);
+	/* Точка по центру поля отступа */
+	left: calc(var(--bullet-indent) / 2 - 0.1875em);
+	/*
+	 * Середина ПЕРВОЙ строки минус радиус. Считаем от 1lh — высоты самой
+	 * строки: --line-height-b1 на телефоне задан в пикселях, а не долей,
+	 * и прежний calc с ним разваливался — точка уезжала к верхнему краю
+	 * строки (видно было на 700 и ниже).
+	 */
+	top: 0.55em;
+	top: calc(0.5lh - 0.1875em);
 	width: 0.375em;
 	height: 0.375em;
 	border-radius: 50%;
 	background-color: var(--color-black);
+}
+
+/*
+ * Телефон: поле отступа 30 вместо 33.75 (макет 3237:15121 — точка в
+ * поле 30, текст от 30). К 700 значение возвращается к прежнему, скачка
+ * на стыке нет.
+ */
+@media (max-width: 700px) {
+	.article-section__body ul.wp-block-list > li {
+		--bullet-indent: clamp(30px, calc(26.03px + 1.1029vw), 33.75px);
+	}
 }
 
 /*

@@ -124,7 +124,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <style class="wp-fonts-local">
 @font-face{font-family:"Wix Madefor Display";font-style:normal;font-weight:400;font-display:fallback;src:url('https://privarnikova.github.io/onyca-static/') format('woff2');}
 @font-face{font-family:"Wix Madefor Display";font-style:normal;font-weight:500;font-display:fallback;src:url('https://privarnikova.github.io/onyca-static/') format('woff2');}
-@font-face{font-family:"Wix Madefor Display";font-style:normal;font-weight:600;font-display:fallback;src:url('./index_files/SZcS3EX9IbbyeJ8aOluD52KXgUA_7Ed1I13G853Cp9duUYG_ZVthv_3HQKgh.woff2') format('woff2');}
+@font-face{font-family:"Wix Madefor Display";font-style:normal;font-weight:600;font-display:fallback;src:url('https://privarnikova.github.io/onyca-static/') format('woff2');}
 @font-face{font-family:"Wix Madefor Display";font-style:normal;font-weight:700;font-display:fallback;src:url('./index_files/SZcS3EX9IbbyeJ8aOluD52KXgUA_7Ed1I13G853Cp9duUYGGZVthv_3HQKgh.woff2') format('woff2');}
 @font-face{font-family:"Wix Madefor Display";font-style:normal;font-weight:800;font-display:fallback;src:url('https://privarnikova.github.io/onyca-static/') format('woff2');}
 </style>
@@ -176,7 +176,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<p class="contact-form-intro__text">От первой идеи до ежедневного развития — помогаем компаниям строить целостное цифровое присутствие, которое работает сегодня и может развиваться завтра.</p>
 	</div>
 
-		<form class="contact-form" method="post" novalidate="">
+			<form class="contact-form" method="post" novalidate="">
 				<div class="contact-form__group" data-required-group="tags">
 			<p class="contact-form__label">Ваш проект</p>
 			<div class="contact-form__tabs">
@@ -213,7 +213,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 				<label for="popup-project-telegram">Ваш Telegram</label>
 			</div>
 						<div class="field contact-form__field contact-form__field--full">
-				<textarea id="popup-project-message" name="contact_message" rows="1" placeholder=" " style=""></textarea>
+				<textarea id="popup-project-message" name="contact_message" rows="1" placeholder=" "></textarea>
 				<label for="popup-project-message">Расскажите о проекте</label>
 			</div>
 		</div>
@@ -249,9 +249,13 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		</fieldset>
 
 		<div class="contact-form__actions">
-			<button type="button" class="btn btn--secondary contact-form__attach">Прикрепить файл</button>
+			<button type="button" class="btn btn--secondary contact-form__attach" data-attach="">Прикрепить файл</button>
 			<button type="submit" class="btn btn--cta contact-form__submit"><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Отправить</span></button>
+						<input class="contact-form__file" type="file" name="contact_files[]" multiple="" accept=".doc,.docx,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf" data-attach-input="" hidden="">
 		</div>
+
+		<ul class="contact-form__attached" data-attach-list="" hidden=""></ul>
+		<p class="contact-form__attach-error" data-attach-error="" hidden=""></p>
 
 		<div class="consent contact-form__consent" data-required-group="consent">
 						<input class="radio-control" type="checkbox" name="contact_consent" id="popup-project-consent">
@@ -273,7 +277,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 		<p class="contact-form-intro__text">Даже если подходящей вакансии сейчас нет, мы сохраним контакт и вернемся к нему, когда появится подходящая задача.</p>
 	</div>
 
-	<form class="contact-form contact-form--career" method="post" novalidate="">
+	<form class="contact-form contact-form--career contact-form--no-tags" method="post" novalidate="">
 		<div class="contact-form__fields">
 			<div class="field contact-form__field">
 				<input type="text" id="popup-career-name" name="career_name" placeholder=" ">
@@ -292,15 +296,19 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 				<label for="popup-career-telegram">Твой Telegram</label>
 			</div>
 			<div class="field contact-form__field contact-form__field--full">
-				<textarea id="popup-career-message" name="career_message" rows="1" placeholder=" " style=""></textarea>
+				<textarea id="popup-career-message" name="career_message" rows="1" placeholder=" "></textarea>
 				<label for="popup-career-message">Расскажи о себе</label>
 			</div>
 		</div>
 
 		<div class="contact-form__actions">
-			<button type="button" class="btn btn--secondary contact-form__attach">Прикрепить файл</button>
+			<button type="button" class="btn btn--secondary contact-form__attach" data-attach="">Прикрепить файл</button>
 			<button type="submit" class="btn btn--cta contact-form__submit"><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Отправить</span></button>
+						<input class="contact-form__file" type="file" name="career_files[]" multiple="" accept=".doc,.docx,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf" data-attach-input="" hidden="">
 		</div>
+
+		<ul class="contact-form__attached" data-attach-list="" hidden=""></ul>
+		<p class="contact-form__attach-error" data-attach-error="" hidden=""></p>
 
 		<div class="consent contact-form__consent" data-required-group="consent">
 			<input class="radio-control" type="checkbox" name="career_consent" id="popup-career-consent">

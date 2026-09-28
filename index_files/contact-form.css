@@ -29,6 +29,12 @@
  * описывает и ширину текста, и промежуток.
  */
 .contact-form-section {
+	/*
+	 * Зазор между рядами полей: 72 на 1920, 69 на 1600. Объявлен на
+	 * секции, а не на самой форме, — в стопке им же меряется расстояние
+	 * от текста до формы без тегов.
+	 */
+	--form-field-gap: clamp(69px, calc(54px + 0.9375vw), 72px);
 	--form-left: min(calc(48.75vw - 6px), 930px);
 
 	display: grid;
@@ -98,8 +104,13 @@
 	grid-template-columns: repeat(auto-fit, minmax(max(200px, 45%), 1fr));
 	/* 20 на 1920, 18 на 1600 — тот же зазор сетки */
 	column-gap: clamp(18px, calc(8px + 0.625vw), 20px);
-	row-gap: clamp(69px, calc(54px + 0.9375vw), 72px);
-	margin-top: clamp(69px, calc(54px + 0.9375vw), 72px);
+	/*
+	 * Между рядами полей 72 на 1920 и 69 на 1600: в этот зазор уезжает
+	 * подпись заполненного поля, поэтому он же нужен и ПЕРЕД первым
+	 * полем — см. стопку ниже 1040.
+	 */
+	row-gap: var(--form-field-gap);
+	margin-top: var(--form-field-gap);
 }
 
 .contact-form__field--full {
@@ -195,6 +206,72 @@
 }
 
 /*
+ * Прикреплённые файлы. Макета у этого состояния нет — величины взяты от
+ * соседей формы: отбивка та же, что между рядами кнопок, строка списка
+ * это B1, крестик — пиктограмма x в её обычном поле 24.
+ */
+.contact-form__attached {
+	display: grid;
+	/* minmax(0, 1fr), а не auto: иначе длинное имя раздувает всю форму */
+	grid-template-columns: minmax(0, 1fr);
+	row-gap: clamp(10px, calc(0.625vw), 12px);
+	margin: clamp(18px, calc(8px + 0.625vw), 20px) 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.contact-form__attached-item {
+	display: flex;
+	min-width: 0;
+	align-items: center;
+	justify-content: space-between;
+	column-gap: clamp(14px, calc(4px + 0.625vw), 16px);
+}
+
+.contact-form__attached-name {
+	/*
+	 * Длинное имя не растягивает форму, а обрезается многоточием.
+	 * min-width: 0 обязателен: без него flex-элемент не даёт себя сжать
+	 * ниже длины текста, и строка вылезала за экран горизонтальной
+	 * прокруткой.
+	 */
+	min-width: 0;
+	overflow: hidden;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-text);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.contact-form__attached-remove {
+	flex: none;
+	display: flex;
+	padding: 0;
+	border: none;
+	background: none;
+	color: var(--color-text-footer);
+	cursor: pointer;
+	transition: color 0.3s ease;
+}
+
+.contact-form__attach-error {
+	margin: clamp(10px, calc(0.625vw), 12px) 0 0;
+	font-size: var(--font-size-b1);
+	font-weight: var(--font-weight-body);
+	line-height: var(--line-height-b1);
+	color: var(--color-error);
+}
+
+/* Наведения ниже 1200 нет — там тач, подсветка залипает */
+@media (hover: hover) and (min-width: 1200px) {
+	.contact-form__attached-remove:hover {
+		color: var(--color-text);
+	}
+}
+
+/*
  * Состояние «Ошибка» (Figma 1236:1915 и одноимённые узлы на остальных
  * точках): краснеют подписи обязательных групп. Поле формы красит себя
  * само (.field.is-error в field.css), здесь — группы формы: теги проекта
@@ -270,14 +347,13 @@
 
 	.contact-form__fields {
 		/* auto-fit + minmax: две колонки, пока каждая может быть не уже
-		   280px, дальше сетка сама схлопывается в одну (≈624px вьюпорта).
-		   На 700 даёт ровно 2×316px как в макете, на 360 — одну колонку.
-		   Раньше переключение стояло плоско на 699px и раскладка прыгала. */
-		/* max(260px, 45%) в минимуме трека: две колонки, пока каждая может
-		   быть не уже 260px, и НИКОГДА три — при 45% третья не помещается
-		   по определению. Раньше на 1599 форма становилась шире и auto-fit
-		   набирал три колонки вместо двух. */
-		grid-template-columns: repeat(auto-fit, minmax(max(200px, 45%), 1fr));
+		   минимума трека, дальше сетка схлопывается в одну сама. На 700
+		   это ровно 2×316px как в макете.
+		   max(208px, 45%): 45% не даёт набрать третью колонку ни при
+		   какой ширине, а 208 задаёт точку перехода на одну колонку —
+		   470 по окну (правка заказчика; раньше пара держалась до 431 и
+		   поля становились совсем узкими). */
+		grid-template-columns: repeat(auto-fit, minmax(max(208px, 45%), 1fr));
 		column-gap: 18px;
 	}
 
@@ -293,12 +369,27 @@
 @media (max-width: 1040px) {
 	.contact-form-section {
 		grid-template-columns: 1fr;
-		row-gap: clamp(40px, calc(12.47px + 7.6471vw), 66px);
+		/* 66 на 700 и 48 на 360 (макет 3271:15402: текст 236, теги на 284) */
+		--form-stack-gap: clamp(48px, calc(28.94px + 5.2941vw), 66px);
+		row-gap: var(--form-stack-gap);
 	}
 
 	.contact-form-intro,
 	.contact-form {
 		grid-column: 1;
+	}
+
+	/*
+	 * Форма без тегов (дизайн-поддержка, карьера): до неё столько же,
+	 * сколько между рядами полей, — 69 на 700 и 72 на 360. Первым идёт
+	 * поле, и подпись заполненного поля уезжает вверх именно в этот
+	 * зазор, поэтому он должен быть тем же, что и внутри формы (правка
+	 * заказчика; в макете 3904:26995 на 700 стоит 66 — на три меньше
+	 * шага полей). У формы с тегами сверху подпись «Ваш проект», ей
+	 * хватает 48 (макет 3271:15402).
+	 */
+	.contact-form-section:has(.contact-form--no-tags) {
+		row-gap: var(--form-field-gap);
 	}
 }
 
@@ -341,19 +432,16 @@
 		font-size: clamp(32px, calc(29.88px + 0.5882vw), 34px);
 	}
 
-	.contact-form {
-		width: 100%;
-	}
-
-	.contact-form__fields {
-		/* Колонки больше не переопределяем — auto-fit выше схлопывает их
-		   сам по нехватке места. Здесь только вертикальный зазор: 69px
-		   на 700 → 72px на 360. Раньше он сходился к 32px — значение
-		   подбиралось под старое высокое поле, у которого место под
-		   поднятую подпись было внутри. Теперь подпись уезжает в этот
-		   зазор, и он равен макетному: 72 в пустом состоянии, из них
-		   38 занимает подпись, когда поле заполнено. */
-		row-gap: clamp(69px, calc(75.18px - 0.8824vw), 72px);
+	.contact-form-section {
+		/* Колонки не переопределяем — auto-fit выше схлопывает их сам по
+		   нехватке места. Здесь только вертикальный зазор: 69px на 700 →
+		   72px на 360. Раньше он сходился к 32px — значение подбиралось
+		   под старое высокое поле, у которого место под поднятую подпись
+		   было внутри. Теперь подпись уезжает в этот зазор, и он равен
+		   макетному: 72 в пустом состоянии, из них 38 занимает подпись,
+		   когда поле заполнено. Столько же остаётся и перед первым
+		   полем — см. стопку выше. */
+		--form-field-gap: clamp(69px, calc(75.18px - 0.8824vw), 72px);
 	}
 
 	.contact-form__actions {

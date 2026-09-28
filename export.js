@@ -251,6 +251,37 @@ async function collectPagination( page, url, prefix ) {
       }
     });
 
+    /*
+     * Снимок делается в окне 1920, и в разметку попадают величины,
+     * посчитанные скриптами именно для этой ширины: запас под разворот
+     * шоурила, высота дорожки плавающей кнопки, сдвиги ленты логотипов
+     * и кнопок ЦД. На телефоне они оставались от ноутбука — под первым
+     * экраном зиял отступ в 200px, а кнопка «Обсудить проект» висела
+     * посреди текста. Стираем ровно эти свойства: остальное в атрибуте
+     * style пришло из шаблонов (цвета кейса, места подписей у кругов) и
+     * нужно копии как есть.
+     */
+    await page.evaluate(() => {
+      const written = [
+        '--hero-shrink',
+        '--showreel-overflow',
+        '--showreel-scale',
+        '--showreel-shift',
+        '--showreel-ratio',
+        '--card-scale',
+        'transform',
+        'height',
+      ];
+
+      document.querySelectorAll('[style]').forEach(el => {
+        written.forEach(prop => el.style.removeProperty(prop));
+
+        if (!el.getAttribute('style')) {
+          el.removeAttribute('style');
+        }
+      });
+    });
+
     pages.push({ out: item.out, html: await page.content() });
     await page.close();
   }
