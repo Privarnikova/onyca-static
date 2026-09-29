@@ -1585,6 +1585,11 @@
 			window.scrollTo( x, y );
 		}
 
+		/* onyca.digital/order/ (page-order.php) — поп-ап открыт сразу, без клика */
+		if ( document.body.dataset.popupOpenOnLoad ) {
+			open( document.body.dataset.popupOpenOnLoad );
+		}
+
 		document.addEventListener( 'click', function ( event ) {
 			var opener = event.target.closest( '[data-popup-open]' );
 
