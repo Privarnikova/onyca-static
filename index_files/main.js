@@ -50,7 +50,7 @@
 			 * Порог 700 взят с контрольной точки макетов; уточнить
 			 * замером, когда появится макет первого экрана на планшете.
 			 */
-			if ( ! firstScreen || ! window.matchMedia( '(min-width: 701px)' ).matches ) {
+			if ( ! firstScreen || ! window.matchMedia( '(min-width: 1100px)' ).matches ) {
 				return 0;
 			}
 
@@ -219,6 +219,7 @@
 		function unlockScroll() {
 			document.documentElement.style.overflow = '';
 			document.documentElement.style.paddingRight = '';
+			revealHeader();
 		}
 
 		/*
@@ -797,6 +798,98 @@
 		} );
 	}
 
+
+	/**
+	 * Вернуть шапку на экран. Нужно после закрытия поп-апа и
+	 * полноэкранного ролика: пока они открыты, шапка не видна, а
+	 * скрытой она остаётся и после — вверху окна оказывается
+	 * содержимое страницы, и Safari на iPhone красит системную полосу
+	 * его цветом вместо белого.
+	 */
+	function revealHeader() {
+		var header = document.querySelector( '[data-site-header]' );
+
+		if ( header ) {
+			header.classList.remove( 'is-hidden' );
+		}
+	}
+
+
+	/*
+	 * Круги «Студии»: толщина линии должна оставаться постоянной в CSS-
+	 * пикселях (1 до 700, дальше кривая к 0.5 на 360 — см.
+	 * --circle-stroke-target в studio-page.css), а не тянуться вместе с
+	 * картинкой. vector-effect="non-scaling-stroke" в самом SVG для этого
+	 * не подходит: он отменяет только явный CSS/SVG transform на
+	 * элементе, а не масштаб, который берётся из соотношения
+	 * viewBox и CSS-ширины (то есть из обычного width:100%) — Chrome в
+	 * этом случае всё равно тянет обводку вместе с картинкой (проверено
+	 * отдельным замером на изолированной странице).
+	 *
+	 * Поэтому обводку считаем сами: зная фактическую ширину картинки на
+	 * экране и ширину её viewBox, переводим желаемую CSS-толщину в
+	 * координаты viewBox и подставляем как атрибут — тогда браузер сам
+	 * отрисует её как надо, каким бы ни было соотношение масштаба.
+	 */
+	function initStudioCircleStroke() {
+		var figures = document.querySelectorAll( '.studio-circles__figure' );
+
+		if ( ! figures.length || ! ( 'ResizeObserver' in window ) ) {
+			return;
+		}
+
+		/*
+		 * Целевая толщина в CSS-пикселях — 1 до 700, дальше кривая к 0.5
+		 * на 360 (то же самое значение, что задаёт --circle-stroke-target
+		 * в studio-page.css). Считаем прямо в JS, а не через
+		 * getComputedStyle: computed style у кастомного свойства с
+		 * clamp()/calc() внутри возвращает исходную строку формулы, а не
+		 * посчитанное число — parseFloat на ней даёт NaN, и толщина
+		 * тогда всегда съезжала бы на запасное значение.
+		 */
+		function targetThickness() {
+			var vw = window.innerWidth;
+
+			if ( vw > 700 ) {
+				return 1;
+			}
+
+			return Math.min( 1, Math.max( 0.5, -0.03 + 0.147 * ( vw / 100 ) ) );
+		}
+
+		function apply( figure ) {
+			var width = figure.getBoundingClientRect().width;
+
+			/* Скрытая композиция (display:none) имеет нулевую ширину */
+			if ( ! width ) {
+				return;
+			}
+
+			var svg = figure.querySelector( 'svg' );
+			var group = svg ? svg.querySelector( 'g' ) : null;
+
+			if ( ! svg || ! group || ! svg.viewBox || ! svg.viewBox.baseVal ) {
+				return;
+			}
+
+			var viewBoxWidth = svg.viewBox.baseVal.width;
+			var stroke = ( targetThickness() * viewBoxWidth ) / width;
+
+			group.setAttribute( 'stroke-width', stroke.toFixed( 3 ) );
+		}
+
+		var observer = new ResizeObserver( function ( entries ) {
+			entries.forEach( function ( entry ) {
+				apply( entry.target );
+			} );
+		} );
+
+		figures.forEach( function ( figure ) {
+			observer.observe( figure );
+			apply( figure );
+		} );
+	}
+
 	/**
 	 * Кнопки ЦД (ТЗ п. 02, тип 1): притягиваются к курсору и заливаются
 	 * при наведении. Референс поведения — кнопка Telegram на EikoDigital.
@@ -1265,6 +1358,7 @@
 		function unlockScroll() {
 			document.documentElement.style.overflow = '';
 			document.documentElement.style.paddingRight = '';
+			revealHeader();
 		}
 
 		/*
@@ -1741,15 +1835,12 @@
 
 		/*
 		 * Разворот видео — кадры десктопного макета (975:2391). На 1200
-		 * и ниже его нет: макет 3372:11995 показывает видео статичным,
-		 * на своём месте, а первый экран не занимает окно целиком и к
-		 * его низу не привязан. Порог — строго выше 1200, а не «от»
-		 * 1200: раньше граница совпадала с CSS-переключением шапки на
-		 * бургер (1200 включительно = уже планшет), и на самой границе
-		 * анимация ещё запускалась и раздувала видео поверх статичной
-		 * вёрстки.
+		 * и ниже его нет: там первый экран идёт стопкой из макета 700 и
+		 * видео стоит на своём месте во всю ширину. Порог — 1100: по
+		 * правке заказчика на 1200 видео ещё растёт, а ниже 1100 уже
+		 * нет, там же CSS переводит первый экран в раскладку 700.
 		 */
-		if ( ! window.matchMedia( '(min-width: 1201px)' ).matches ) {
+		if ( ! window.matchMedia( '(min-width: 1100px)' ).matches ) {
 			return;
 		}
 
@@ -2236,6 +2327,7 @@
 		function unlockScroll() {
 			document.documentElement.style.overflow = '';
 			document.documentElement.style.paddingRight = '';
+			revealHeader();
 		}
 
 		function close() {
@@ -3078,6 +3170,7 @@
 		initPopup();
 		initContactForm();
 		initLazyVideo();
+		initStudioCircleStroke();
 		initMoscowClock();
 		initCoverContrast();
 		initDiscussButton();

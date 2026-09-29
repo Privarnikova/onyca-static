@@ -117,12 +117,41 @@
 }
 
 
+/*
+ * Кегль немонотонный — 24 на 1920, 21 на 1600 и 1200 (макеты 3513:17633
+ * и 3372:12016 — стиль H4 21, а не отдельный размер), снова растёт к 26
+ * на 700 (3792:25000 — hello@… 26px) и спадает до 24 на 360 (2570:1954,
+ * H3 24). Раньше одна формула без плато на 1600-1200 сразу насыщалась в
+ * верхней границе 26 везде ниже 1728 — контакты в подвале на 1600 и
+ * 1200 были заметно крупнее макета.
+ */
 .site-footer__contacts-link {
-	font-size: clamp(24px, calc(36px - 0.625vw), 26px);
+	font-size: clamp(21px, calc(6px + 0.9375vw), 24px);
 	font-weight: var(--font-weight-heading);
 	line-height: var(--line-height-heading);
 	color: var(--color-text);
 	text-decoration: none;
+}
+
+/* 21 плато с 1600 до 1200 */
+@media (max-width: 1600px) {
+	.site-footer__contacts-link {
+		font-size: 21px;
+	}
+}
+
+/* 21 на 1200 растёт до 26 на 700 */
+@media (max-width: 1200px) {
+	.site-footer__contacts-link {
+		font-size: clamp(21px, calc(33px - 1vw), 26px);
+	}
+}
+
+/* 26 на 700 спадает до 24 на 360 */
+@media (max-width: 699px) {
+	.site-footer__contacts-link {
+		font-size: clamp(24px, calc(21.88px + 0.5882vw), 26px);
+	}
 }
 
 .site-footer__divider {
@@ -404,7 +433,14 @@
 	 */
 	.site-footer__contacts,
 	.site-footer__bottom,
-	.site-footer__legal {
+	.site-footer__legal,
+	/*
+	 * Меню — тоже без зазора: его подколонки должны совпадать с
+	 * четвертями подвала (там же, где «Политика Cookie»), а зазор сдвигал
+	 * «Студия/Карьера/Контакты» на 462 вместо 450 — с той же третьей
+	 * четвертью политик они не совпадали.
+	 */
+	.site-footer__menu {
 		column-gap: 0;
 	}
 

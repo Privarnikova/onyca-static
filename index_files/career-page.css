@@ -3,8 +3,6 @@
  *
  * Поля по краям и расстояния между блоками задаёт страница целиком —
  * как на «Студии»: .career-page это и контейнер, и сетка с зазором 188.
- *
- * ВНИМАНИЕ: свёрстано под 1920, макетов остальных разрешений пока нет.
  */
 
 .career-page {
@@ -47,9 +45,14 @@
 	line-height: var(--line-height-b1);
 }
 
-/* Абзацы описания разделены пустой строкой — как в макете */
+/*
+ * Абзацы описания разделены пустой строкой — как в макете. 1lh, а не
+ * calc(кегль × интерлиньяж): ниже 780 --line-height-b1 сам в пикселях
+ * (components/tokens.css), и умножение двух длин ломает calc() —
+ * отступ обнулялся молча.
+ */
 .career-hero__lead p + p {
-	margin-top: calc(var(--font-size-b1) * var(--line-height-b1));
+	margin-top: 1lh;
 }
 
 .career-hero__media {
@@ -81,9 +84,18 @@
 	   на 1600 отбивка 44 (макет 3506:14867: заголовок 41, текст на 85) */
 	margin: clamp(44px, calc(4px + 2.5vw), 52px) 0 0;
 	max-width: 600px;
+}
+
+.career-idea__body p {
+	margin: 0;
 	font-size: var(--font-size-b1);
 	font-weight: var(--font-weight-body);
 	line-height: var(--line-height-b1);
+}
+
+/* Абзацы разделены пустой строкой — как в макете */
+.career-idea__body p + p {
+	margin-top: 1lh;
 }
 
 .career-idea__media {
@@ -100,6 +112,18 @@
 	/* 222 от верха заголовка до полотна при высоте заголовка 144;
 	   на 1600 отбивка 66 (макет 3506:15181: заголовок 123, полотно на 189) */
 	row-gap: clamp(66px, calc(6px + 3.75vw), 78px);
+}
+
+/*
+ * Перенос заголовка расставлен в макете вручную: «…и хотим, чтобы /
+ * сотрудничество с нами было выгодно не только студии, / но и самому
+ * человеку». Во всю ширину сетки (1150) строка ломается на слово
+ * позже, поэтому рамка та же, что на 1600.
+ */
+@media (max-width: 1300px) {
+	.career-values__title {
+		max-width: 1014px;
+	}
 }
 
 .career-values__title {
@@ -169,15 +193,22 @@
 }
 
 /*
- * Ниже 1200 макетов нет: колонки складываются, тезисы идут по два в
- * ряд, а на телефоне — по одному.
+ * Своих макетов между 1200 и 700 нет ни у одного блока страницы, и все
+ * они разъезжаются раньше 700 — телефонный дизайн везде с 900.
  */
-@media (max-width: 700px) {
+@media (max-width: 900px) {
+	/* Сетка телефона — 2 колонки (967:672) */
+	.career-hero,
+	.career-idea,
+	.career-qualities,
+	.career-qualities__list {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.career-hero__title,
 	.career-hero__lead,
 	.career-idea__text,
-	.career-idea__media,
-	.career-values__title {
+	.career-idea__media {
 		grid-column: 1 / -1;
 		max-width: none;
 	}
@@ -190,24 +221,78 @@
 		row-gap: 52px;
 	}
 
+	/*
+	 * «Личностные качества» по одному в ряд, во всю ширину: строчный
+	 * ритм (отступ до линии, сама линия во всю ширину тезиса) тот же,
+	 * что и на телефоне — здесь просто раньше включается.
+	 */
+	.career-qualities,
+	.career-qualities__list {
+		row-gap: 44px;
+	}
+
+	.career-qualities__item {
+		grid-column: 1 / -1;
+		padding-bottom: 27px;
+		background-size: 100% 1px;
+	}
+
+	.career-values {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.career-values__title {
+		grid-column: 1 / -1;
+		max-width: none;
+	}
 }
 
 /*
  * Ровно на 1200 (макет 3669:9586). На 1600 страница принята десктопной,
  * ниже 1200 колонки складываются правилом выше, поэтому запрос
- * однопиксельный.
+ * однопиксельный. Планшетная раскладка держится только до 901 у всех
+ * блоков страницы.
  *
  * Блок в конце файла намеренно: у правил та же специфичность, что у
  * базовых, и порядок решает.
  */
-@media (min-width: 701px) and (max-width: 1200px) {
+@media (min-width: 901px) and (max-width: 1300px) {
+	.career-values {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		/* Заголовок во всю ширину, до полотна 66 */
+		row-gap: 66px;
+	}
+
+	.career-values__title {
+		grid-column: 1 / -1;
+	}
+	/* Сетка планшета — 4 колонки, а не 6 (принятая сетка 1200, 967:662) */
+	.career-hero,
+	.career-idea,
+	.career-qualities,
+	.career-qualities__list {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
 	/* Первый экран: описание во всю правую половину, до шоурила 160 */
 	.career-hero {
 		row-gap: 160px;
 	}
 
+	.career-hero__title {
+		/*
+		 * Было 1/4 из шести (половина, 566px) — унаследовано от десктопа
+		 * и НЕ было переопределено здесь раньше. В новой четырёхколоночной
+		 * сетке те же координаты значили бы 3/4 (858px) и наезжали на
+		 * тезис, из-за чего грид сбрасывал его на новую строку. Теперь
+		 * явно 1/3 — половина из четырёх, как и было по факту.
+		 */
+		grid-column: 1 / 3;
+	}
+
 	.career-hero__lead {
-		grid-column: 4 / -1;
+		/* Было 4/-1 из шести (правая половина); теперь 3/-1 из четырёх */
+		grid-column: 3 / -1;
 	}
 
 	/*
@@ -216,7 +301,8 @@
 	 * широкого полотна 909×445.
 	 */
 	.career-idea__text {
-		grid-column: 1 / 4;
+		/* Было 1/4 из шести (левая половина); теперь 1/3 из четырёх */
+		grid-column: 1 / 3;
 		max-width: none;
 	}
 
@@ -227,16 +313,14 @@
 	}
 
 	.career-idea__media {
+		/*
+		 * Было 4/-1 из шести (правая половина, унаследовано от десктопа,
+		 * не было переопределено). В новой сетке это давало 1 из 4
+		 * колонок (274px) вместо половины (566px) — визуал сжимался и
+		 * левее него зря пустовала четвёртая колонка.
+		 */
+		grid-column: 3 / -1;
 		aspect-ratio: 566 / 415;
-	}
-
-	/* «Ценим сильных специалистов»: заголовок во всю ширину, до полотна 66 */
-	.career-values {
-		row-gap: 66px;
-	}
-
-	.career-values__title {
-		grid-column: 1 / -1;
 	}
 
 	/*
@@ -252,7 +336,8 @@
 	}
 
 	.career-qualities__item {
-		grid-column: span 3;
+		/* Было span 3 из шести (половина); теперь span 2 из четырёх */
+		grid-column: span 2;
 		padding-bottom: 27px;
 		background-size: 100% 1px;
 	}
@@ -269,20 +354,3 @@
 	}
 }
 
-/*
- * С 700 и ниже (макет 3922:12009) «Личностные качества» идут по одному в
- * ряд во всю ширину: 44 от заголовка и между рядами, от текста до линии
- * 27. Выше держится раскладка 1200 — по два в ряд (блок выше).
- */
-@media (max-width: 700px) {
-	.career-qualities,
-	.career-qualities__list {
-		row-gap: 44px;
-	}
-
-	.career-qualities__item {
-		grid-column: 1 / -1;
-		padding-bottom: 27px;
-		background-size: 100% 1px;
-	}
-}

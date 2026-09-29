@@ -359,11 +359,16 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 						<div class="studio-circles__figure studio-circles__figure--wide" aria-hidden="true">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1840 1337" fill="none" role="img" aria-label="Брендинг, дизайн-поддержка, UX/UI-дизайн, CG &amp; Motion">
   <!--
-    vector-effect: обводка не тянется вместе с картинкой. Без неё круги
-    на узкой композиции толстели по мере роста экрана (1.7px на 608 при
-    1px на десктопе), а в макете линия везде тонкая.
+    stroke-width подменяется скриптом (initStudioCircleStroke в main.js):
+    он меряет фактическую ширину картинки и пересчитывает обводку в
+    координаты viewBox, поэтому на экране она остаётся той же в CSS-
+    пикселях независимо от масштаба. CSS width:100% тянет саму картинку
+    как обычно, но НЕ влияет на обводку через vector-effect — в Chrome
+    non-scaling-stroke не отменяет масштаб, заданный отношением
+    viewBox/CSS-ширины (проверено отдельным замером), поэтому обводка в
+    JS, а не в SVG или CSS. 1 — запасное значение до первого расчёта.
   -->
-  <g stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke">
+  <g stroke="currentColor" stroke-width="1.203">
     <circle cx="410" cy="679" r="409.5"></circle>
     <circle cx="1029" cy="927" r="409.5"></circle>
     <circle cx="848.5" cy="292.5" r="292"></circle>
@@ -379,12 +384,8 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 
 			<div class="studio-circles__figure studio-circles__figure--narrow" aria-hidden="true">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 296" fill="none" role="img" aria-label="Брендинг, дизайн-поддержка, UX/UI-дизайн, CG &amp; Motion">
-  <!--
-    vector-effect: обводка не тянется вместе с картинкой. Без неё круги
-    на узкой композиции толстели по мере роста экрана (1.7px на 608 при
-    1px на десктопе), а в макете линия везде тонкая.
-  -->
-  <g stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke">
+  <!-- stroke-width подменяется скриптом — см. studio-circles.svg -->
+  <g stroke="currentColor" stroke-width="1">
     <circle cx="78.4" cy="151.7" r="78.2"></circle>
     <circle cx="203" cy="217.4" r="78.2"></circle>
     <circle cx="139.9" cy="78.4" r="78.2"></circle>
@@ -451,7 +452,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 </section>
 
 		<section class="client-logos" aria-label="Логотипы клиентов">
-		<div class="client-logos__track" data-client-logos="" style="transform: translateX(-863.417px);">
+		<div class="client-logos__track" data-client-logos="">
 					<div class="client-logos__row">
 									<div class="client-logos__item">
 												<img src="./index_files/client-1.svg" alt="" decoding="async">
@@ -843,8 +844,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 <section class="contact-form-section container popup__form">
 	<div class="contact-form-intro">
 		<h2 class="contact-form-intro__title">Давай познакомимся</h2>
-		<p class="contact-form-intro__text">Если тебе близок наш подход к работе и ты хочешь развиваться вместе со студией — расскажи о себе.</p>
-		<p class="contact-form-intro__text">Даже если подходящей вакансии сейчас нет, мы сохраним контакт и вернемся к нему, когда появится подходящая задача.</p>
+				<p class="contact-form-intro__text">Если тебе близок наш подход к работе и ты хочешь развиваться вместе со студией — расскажи о себе.</p>
 	</div>
 
 	<form class="contact-form contact-form--career contact-form--no-tags" method="post" novalidate="">
@@ -927,7 +927,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 	</div>
 </div>
 
-<div class="float-track" data-float-track="" style="height: 9030.33px;">
+<div class="float-track" data-float-track="">
 	<div class="discuss-button is-visible" data-discuss-button="">
 		<a class="btn btn--cta btn--cta--primary discuss-button__btn" href="contacts.html" data-popup-open="project"><span class="btn__fill" aria-hidden="true"></span>
 			<span class="btn__text">Обсудить проект</span>

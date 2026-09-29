@@ -4,8 +4,6 @@
  * Исполнители по три в ряд, каждый в двух колонках: имя, под ним
  * должность, снизу линия. Ниже дата выпуска в первой колонке, срок во
  * второй и описание в колонках 3–4.
- *
- * ВНИМАНИЕ: свёрстано под 1920, макетов остальных разрешений пока нет.
  */
 
 .project-team {
@@ -99,8 +97,15 @@
  * порог был 1199 — на самом 1200 ещё стояла десктопная тройка в ряд.
  */
 @media (max-width: 1200px) {
+	.project-team,
+	.project-team__list {
+		/* Сетка планшета — 4 колонки, а не 6 (принятая сетка 1200, 967:662) */
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
 	.project-team__member {
-		grid-column: span 3;
+		/* Было span 3 из шести (половина); в новой сетке та же половина — span 2 из четырёх */
+		grid-column: span 2;
 	}
 
 	.project-team__summary {
@@ -114,6 +119,12 @@
  * раскладка 700, а не телефонная.
  */
 @media (max-width: 544px) {
+	.project-team,
+	.project-team__list {
+		/* Сетка телефона — 2 колонки (967:672) */
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.project-team__member,
 	.project-team__fact--release,
 	.project-team__fact--duration,
@@ -137,20 +148,23 @@
  * Число 274 здесь в пикселях: запрос однопиксельный, ширина рабочей
  * области на нём всегда 1150.
  */
+/*
+ * Дата, срок и описание встают ровно по колонкам новой четырёхколоночной
+ * сетки — 1, 2 и 3–4 (274 / 274 / 566 при рабочей области 1150 на
+ * 1200). Раньше это были подогнанные пиксельные хаки под старую
+ * шестиколоночную сетку (та же геометрия, более сложная запись).
+ */
 @media (min-width: 801px) and (max-width: 1200px) {
 	.project-team__fact--release {
-		grid-column: 1 / 2;
-		width: 274px;
+		grid-column: 1;
 	}
 
 	.project-team__fact--duration {
-		grid-column: 2 / 4;
-		justify-self: end;
-		width: 274px;
+		grid-column: 2;
 	}
 
 	.project-team__summary {
-		grid-column: 4 / -1;
+		grid-column: 3 / -1;
 	}
 }
 
@@ -163,12 +177,14 @@
  */
 @media (min-width: 545px) and (max-width: 800px) {
 	.project-team__fact--release {
-		grid-column: 1 / 4;
+		/* Было 1/4 из шести (первая половина); в новой сетке — 1/3 из четырёх */
+		grid-column: 1 / 3;
 		width: auto;
 	}
 
 	.project-team__fact--duration {
-		grid-column: 4 / -1;
+		/* Было 4/-1 из шести (вторая половина); в новой сетке — 3/-1 из четырёх */
+		grid-column: 3 / -1;
 		justify-self: start;
 		width: auto;
 	}

@@ -9,7 +9,7 @@
  * пути на относительные, убирает ссылки на localhost и служебные скрипты
  * WordPress, которые на статике падают с ошибкой.
  */
-const { chromium } = require('playwright');
+const { chromium, request } = require('playwright');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -212,6 +212,7 @@ async function collectPagination( page, url, prefix ) {
   await collectFromSitemap(browser, 'project-sitemap.xml', 'case-');
   await collectBlogViews(browser);
   const assets = new Map();
+  const media = new Set();
   const pages = [];
 
   for (const item of PAGES) {
@@ -292,11 +293,40 @@ async function collectPagination( page, url, prefix ) {
       });
     });
 
+    /*
+     * Ролики лежат в разметке с preload="none" и подгружаются по
+     * появлению в поле зрения. Те, до которых снимок не докрутился, в
+     * перехваченные ответы вообще не попадают, а у остальных браузер
+     * просит файл кусками (206 Partial Content) — в копию попадал
+     * обрывок в несколько килобайт, и видео не проигрывалось. Поэтому
+     * адреса роликов собираем из самой разметки и докачиваем целиком
+     * отдельным запросом (ниже, после обхода страниц).
+     */
+    const videos = await page.evaluate(() =>
+      [...document.querySelectorAll('video[src]')].map(node => node.src)
+    );
+
+    videos.forEach(url => media.add(url));
+
     pages.push({ out: item.out, html: await page.content() });
     await page.close();
   }
 
   await browser.close();
+
+  const api = await request.newContext();
+
+  for (const url of media) {
+    try {
+      const res = await api.get(url);
+
+      if (res.ok()) {
+        assets.set(url, await res.body());
+      }
+    } catch (e) {}
+  }
+
+  await api.dispose();
 
   fs.rmSync(FILES, { recursive: true, force: true });
   fs.mkdirSync(FILES, { recursive: true });

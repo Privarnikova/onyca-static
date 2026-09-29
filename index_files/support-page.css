@@ -5,8 +5,6 @@
  * Поля по краям и расстояния между блоками задаёт страница целиком —
  * как на главной и на специализациях: .support-page это и контейнер, и
  * сетка с зазором 186.
- *
- * ВНИМАНИЕ: свёрстано под 1920, макетов других разрешений пока нет.
  */
 
 .support-page {
@@ -46,9 +44,14 @@
 	margin: 0;
 }
 
-/* Абзацы описания разделены пустой строкой — как в макете */
+/*
+ * Абзацы описания разделены пустой строкой — как в макете. 1lh, а не
+ * calc(кегль × интерлиньяж): ниже 780 --line-height-b1 сам в пикселях
+ * (components/tokens.css), и умножение двух длин ломает calc() —
+ * отступ обнулялся молча.
+ */
 .support-hero__lead p + p {
-	margin-top: calc(var(--font-size-b1) * var(--line-height-b1));
+	margin-top: 1lh;
 }
 
 .support-hero__media {
@@ -315,6 +318,14 @@
  * что на статье и специализации.
  */
 @media (max-width: 700px) {
+	.support-hero,
+	.support-team,
+	.support-advantages,
+	.support-process {
+		/* Сетка телефона — 2 колонки (967:672) */
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.support-hero {
 		row-gap: 52px;
 	}
@@ -353,8 +364,23 @@
 	 * Ручной перенос в «Руководитель / проекта» не нужен и на телефоне:
 	 * в макете 3032:9157 имя стоит в одну строку (330×24). Раньше он
 	 * снимался только на 1200 и на 700.
+	 *
+	 * То же самое у второй карточки: «Столько специалистов, сколько
+	 * нужно задаче» тоже в одну строку (макет 3931:38081) — раньше
+	 * правило снимало перенос только у первой карточки.
 	 */
-	.support-team__item:first-child .support-team__name br {
+	.support-team__item .support-team__name br {
+		display: none;
+	}
+
+	/*
+	 * В «Почему мы» ручные переносы под узкую десктопную колонку: на
+	 * широкой колонке 700 (650px) первый и четвёртый тезисы умещаются в
+	 * строку целиком (макет 3931:38160 и 3931:38175 — оба 650×21),
+	 * остальные четыре остаются в две строки, как и было.
+	 */
+	.support-advantages__item:nth-child(1) .support-advantages__text br,
+	.support-advantages__item:nth-child(4) .support-advantages__text br {
 		display: none;
 	}
 
@@ -410,24 +436,40 @@
  * запрос однопиксельный.
  */
 @media (min-width: 701px) and (max-width: 1200px) {
+	.support-hero,
+	.support-team,
+	.support-advantages,
+	.support-process {
+		/* Сетка планшета — 4 колонки, а не 6 (принятая сетка 1200, 967:662) */
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
 	/* Первый экран: описание во всю правую половину, до ролика 80 */
 	.support-hero {
 		row-gap: 80px;
 	}
 
+	.support-hero__title {
+		/* Было 1/4 из шести (половина) — теперь половина из четырёх */
+		grid-column: 1 / 3;
+	}
+
 	.support-hero__lead {
-		grid-column: 4 / -1;
+		/* Было 4/-1 из шести (половина) — теперь 3/-1 */
+		grid-column: 3 / -1;
 	}
 
 	/* Заголовки блоков занимают левую половину */
 	.support-team__title,
 	.support-advantages__title {
-		grid-column: 1 / 4;
+		/* Было 1/4 из шести (половина, капалось max-width:498) */
+		grid-column: 1 / 3;
 		max-width: 498px;
 	}
 
 	.support-process__title {
-		grid-column: 1 / 4;
+		/* Было 1/4 из шести (половина, капалось max-width:326) */
+		grid-column: 1 / 3;
 		max-width: 326px;
 	}
 
@@ -437,7 +479,8 @@
 	}
 
 	.support-team__item {
-		grid-column: 4 / -1;
+		/* Было 4/-1 из шести (половина) — теперь 3/-1 */
+		grid-column: 3 / -1;
 		/* 66 от текста до линии вместо 78 */
 		padding-bottom: 66px;
 	}
@@ -449,7 +492,8 @@
 
 	.support-advantages__item:nth-child(odd),
 	.support-advantages__item:nth-child(even) {
-		grid-column: 4 / -1;
+		/* Было 4/-1 из шести (половина) — теперь 3/-1 */
+		grid-column: 3 / -1;
 	}
 
 	.support-advantages__item {
@@ -483,11 +527,13 @@
 	}
 
 	.support-process__item {
-		grid-column: span 3;
+		/* Было span 3 из шести (половина, два в ряд) — теперь span 2 из четырёх */
+		grid-column: span 2;
 	}
 
 	.support-process__media {
-		aspect-ratio: 566 / 415;
+		/* 566×463 в макете 3931:35154 — раньше стояло 415 по высоте */
+		aspect-ratio: 566 / 463;
 		/* 14 от визуала до подписи */
 		margin-bottom: 14px;
 	}
@@ -524,7 +570,8 @@
  */
 @media (min-width: 609px) and (max-width: 700px) {
 	.support-process__item {
-		grid-column: span 3;
+		/* Было span 3 из шести (половина, два в ряд) — теперь span 1 из двух */
+		grid-column: span 1;
 	}
 
 	.support-process {
@@ -574,6 +621,17 @@
  * Раньше описание прижималось к правому краю через justify-self, и у
  * строк с текстом разной длины левые края расходились.
  */
+/*
+ * Перенос заголовка «Каждая задача под контролем» в макете расставлен
+ * вручную — «Каждая задача / под контролем». Рамка 326 из макета даёт
+ * перенос на слово позже, поэтому сужаем её до 260.
+ */
+@media (max-width: 1300px) {
+	.support-process__title {
+		max-width: 260px;
+	}
+}
+
 @media (min-width: 951px) and (max-width: 1200px) {
 	.support-profiles__item {
 		grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -602,6 +660,8 @@
  */
 @media (max-width: 950px) {
 	.support-profiles__item {
+		/* Сетка телефона — 2 колонки (967:672) */
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		min-height: 0;
 		/* 16 на 950 и 24 на 700 (макет 3903:25169) — между ними считаем */
 		row-gap: clamp(16px, calc(46.4px - 3.2vw), 24px);
