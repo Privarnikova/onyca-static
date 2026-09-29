@@ -1183,6 +1183,115 @@
 		} );
 	}
 
+	/**
+	 * Маска телефона — +7 (999) 999-99-99, только цифры, не больше 10 после
+	 * кода страны. Сейчас это поле «Твой телефон» в форме вакансий
+	 * (career-form.php) — без маски туда можно было ввести буквы и сколько
+	 * угодно символов. Селектор не завязан на конкретную форму: если
+	 * появится ещё один input[type=tel], маска подхватит и его.
+	 */
+	function initPhoneMask() {
+		var inputs = document.querySelectorAll( 'input[type="tel"]' );
+
+		if ( ! inputs.length ) {
+			return;
+		}
+
+		/* Цифры без кода страны (до 10 знаков) → «+7 (999) 999-99-99» */
+		function format( digits ) {
+			var out = '+7';
+
+			if ( ! digits.length ) {
+				return out;
+			}
+
+			out += ' (' + digits.substring( 0, 3 );
+
+			if ( digits.length >= 3 ) {
+				out += ')';
+			}
+
+			if ( digits.length > 3 ) {
+				out += ' ' + digits.substring( 3, 6 );
+			}
+
+			if ( digits.length > 6 ) {
+				out += '-' + digits.substring( 6, 8 );
+			}
+
+			if ( digits.length > 8 ) {
+				out += '-' + digits.substring( 8, 10 );
+			}
+
+			return out;
+		}
+
+		/*
+		 * Ведущие 7/8 — код страны из набора вроде «8 900...», не часть
+		 * номера. leadingStripped нужен ниже — чтобы курсор считал «свои»
+		 * цифры без этой срезанной первой.
+		 */
+		function digitsOf( raw ) {
+			var all = raw.replace( /\D/g, '' );
+			var leadingStripped = all.charAt( 0 ) === '7' || all.charAt( 0 ) === '8';
+
+			return {
+				digits: ( leadingStripped ? all.substring( 1 ) : all ).substring( 0, 10 ),
+				leadingStripped: leadingStripped,
+			};
+		}
+
+		inputs.forEach( function ( input ) {
+			/* «+7 (999) 999-99-99» — 18 знаков, длиннее маска не бывает */
+			input.setAttribute( 'maxlength', 18 );
+			input.setAttribute( 'inputmode', 'tel' );
+
+			input.addEventListener( 'input', function () {
+				var caret = input.selectionStart || 0;
+				var digitsBeforeCaretRaw = input.value.substring( 0, caret ).replace( /\D/g, '' ).length;
+
+				var result = digitsOf( input.value );
+				var digits = result.digits;
+
+				/* Код страны срезан спереди — курсор считаем без этой цифры */
+				var digitsBeforeCaret = result.leadingStripped
+					? Math.max( 0, digitsBeforeCaretRaw - 1 )
+					: digitsBeforeCaretRaw;
+				digitsBeforeCaret = Math.min( digitsBeforeCaret, digits.length );
+
+				input.value = digits.length ? format( digits ) : '';
+
+				/* «+7» в начале строки не считаем — курсор ищем только среди введённых цифр */
+				var pos = digits.length ? 2 : 0;
+				var seen = 0;
+
+				while ( pos < input.value.length && seen < digitsBeforeCaret ) {
+					if ( /\d/.test( input.value.charAt( pos ) ) ) {
+						seen++;
+					}
+
+					pos++;
+				}
+
+				input.setSelectionRange( pos, pos );
+			} );
+
+			input.addEventListener( 'focus', function () {
+				if ( ! input.value ) {
+					input.value = '+7 ';
+					input.setSelectionRange( input.value.length, input.value.length );
+				}
+			} );
+
+			/* Код страны без единой цифры номера — не значение, а пустое поле */
+			input.addEventListener( 'blur', function () {
+				if ( digitsOf( input.value ).digits.length === 0 ) {
+					input.value = '';
+				}
+			} );
+		} );
+	}
+
 	function initTabPills() {
 		var pills = document.querySelectorAll( '.tab-pill:not(.tab-pill--more)' );
 
@@ -1442,13 +1551,20 @@
 
 		function close() {
 			popup.classList.remove( 'is-open' );
-			unlockScroll();
 
-			/* Прячем, когда содержимое уехало вниз */
+			/*
+			 * Прячем и возвращаем прокрутку строго вместе, не раньше: поп-ап
+			 * ещё 220мс висит на весь экран (position: fixed, inset: 0) и
+			 * гаснет прозрачностью — если снять блокировку сразу, за это
+			 * окно можно успеть потянуть страницу вверх поверх системной
+			 * полосы, и та полоса берёт цвет прозрачного, ещё не скрытого
+			 * поп-апа вместо белого фона страницы под ним.
+			 */
 			window.clearTimeout( hideTimer );
 			hideTimer = window.setTimeout( function () {
 				if ( ! popup.classList.contains( 'is-open' ) ) {
 					popup.hidden = true;
+					unlockScroll();
 				}
 			}, POPUP_HIDE_DELAY );
 		}
@@ -1684,14 +1800,24 @@
 			} );
 		}
 
-		/* Полоса открывает тот же поп-ап, что и плавающая кнопка, и уходит */
+		/*
+		 * Полоса открывает тот же поп-ап, что и плавающая кнопка, и уходит.
+		 * На ≤1200 (case-lead.css) полоса становится поп-апом с двумя
+		 * кнопками — «Обсудить проект» тоже открывает форму и тоже должна
+		 * закрывать саму полосу: без этого чёрная плашка оставалась под
+		 * поп-апом формы и красила системную полосу iOS в чёрный вместо
+		 * белого.
+		 */
 		var link = lead.querySelector( '.case-lead__link' );
+		var discuss = lead.querySelector( '.case-lead__discuss' );
 
-		if ( link ) {
-			link.addEventListener( 'click', function () {
-				hide();
-			} );
-		}
+		[ link, discuss ].forEach( function ( trigger ) {
+			if ( trigger ) {
+				trigger.addEventListener( 'click', function () {
+					hide();
+				} );
+			}
+		} );
 
 		/* Баннер cookie приняли — проверяем сразу, не дожидаясь прокрутки */
 		var accept = document.querySelector( '[data-cookie-accept]' );
@@ -3207,6 +3333,7 @@
 		initMagneticButtons();
 		initPopup();
 		initContactForm();
+		initPhoneMask();
 		initLazyVideo();
 		initStudioCircleStroke();
 		initMoscowClock();
