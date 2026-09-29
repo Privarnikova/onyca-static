@@ -268,9 +268,20 @@
 		row-gap: clamp(44px, calc(60.47px - 2.3529vw), 52px);
 	}
 
-	.vacancies .faq__question,
-	.vacancies .faq__details.is-open .faq__question {
+	/*
+	 * padding-block, а не отдельно верх/низ, здесь ловил и верх: у
+	 * .is-open он перебивал .faq__item:first-child .faq__question
+	 * {padding-top:0} (faq.css) и добавлял первой вакансии 27–32px
+	 * сверху при раскрытии — строка вопроса прыгала вниз вместе с
+	 * ответом. На 700+ (блок выше) верх не трогают — только padding-
+	 * bottom, тот же приём здесь.
+	 */
+	.vacancies .faq__question {
 		padding-block: clamp(27px, calc(37.29px - 1.4706vw), 32px);
+	}
+
+	.vacancies .faq__details.is-open .faq__question {
+		padding-bottom: clamp(27px, calc(37.29px - 1.4706vw), 32px);
 	}
 
 	.vacancies__apply {

@@ -106,6 +106,11 @@
 	color: var(--color-text);
 }
 
+/* Переносы только в узкой колонке (≤699) — см. правило ниже в файле */
+.br-narrow-note {
+	display: none;
+}
+
 /* Верхний тезис стоит вровень с заголовком */
 .home-hero__note--top {
 	grid-row: 1;
@@ -714,6 +719,11 @@
 	.front-page {
 		row-gap: clamp(148px, calc(135.29px + 3.529vw), 160px);
 		padding-bottom: clamp(148px, calc(135.29px + 3.529vw), 160px);
+	}
+
+	/* Переносы тезисов первого экрана — см. front-page.php */
+	.br-narrow-note {
+		display: inline;
 	}
 
 	/*

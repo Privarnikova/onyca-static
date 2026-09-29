@@ -126,10 +126,18 @@
 	}
 
 	.project-team__member,
-	.project-team__fact--release,
-	.project-team__fact--duration,
 	.project-team__summary {
 		grid-column: 1 / -1;
+	}
+
+	/*
+	 * Дата и срок — во второй колонке (макет 360, 3271:16898), а не во
+	 * всю ширину: значения прижаты к правой половине, левая половина
+	 * строки пустая.
+	 */
+	.project-team__fact--release,
+	.project-team__fact--duration {
+		grid-column: 2;
 	}
 
 	/* Карточки в столбик — макет 3258:13635: между ними 32, не 48 */

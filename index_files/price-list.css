@@ -363,11 +363,13 @@
 
 	/*
 	 * Дизайн-поддержка — третья колонка тоже значение («Месяц»), не
-	 * стрелка: 90 под «Час» (до 88) и 100 под «Месяц» (до 99).
+	 * стрелка: имя не сжимается меньше 130 (макет 3257:7905: колонки
+	 * 130/60/99, а не 90 под «Час» — так строка «Руководитель проекта»
+	 * теряла место и ломалась теснее, чем в макете).
 	 */
 	.price-table--monthly .price-table__head,
 	.price-table--monthly .price-table__link {
-		grid-template-columns: minmax(0, 1fr) 90px 100px;
+		grid-template-columns: minmax(130px, 1fr) 60px 99px;
 	}
 
 	.price-table__head .price-table__cell:first-child,

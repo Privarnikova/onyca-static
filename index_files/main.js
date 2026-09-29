@@ -2905,14 +2905,29 @@
 						return;
 					}
 
+					/*
+					 * Высота на 0 ДО item.open = true: нативное раскрытие
+					 * <details> отрисовывает ответ на полную высоту раньше,
+					 * чем стартует animate() ниже, и страница на кадр
+					 * дёргается вниз — заметнее там, где ответ длиннее
+					 * (первая вакансия с текстом и кнопкой, у вопросов
+					 * покороче незаметно).
+					 */
+					answer.style.height = '0px';
+
 					item.open = true;
 					item.classList.add( 'is-open' );
 
 					if ( still ) {
+						answer.style.height = '';
+
 						return;
 					}
 
-					slide( 0, answer.scrollHeight );
+					slide( 0, answer.scrollHeight, function () {
+						/* Высота снова живая — контент может меняться (resize, шрифты) */
+						answer.style.height = '';
+					} );
 				}
 
 				function close() {
