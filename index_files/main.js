@@ -1184,11 +1184,33 @@
 	}
 
 	function initTabPills() {
-		var pills = document.querySelectorAll( '.tab-pill' );
+		var pills = document.querySelectorAll( '.tab-pill:not(.tab-pill--more)' );
 
 		pills.forEach( function ( pill ) {
 			pill.addEventListener( 'click', function () {
 				pill.classList.toggle( 'is-selected' );
+			} );
+		} );
+	}
+
+	/**
+	 * Кнопка «Ещё» у тегов «Ваш проект» (только ≤699, макет 360 «Форма 1»,
+	 * 3271:15402): по клику показывает остальные семь тегов и саму себя
+	 * прячет. На 700 и выше кнопки нет (contact-form.css), обработчик
+	 * просто не находит её и ничего не делает.
+	 */
+	function initTabPillsMore() {
+		var groups = document.querySelectorAll( '[data-tab-pills]' );
+
+		groups.forEach( function ( group ) {
+			var moreButton = group.querySelector( '[data-tab-pills-more]' );
+
+			if ( ! moreButton ) {
+				return;
+			}
+
+			moreButton.addEventListener( 'click', function () {
+				group.classList.add( 'is-expanded' );
 			} );
 		} );
 	}
@@ -3165,6 +3187,7 @@
 		initBurgerMenu();
 		initFilterTabs();
 		initTabPills();
+		initTabPillsMore();
 		initCookieBanner();
 		initMagneticButtons();
 		initPopup();

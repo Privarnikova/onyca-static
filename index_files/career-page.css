@@ -217,8 +217,16 @@
 		row-gap: 52px;
 	}
 
+	/*
+	 * До текста и до полотна — 32 (макет 360, 3128:1926): было 52, унаследовано
+	 * без сверки с телефонным макетом.
+	 */
 	.career-idea {
-		row-gap: 52px;
+		row-gap: 32px;
+	}
+
+	.career-idea__body {
+		margin-top: 32px;
 	}
 
 	/*
@@ -237,8 +245,10 @@
 		background-size: 100% 1px;
 	}
 
+	/* До полотна — 52 (макет 360, 3128:1988): было 66, клемп не считал ниже 1600 */
 	.career-values {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+		row-gap: 52px;
 	}
 
 	.career-values__title {

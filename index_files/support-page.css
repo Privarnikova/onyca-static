@@ -336,10 +336,34 @@
 		max-width: none;
 	}
 
+	/*
+	 * От заголовка до первой карточки — 52, между карточками — 32 (макет
+	 * 360: «Ваша внешняя дизайн-команда» 3032:9153, «Почему мы» 3066:9411).
+	 * Один row-gap не даёт разных зазоров в общей сетке (заголовок и
+	 * карточки — строки одной grid), поэтому зазор общий — 32, а первая
+	 * карточка сама отодвинута от заголовка на недостающие 20.
+	 */
 	.support-team,
-	.support-advantages,
+	.support-advantages {
+		row-gap: 32px;
+	}
+
+	.support-team__item:first-child,
+	.support-advantages__item:nth-child(1) {
+		margin-top: 20px;
+	}
+
+	/*
+	 * У «Каждая задача под контролем» до первой карточки 32, между
+	 * карточками 48 (макет 360, 3066:9314) — наоборот, первая карточка
+	 * ближе к заголовку, чем следующие друг к другу.
+	 */
 	.support-process {
-		row-gap: 52px;
+		row-gap: 48px;
+	}
+
+	.support-process__item:first-child {
+		margin-top: -16px;
 	}
 
 	.support-team__title,
@@ -381,6 +405,18 @@
 	 */
 	.support-advantages__item:nth-child(1) .support-advantages__text br,
 	.support-advantages__item:nth-child(4) .support-advantages__text br {
+		display: none;
+	}
+
+	/*
+	 * Третий и шестой тезисы («Без собственного штата», «Прозрачный
+	 * учет») — перенос ломает строку на телефоне раньше, чем нужно (макет
+	 * 360, 3066:9411: оба тезиса на три строки, а с переносом выходит
+	 * четыре). На 700 скрытие ничего не меняет — с переносом и без него
+	 * строк там уже поровну (проверено).
+	 */
+	.support-advantages__item:nth-child(3) .support-advantages__text br,
+	.support-advantages__item:nth-child(6) .support-advantages__text br {
 		display: none;
 	}
 
