@@ -327,12 +327,15 @@
  * подсветка обрывалась. Верхняя часть отступа у первой строки не нужна.
  */
 /*
- * Полоса над названием: 50 на 1920, 44 на 1200 (макет 3372:11995 —
- * строка 119), 40 на 700 (3792:25205 — строка 111). Одна прямая через
- * все три точки.
+ * Полоса над названием: 50 на 1920, 43.4 на 1600 (макет 3425:15115 —
+ * строка 119, было по прямой от 1920 к 1200 напрямую, без 1600 как
+ * реальной точки — та прямая на 1600 давала 47.4, строка получалась 127
+ * вместо 119), 44 на 1200 (макет 3372:11995 — строка 119), 40 на 700
+ * (3792:25205 — строка 111). Три сегмента по реальным точкам, не одна
+ * прямая через все четыре.
  */
 .home-services__item + .home-services__item .home-services__link {
-	padding-top: clamp(40px, calc(34.26px + 0.8197vw), 50px);
+	padding-top: clamp(43.4px, calc(10.4px + 2.0625vw), 50px);
 }
 
 /*
@@ -350,11 +353,38 @@
 	align-items: flex-start;
 	justify-content: space-between;
 	gap: var(--grid-gap);
-	/* Полоса под названием: 50 на 1920, 44 на 1200, 40 на 700 */
-	padding-bottom: clamp(40px, calc(34.26px + 0.8197vw), 50px);
+	/* Полоса под названием — та же лестница, что у полосы над названием */
+	padding-bottom: clamp(43.4px, calc(10.4px + 2.0625vw), 50px);
 	border-bottom: 1px solid var(--color-divider);
 	color: var(--color-text);
 	text-decoration: none;
+}
+
+/*
+ * Ниже правила заново переопределяют padding-top/padding-bottom для
+ * 1600 и 1200 — размещены ПОСЛЕ безусловного `.home-services__link` выше,
+ * иначе тот (та же специфичность, но позже в файле) их перебивает.
+ */
+@media (max-width: 1600px) {
+	/* Почти плато: 43.4 на 1600 → 44 на 1200 */
+	.home-services__item + .home-services__item .home-services__link {
+		padding-top: clamp(43.4px, calc(45.8px - 0.15vw), 44px);
+	}
+
+	.home-services__link {
+		padding-bottom: clamp(43.4px, calc(45.8px - 0.15vw), 44px);
+	}
+}
+
+/* 44 на 1200 → 40 на 700 (макет 3792:25205 — строка 111) */
+@media (max-width: 1200px) {
+	.home-services__item + .home-services__item .home-services__link {
+		padding-top: clamp(40px, calc(34.4px + 0.8vw), 44px);
+	}
+
+	.home-services__link {
+		padding-bottom: clamp(40px, calc(34.4px + 0.8vw), 44px);
+	}
 }
 
 .home-services__title {
