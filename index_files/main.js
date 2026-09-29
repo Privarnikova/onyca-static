@@ -1565,8 +1565,24 @@
 				if ( ! popup.classList.contains( 'is-open' ) ) {
 					popup.hidden = true;
 					unlockScroll();
+					nudgeScroll();
 				}
 			}, POPUP_HIDE_DELAY );
+		}
+
+		/*
+		 * iOS Safari за закрытым поп-апом (был во весь экран, position:
+		 * fixed, inset: 0) не всегда сам перекрашивает системную полосу
+		 * обратно в белый — она остаётся прозрачной, пока не случится
+		 * настоящая прокрутка. Сдвиг на 1px и обратно синхронно — тот же
+		 * самый скролл для браузера, без видимого дёргания страницы.
+		 */
+		function nudgeScroll() {
+			var x = window.scrollX;
+			var y = window.scrollY;
+
+			window.scrollTo( x, y + 1 );
+			window.scrollTo( x, y );
 		}
 
 		document.addEventListener( 'click', function ( event ) {
@@ -1734,6 +1750,21 @@
 		}
 
 		/*
+		 * Мгновенное скрытие — специально для открытия поп-апа поверх
+		 * полосы (клик по «Обсудить проект» или по всей плашке-ссылке).
+		 * Красивый уезд вниз здесь ни к чему: поп-ап и так закрывает
+		 * полосу сверху, а 450мс его анимации — ровно то окно, где
+		 * чёрная плашка ещё жива одновременно с открывающимся (ещё
+		 * прозрачным на первых кадрах) поп-апом, и системная полоса
+		 * iOS успевает закраситься в её цвет, а не в белый поп-апа.
+		 */
+		function hideInstantly() {
+			lead.classList.remove( 'is-visible' );
+			lead.hidden = true;
+			lead.classList.add( 'is-hidden' );
+		}
+
+		/*
 		 * Пока на экране баннер о cookie, полосу не показываем: они стоят в
 		 * одном углу и вдвоём наваливаются на посетителя. Полоса дождётся,
 		 * пока баннер примут.
@@ -1807,13 +1838,26 @@
 		 * закрывать саму полосу: без этого чёрная плашка оставалась под
 		 * поп-апом формы и красила системную полосу iOS в чёрный вместо
 		 * белого.
+		 *
+		 * Мгновенно — только здесь и только ≤1200: сам `.case-lead__link`
+		 * (вся полоса как ссылка) — общий элемент и для десктопа, и для
+		 * планшета/телефона, различает их только ширина экрана в момент
+		 * клика. Выше 1200 своего поп-апа над полосой нет — там обычная
+		 * анимация закрытия, как у кнопки «Закрыть».
 		 */
 		var link = lead.querySelector( '.case-lead__link' );
 		var discuss = lead.querySelector( '.case-lead__discuss' );
+		var narrowQuery = window.matchMedia( '(max-width: 1200px)' );
 
 		[ link, discuss ].forEach( function ( trigger ) {
 			if ( trigger ) {
 				trigger.addEventListener( 'click', function () {
+					if ( narrowQuery.matches ) {
+						hideInstantly();
+
+						return;
+					}
+
 					hide();
 				} );
 			}
