@@ -1565,24 +1565,8 @@
 				if ( ! popup.classList.contains( 'is-open' ) ) {
 					popup.hidden = true;
 					unlockScroll();
-					nudgeScroll();
 				}
 			}, POPUP_HIDE_DELAY );
-		}
-
-		/*
-		 * iOS Safari за закрытым поп-апом (был во весь экран, position:
-		 * fixed, inset: 0) не всегда сам перекрашивает системную полосу
-		 * обратно в белый — она остаётся прозрачной, пока не случится
-		 * настоящая прокрутка. Сдвиг на 1px и обратно синхронно — тот же
-		 * самый скролл для браузера, без видимого дёргания страницы.
-		 */
-		function nudgeScroll() {
-			var x = window.scrollX;
-			var y = window.scrollY;
-
-			window.scrollTo( x, y + 1 );
-			window.scrollTo( x, y );
 		}
 
 		/* onyca.digital/order/ (page-order.php) — поп-ап открыт сразу, без клика */
