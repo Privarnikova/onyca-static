@@ -164,9 +164,30 @@
 			lastScrollY = currentScrollY;
 		}
 
+		/*
+		 * resize — не напрямую: на iPhone закрытие поп-апа (снятие
+		 * overflow: hidden с html) возвращает адресную строку Safari,
+		 * window.innerHeight растёт, maxScrollY (= scrollHeight −
+		 * innerHeight) в update() уменьшается — и если реальный
+		 * window.scrollY был близко к старому максимуму, currentScrollY
+		 * обрезается НИЖЕ lastScrollY, хотя пользователь не скроллил.
+		 * update() читает это как «прокрутка вверх» и убирает is-hidden —
+		 * шапка выпадает сама по себе, через момент после закрытия
+		 * поп-апа (тот же класс бага, что чинили в бургер-меню, см.
+		 * initBurgerMenu). Debounce: действуем только по итоговому,
+		 * устоявшемуся состоянию, не по кадру посреди анимации адресной
+		 * строки.
+		 */
+		var resizeTimer = null;
+
+		function debouncedUpdate() {
+			window.clearTimeout( resizeTimer );
+			resizeTimer = window.setTimeout( update, 250 );
+		}
+
 		update();
 		window.addEventListener( 'scroll', update, { passive: true } );
-		window.addEventListener( 'resize', update );
+		window.addEventListener( 'resize', debouncedUpdate );
 	}
 
 	/**
