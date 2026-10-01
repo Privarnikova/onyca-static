@@ -1693,19 +1693,47 @@
 		/* С какой формы пришли — чтобы «Попробовать снова» вернул её */
 		var lastFormPane = null;
 
+		/*
+		 * Блокировка прокрутки — через position: fixed у body, а не
+		 * overflow: hidden у html. У overflow: hidden на iOS Safari есть
+		 * побочный эффект: переключение прячет и возвращает адресную
+		 * строку (тело документа резко меняет прокручиваемую высоту), а
+		 * сама анимация строки — ровно то окно, когда фикс-позиционные
+		 * потомки (белая полоса под вырезом, body::before в main.css)
+		 * могут на кадр отрисоваться не там, и системная полоса сверху
+		 * подхватывает чужой цвет. Та же причина, по которой в body уже
+		 * нет overflow-x: clip (см. комментарий у body чуть выше) — там
+		 * ломался не цвет, а клик по фикс-кнопке, но источник тот же.
+		 *
+		 * position: fixed у body с отрицательным top на высоту прокрутки
+		 * держит страницу на месте, не трогая overflow совсем — адресная
+		 * строка не анимируется, и перерисовывать нечего.
+		 */
+		var lockedScrollY = 0;
+
 		function lockScroll() {
 			var scrollbar = window.innerWidth - document.documentElement.clientWidth;
 
-			document.documentElement.style.overflow = 'hidden';
+			lockedScrollY = window.scrollY;
+
+			document.body.style.position = 'fixed';
+			document.body.style.top = -lockedScrollY + 'px';
+			document.body.style.left = '0';
+			document.body.style.right = '0';
 
 			if ( scrollbar > 0 ) {
-				document.documentElement.style.paddingRight = scrollbar + 'px';
+				document.body.style.paddingRight = scrollbar + 'px';
 			}
 		}
 
 		function unlockScroll() {
-			document.documentElement.style.overflow = '';
-			document.documentElement.style.paddingRight = '';
+			document.body.style.position = '';
+			document.body.style.top = '';
+			document.body.style.left = '';
+			document.body.style.right = '';
+			document.body.style.paddingRight = '';
+
+			window.scrollTo( 0, lockedScrollY );
 		}
 
 		/*
