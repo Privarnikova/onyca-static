@@ -107,15 +107,6 @@
 	gap: clamp(14px, calc(4px + 0.625vw), 16px);
 }
 
-/*
- * «Ещё» — только на телефоне (≤699): там теги скрыты за прогрессивным
- * раскрытием, на 700 и выше идут все сразу и кнопка не нужна. На этой
- * ширине .tab-pill--extra ничем не переопределяется — обычный .tab-pill.
- */
-.tab-pill--more {
-	display: none;
-}
-
 .contact-form__fields {
 	display: grid;
 	/*
@@ -441,29 +432,6 @@
 	.contact-form-section.container {
 		padding-left: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
 		padding-right: clamp(15px, calc(4.4118px + 2.9412vw), 25px);
-	}
-
-	/*
-	 * Табы «Ваш проект»: в макете видно только первые пять и кнопку
-	 * «Ещё» — прогрессивное раскрытие (main.js, initTabPillsMore).
-	 * Класс .is-expanded вешает JS по клику — раскрытие через класс, а
-	 * не атрибут hidden: у него в проекте display:none !important
-	 * (main.css) на любой ширине, здесь же скрытие только до 699.
-	 */
-	.tab-pill--extra {
-		display: none;
-	}
-
-	.tab-pill--more {
-		display: inline-flex;
-	}
-
-	.contact-form__tabs.is-expanded .tab-pill--extra {
-		display: inline-flex;
-	}
-
-	.contact-form__tabs.is-expanded .tab-pill--more {
-		display: none;
 	}
 
 	.contact-form-intro {

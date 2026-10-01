@@ -128,3 +128,17 @@
 		--discuss-bottom: calc(clamp(25px, 2.0833vw, 40px) + env(safe-area-inset-bottom, 0px));
 	}
 }
+
+/*
+ * ≥1301 — кнопка стоит в одной дорожке с полосой лид-магнита кейса
+ * (components/case-lead.css, --case-lead-bottom) и должна быть на одном
+ * уровне с ней, а формула выше (через 1200 и 700) этого не даёт: прямая
+ * через 1920/40 и 1200/25 на 1600 считает 33.33, а по факту макета
+ * (3545:29017 — полоса, 2645:7145 — кнопка, оба 1600) там 35 у обеих.
+ * Та же формула, что у --case-lead-bottom — иначе разъедутся снова.
+ */
+@media (min-width: 1301px) {
+	.discuss-button {
+		--discuss-bottom: calc(clamp(20px, calc(10px + 1.5625vw), 40px) + env(safe-area-inset-bottom, 0px));
+	}
+}

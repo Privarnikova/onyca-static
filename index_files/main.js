@@ -275,9 +275,6 @@
 			}, MENU_HIDE_DELAY );
 		}
 
-		/* Ширина при открытии — чтобы отличить реальный resize (ниже) */
-		var openedWidth = 0;
-
 		toggle.addEventListener( 'click', function () {
 			var isOpen = toggle.getAttribute( 'aria-expanded' ) === 'true';
 
@@ -292,7 +289,6 @@
 			lockScroll();
 			setMenuHeight();
 			toggleCookieBanner( true );
-			openedWidth = window.innerWidth;
 
 			/* Класс — следующим кадром, чтобы переход проиграл выезд */
 			window.requestAnimationFrame( function () {
@@ -300,40 +296,54 @@
 			} );
 		} );
 
+		/*
+		 * lockScroll() прячет адресную строку Safari на iOS, а её уход сам
+		 * по себе шлёт window resize — без участия пользователя,
+		 * window.innerHeight в моменте отдаёт промежуточное значение.
+		 * Раньше такой resize отличали от настоящего по ширине окна (она
+		 * будто бы не меняется, в отличие от поворота/перехода на
+		 * десктоп) — не сработало у заказчика (iPhone 14 Pro Max, iOS
+		 * 26.6.2): судя по всему, во время самой анимации ширина тоже
+		 * успевает дёрнуться на пиксель-два, точное сравнение === это не
+		 * ловит, и баг остаётся в части браузеров.
+		 *
+		 * Вместо того чтобы угадывать причину resize по одному событию,
+		 * ждём, пока они перестанут сыпаться (debounce): во время анимации
+		 * адресной строки resize обычно летит непрерывно, пока она
+		 * двигается, и таймер всё время сбрасывается; как только значения
+		 * устаканились — действуем по итоговому состоянию, каким бы оно ни
+		 * было. Тест на закрытие при переходе на десктоп (behaviour.spec.js)
+		 * ждёт 400мс после resize — 250мс сюда укладываются.
+		 */
+		var resizeTimer = null;
+
 		window.addEventListener( 'resize', function () {
 			if ( toggle.getAttribute( 'aria-expanded' ) !== 'true' ) {
 				return;
 			}
 
-			/*
-			 * lockScroll() прячет адресную строку Safari на iOS, а её уход
-			 * сам по себе шлёт window resize — без участия пользователя.
-			 * window.innerHeight в этот момент отдаёт промежуточное
-			 * значение, setMenuHeight() на нём схлопывал панель до
-			 * нулевой высоты: меню «открывалось» и тут же пропадало, хотя
-			 * aria-expanded оставался true (баг только на iOS Safari,
-			 * воспроизведён на iPhone 14 Pro Max). У такого resize меняется
-			 * только высота — ширина окна та же, что при открытии; у
-			 * настоящего (поворот экрана, переход на десктоп) меняется и
-			 * ширина, поэтому его отличаем по ней, а не по таймеру.
-			 */
-			if ( window.innerWidth === openedWidth ) {
-				return;
-			}
+			window.clearTimeout( resizeTimer );
 
-			/*
-			 * Выше 1200 бургера нет — там десктопная шапка с полным меню.
-			 * Если растянуть окно с открытой панелью, её стили (они целиком
-			 * внутри @media max-width:1200) отваливаются, и панель остаётся
-			 * висеть поверх страницы голым списком, а скролл — заблокирован.
-			 * Поэтому на выходе из планшетного диапазона меню закрываем.
-			 */
-			if ( window.matchMedia( '(min-width: 1201px)' ).matches ) {
-				closeMenu( true );
-				return;
-			}
+			resizeTimer = window.setTimeout( function () {
+				if ( toggle.getAttribute( 'aria-expanded' ) !== 'true' ) {
+					return;
+				}
 
-			setMenuHeight();
+				/*
+				 * Выше 1200 бургера нет — там десктопная шапка с полным
+				 * меню. Если растянуть окно с открытой панелью, её стили
+				 * (они целиком внутри @media max-width:1200) отваливаются,
+				 * и панель остаётся висеть поверх страницы голым списком, а
+				 * скролл — заблокирован. Поэтому на выходе из планшетного
+				 * диапазона меню закрываем.
+				 */
+				if ( window.matchMedia( '(min-width: 1201px)' ).matches ) {
+					closeMenu( true );
+					return;
+				}
+
+				setMenuHeight();
+			}, 250 );
 		} );
 
 		menu.querySelectorAll( '.menu-item-has-children > .menu-trigger' ).forEach( function ( link ) {
@@ -1323,24 +1333,148 @@
 	}
 
 	/**
-	 * Кнопка «Ещё» у тегов «Ваш проект» (только ≤699, макет 360 «Форма 1»,
-	 * 3271:15402): по клику показывает остальные семь тегов и саму себя
-	 * прячет. На 700 и выше кнопки нет (contact-form.css), обработчик
-	 * просто не находит её и ничего не делает.
+	 * Переполнение табов — общее для тегов формы («Ваш проект»), фильтра
+	 * блога и обоих фильтров проектов (отрасли, услуги): [data-tab-overflow]
+	 * на каждой группе. Если теги переносятся больше чем на 3 строки,
+	 * лишние прячутся и вместо них встаёт таб «Еще» — по клику раскрывает
+	 * все.
+	 *
+	 * Порог не по ширине окна (window.innerWidth), а по тому, сколько
+	 * строк реально вышло: в поп-апе «Обсудить проект» у формы свой
+	 * max-width у́же окна, и теги там переносятся на четыре строки даже
+	 * при широком окне (больше 1200) — проверка по window.innerWidth
+	 * тогда ничего не находила и «Еще» не появлялся.
+	 *
+	 * Строки считаем по offsetTop — у флекса с flex-wrap одна строка
+	 * делит одно и то же значение. Таб «Еще» вставляется ПОСЛЕ видимых
+	 * тегов и сам может перенести строку: тогда прячем ещё один тег и
+	 * пробуем снова, пока «Еще» не поместится в третью строку.
 	 */
-	function initTabPillsMore() {
-		var groups = document.querySelectorAll( '[data-tab-pills]' );
+	function initTabPillsOverflow() {
+		var groups = document.querySelectorAll( '[data-tab-overflow]' );
+
+		if ( ! groups.length ) {
+			return;
+		}
+
+		function rowCount( items ) {
+			var rows = 0;
+			var lastTop = null;
+
+			items.forEach( function ( item ) {
+				var top = item.offsetTop;
+
+				if ( lastTop === null || Math.abs( top - lastTop ) > 1 ) {
+					rows++;
+					lastTop = top;
+				}
+			} );
+
+			return rows;
+		}
 
 		groups.forEach( function ( group ) {
-			var moreButton = group.querySelector( '[data-tab-pills-more]' );
+			var more = null;
 
-			if ( ! moreButton ) {
-				return;
+			function pills() {
+				return Array.prototype.slice.call(
+					group.querySelectorAll( '.tab-pill:not(.tab-pill--more)' )
+				);
 			}
 
-			moreButton.addEventListener( 'click', function () {
-				group.classList.add( 'is-expanded' );
-			} );
+			function expand() {
+				pills().forEach( function ( pill ) {
+					pill.hidden = false;
+				} );
+
+				if ( more ) {
+					more.remove();
+					more = null;
+				}
+			}
+
+			function collapse() {
+				var all = pills();
+
+				all.forEach( function ( pill ) {
+					pill.hidden = false;
+				} );
+
+				if ( more ) {
+					more.remove();
+					more = null;
+				}
+
+				if ( rowCount( all ) <= 3 ) {
+					return;
+				}
+
+				var visible = all.length;
+
+				while ( visible > 1 && rowCount( all.slice( 0, visible ) ) > 3 ) {
+					visible--;
+				}
+
+				/*
+				 * Уже выбранный тег не должен уйти за «Еще» — иначе активный
+				 * фильтр пропадёт из вида без возможности понять, что он
+				 * включён. «Все» — выбран по умолчанию, когда фильтра нет
+				 * вообще, это не повод ничего прятать: смотрим только на
+				 * то, что ушло бы за черту.
+				 */
+				if ( all.slice( visible ).some( function ( pill ) { return pill.classList.contains( 'is-selected' ); } ) ) {
+					return;
+				}
+
+				more = document.createElement( 'button' );
+				more.type = 'button';
+				more.className = 'tab-pill tab-pill--more';
+				more.textContent = 'Еще';
+				more.addEventListener( 'click', expand );
+
+				all[ visible - 1 ].insertAdjacentElement( 'afterend', more );
+
+				/* «Еще» сама перенесла строку — освобождаем ей место */
+				while ( visible > 1 && rowCount( all.slice( 0, visible ).concat( [ more ] ) ) > 3 ) {
+					visible--;
+					all[ visible ].insertAdjacentElement( 'beforebegin', more );
+				}
+
+				for ( var i = visible; i < all.length; i++ ) {
+					all[ i ].hidden = true;
+				}
+			}
+
+			collapse();
+
+			/*
+			 * ResizeObserver, не resize окна: группа в поп-апе «Обсудить
+			 * проект» при загрузке страницы ещё скрыта (display: none,
+			 * offsetTop всех тегов — 0, «строка» всего одна), а пересчёт
+			 * был только на resize. Поп-ап открывают кликом, окно при этом
+			 * не меняется — collapse() ни разу не перезапускался с
+			 * реальными размерами. ResizeObserver сам сработает, когда
+			 * группа получит фактический размер (поп-ап открылся) — тот же
+			 * приём, что у initHeroShowreel и initDiscussButton.
+			 */
+			if ( window.ResizeObserver ) {
+				var pending = false;
+
+				new ResizeObserver( function () {
+					if ( pending ) {
+						return;
+					}
+
+					pending = true;
+
+					requestAnimationFrame( function () {
+						pending = false;
+						collapse();
+					} );
+				} ).observe( group );
+			} else {
+				window.addEventListener( 'resize', collapse );
+			}
 		} );
 	}
 
@@ -1734,6 +1868,26 @@
 			return ( window.scrollY + window.innerHeight ) / document.documentElement.scrollHeight;
 		}
 
+		/*
+		 * ≤1300 (case-lead.css) полоса сама несёт кнопку «Обсудить
+		 * проект» в себе (рядом с «Закрыть») — отдельная плавающая кнопка
+		 * в этом диапазоне, пока полоса открыта, не нужна: обе стояли на
+		 * экране разом (полоса — sticky в своей дорожке, не fixed поверх
+		 * всего, как на телефоне ≤599, поэтому не перекрывает её сама по
+		 * себе). Выше 1300 у полосы своей кнопки нет — плавающая остаётся
+		 * единственной и должна быть видна.
+		 */
+		var narrowQuery = window.matchMedia( '(max-width: 1300px)' );
+		var discussWrap = document.querySelector( '[data-discuss-button]' );
+
+		function syncDiscussButton() {
+			if ( ! discussWrap ) {
+				return;
+			}
+
+			discussWrap.hidden = narrowQuery.matches && lead.classList.contains( 'is-visible' );
+		}
+
 		function show() {
 			lead.hidden = false;
 			lead.classList.remove( 'is-hidden' );
@@ -1741,6 +1895,7 @@
 			/* Класс на следующем кадре: иначе перехода снизу не видно */
 			window.requestAnimationFrame( function () {
 				lead.classList.add( 'is-visible' );
+				syncDiscussButton();
 			} );
 
 			remember();
@@ -1750,6 +1905,7 @@
 
 		function hide() {
 			lead.classList.remove( 'is-visible' );
+			syncDiscussButton();
 
 			/* Ждём конец выезда вниз, потом убираем из потока */
 			window.setTimeout( function () {
@@ -1771,6 +1927,7 @@
 			lead.classList.remove( 'is-visible' );
 			lead.hidden = true;
 			lead.classList.add( 'is-hidden' );
+			syncDiscussButton();
 		}
 
 		/*
@@ -1842,21 +1999,20 @@
 
 		/*
 		 * Полоса открывает тот же поп-ап, что и плавающая кнопка, и уходит.
-		 * На ≤1200 (case-lead.css) полоса становится поп-апом с двумя
+		 * На ≤1300 (case-lead.css) полоса становится поп-апом с двумя
 		 * кнопками — «Обсудить проект» тоже открывает форму и тоже должна
 		 * закрывать саму полосу: без этого чёрная плашка оставалась под
 		 * поп-апом формы и красила системную полосу iOS в чёрный вместо
 		 * белого.
 		 *
-		 * Мгновенно — только здесь и только ≤1200: сам `.case-lead__link`
+		 * Мгновенно — только здесь и только ≤1300: сам `.case-lead__link`
 		 * (вся полоса как ссылка) — общий элемент и для десктопа, и для
 		 * планшета/телефона, различает их только ширина экрана в момент
-		 * клика. Выше 1200 своего поп-апа над полосой нет — там обычная
+		 * клика. Выше 1300 своего поп-апа над полосой нет — там обычная
 		 * анимация закрытия, как у кнопки «Закрыть».
 		 */
 		var link = lead.querySelector( '.case-lead__link' );
 		var discuss = lead.querySelector( '.case-lead__discuss' );
-		var narrowQuery = window.matchMedia( '(max-width: 1200px)' );
 
 		[ link, discuss ].forEach( function ( trigger ) {
 			if ( trigger ) {
@@ -1882,6 +2038,9 @@
 		window.addEventListener( 'scroll', onScroll, { passive: true } );
 		window.addEventListener( 'resize', onScroll );
 		window.addEventListener( 'resize', measure );
+		/* Переход через границу 1200 с открытой полосой — обе кнопки
+		   должны снова сойтись к правильному набору */
+		window.addEventListener( 'resize', syncDiscussButton );
 		window.addEventListener( 'load', measure );
 
 		if ( window.ResizeObserver ) {
@@ -2567,7 +2726,11 @@
 			button.type = 'button';
 			button.className = 'showreel-player__close';
 			button.setAttribute( 'aria-label', 'Закрыть' );
-			button.innerHTML = '<svg class="icon icon--32" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18" stroke="currentColor" stroke-linejoin="round"/><path d="M6 6L18 18" stroke="currentColor" stroke-linejoin="round"/></svg>';
+			/* icon--lg, не icon--32: файл x.svg нарисован в viewBox 24 (как и
+			   в поп-апе «Обсудить проект»), а icon--32 — для файлов с
+			   нативным viewBox 32 (меню). С icon--32 обводка растягивалась
+			   вместе с картинкой и выходила толще, чем в меню/поп-апах. */
+			button.innerHTML = '<svg class="icon icon--lg" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18" stroke="currentColor" stroke-linejoin="round"/><path d="M6 6L18 18" stroke="currentColor" stroke-linejoin="round"/></svg>';
 			button.addEventListener( 'click', close );
 
 			/* Щелчок мимо кадра закрывает просмотр */
@@ -3381,7 +3544,6 @@
 		initBurgerMenu();
 		initFilterTabs();
 		initTabPills();
-		initTabPillsMore();
 		initCookieBanner();
 		initMagneticButtons();
 		initPopup();
@@ -3402,6 +3564,7 @@
 		initResponsiveBlogLayout();
 		initProjectFilter();
 		initResponsiveProjectLayout();
+		initTabPillsOverflow();
 		initFaq();
 		initShowreelWatch();
 		initShowreelPlayer();
