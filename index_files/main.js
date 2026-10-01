@@ -1705,14 +1705,17 @@
 		/* Столько же, сколько уход в CSS: 0.45s выезд, закрытие вдвое быстрее */
 		var POPUP_HIDE_DELAY = 220;
 		var hideTimer = null;
+		/* Куда вернуть фокус при закрытии — кнопка/ссылка, что открыла поп-ап */
+		var lastTrigger = null;
 
-		function open( name ) {
+		function open( name, trigger ) {
 			show( name );
 			window.clearTimeout( hideTimer );
 			popup.hidden = false;
 			lockScroll();
 			popup.scrollTop = 0;
 			notify( name );
+			lastTrigger = trigger || null;
 
 			/* Класс — следующим кадром, иначе переход не проиграется */
 			window.requestAnimationFrame( function () {
@@ -1722,6 +1725,24 @@
 
 		function close() {
 			popup.classList.remove( 'is-open' );
+
+			/*
+			 * Фокус с кнопки внутри поп-апа (например, «Закрыть») нужно
+			 * увести ДО того, как она скроется: стандартное поведение
+			 * браузера при исчезновении сфокусированного элемента — сброс
+			 * фокуса на body, но на iOS Safari это не всегда надёжно и
+			 * однажды поймали фокус на .skip-link (z-index: 1000, выше
+			 * поп-апа и даже шоурила) — он невидим до фокуса, но на долю
+			 * кадра мог становиться видимым и, возможно, участвовал в том
+			 * же баге с прозрачной системной полосой. Возвращаем фокус на
+			 * то, что поп-ап открыло — так и положено модалкам, и фокус
+			 * больше никогда не достаётся не пойми чему.
+			 */
+			if ( lastTrigger && document.contains( lastTrigger ) ) {
+				lastTrigger.focus();
+			} else if ( document.activeElement && popup.contains( document.activeElement ) ) {
+				document.activeElement.blur();
+			}
 
 			/*
 			 * Прячем и возвращаем прокрутку строго вместе, не раньше: поп-ап
@@ -1750,7 +1771,7 @@
 
 			if ( opener ) {
 				event.preventDefault();
-				open( opener.dataset.popupOpen );
+				open( opener.dataset.popupOpen, opener );
 				return;
 			}
 
