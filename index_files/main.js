@@ -1375,6 +1375,14 @@
 
 		groups.forEach( function ( group ) {
 			var more = null;
+			/*
+			 * Раз раскрыто по клику — больше не схлопывать эту группу
+			 * автоматически. Без флага ResizeObserver ниже сам ловил рост
+			 * группы от expand() (теги вернулись в поток — другой размер),
+			 * тут же перезапускал collapse() и сворачивал всё обратно:
+			 * «Еще» открывало список на миг и само же его захлопывало.
+			 */
+			var expandedByUser = false;
 
 			function pills() {
 				return Array.prototype.slice.call(
@@ -1383,6 +1391,8 @@
 			}
 
 			function expand() {
+				expandedByUser = true;
+
 				pills().forEach( function ( pill ) {
 					pill.hidden = false;
 				} );
@@ -1394,6 +1404,10 @@
 			}
 
 			function collapse() {
+				if ( expandedByUser ) {
+					return;
+				}
+
 				var all = pills();
 
 				all.forEach( function ( pill ) {
