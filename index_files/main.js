@@ -275,6 +275,9 @@
 			}, MENU_HIDE_DELAY );
 		}
 
+		/* Ширина при открытии — чтобы отличить реальный resize (ниже) */
+		var openedWidth = 0;
+
 		toggle.addEventListener( 'click', function () {
 			var isOpen = toggle.getAttribute( 'aria-expanded' ) === 'true';
 
@@ -289,6 +292,7 @@
 			lockScroll();
 			setMenuHeight();
 			toggleCookieBanner( true );
+			openedWidth = window.innerWidth;
 
 			/* Класс — следующим кадром, чтобы переход проиграл выезд */
 			window.requestAnimationFrame( function () {
@@ -298,6 +302,22 @@
 
 		window.addEventListener( 'resize', function () {
 			if ( toggle.getAttribute( 'aria-expanded' ) !== 'true' ) {
+				return;
+			}
+
+			/*
+			 * lockScroll() прячет адресную строку Safari на iOS, а её уход
+			 * сам по себе шлёт window resize — без участия пользователя.
+			 * window.innerHeight в этот момент отдаёт промежуточное
+			 * значение, setMenuHeight() на нём схлопывал панель до
+			 * нулевой высоты: меню «открывалось» и тут же пропадало, хотя
+			 * aria-expanded оставался true (баг только на iOS Safari,
+			 * воспроизведён на iPhone 14 Pro Max). У такого resize меняется
+			 * только высота — ширина окна та же, что при открытии; у
+			 * настоящего (поворот экрана, переход на десктоп) меняется и
+			 * ширина, поэтому его отличаем по ней, а не по таймеру.
+			 */
+			if ( window.innerWidth === openedWidth ) {
 				return;
 			}
 
