@@ -219,7 +219,6 @@
 		function unlockScroll() {
 			document.documentElement.style.overflow = '';
 			document.documentElement.style.paddingRight = '';
-			revealHeader();
 		}
 
 		/*
@@ -826,22 +825,6 @@
 		videos.forEach( function ( video ) {
 			watcher.observe( video );
 		} );
-	}
-
-
-	/**
-	 * Вернуть шапку на экран. Нужно после закрытия поп-апа и
-	 * полноэкранного ролика: пока они открыты, шапка не видна, а
-	 * скрытой она остаётся и после — вверху окна оказывается
-	 * содержимое страницы, и Safari на iPhone красит системную полосу
-	 * его цветом вместо белого.
-	 */
-	function revealHeader() {
-		var header = document.querySelector( '[data-site-header]' );
-
-		if ( header ) {
-			header.classList.remove( 'is-hidden' );
-		}
 	}
 
 
@@ -1657,7 +1640,6 @@
 		function unlockScroll() {
 			document.documentElement.style.overflow = '';
 			document.documentElement.style.paddingRight = '';
-			revealHeader();
 		}
 
 		/*
@@ -2701,7 +2683,6 @@
 		function unlockScroll() {
 			document.documentElement.style.overflow = '';
 			document.documentElement.style.paddingRight = '';
-			revealHeader();
 		}
 
 		function close() {
