@@ -211,11 +211,12 @@
 }
 
 /*
- * Наведения ниже 1200 нет (main.css: любой hover-эффект — только внутри
- * @media (hover: hover) and (min-width: 1200px)), поэтому превью там не
- * просто невидимо через opacity, а убрано из рендера совсем.
+ * Наведения на 1200 и ниже нет (main.js, initHoverList: любой hover-
+ * эффект — только внутри @media (hover: hover) and (min-width: 1201px)),
+ * поэтому превью там не просто невидимо через opacity, а убрано из
+ * рендера совсем.
  */
-@media (max-width: 1199px) {
+@media (max-width: 1200px) {
 	.service-list__preview {
 		display: none;
 	}

@@ -228,8 +228,8 @@
 	pointer-events: none;
 }
 
-/* Наведения ниже 1200 нет — см. .service-list__preview в specialization.css */
-@media (max-width: 1199px) {
+/* Наведения на 1200 и ниже нет — см. .service-list__preview в specialization.css */
+@media (max-width: 1200px) {
 	.price-table__preview {
 		display: none;
 	}
@@ -253,7 +253,7 @@
 	object-fit: cover;
 }
 
-@media (hover: hover) and (min-width: 1200px) {
+@media (hover: hover) and (min-width: 1201px) {
 	.price-table.is-hovered .price-table__row {
 		color: var(--color-text-disclaimer);
 	}
