@@ -2465,10 +2465,18 @@
 		 * нет. Порог сдвинут с min-width:1200 на 1201 (правка заказчика) —
 		 * на самом 1200 анимация (профили поддержки, список услуг,
 		 * прайс-лист, главная) тоже не должна включаться.
+		 *
+		 * Запрос живой (addEventListener('change', …)), а не разовая
+		 * проверка при загрузке: раньше, если навести курсор при широком
+		 * окне и потом сузить его БЕЗ перезагрузки страницы (resize, а не
+		 * новый заход), курсор мышью не двигался — mouseleave не
+		 * срабатывал, и подсветка/потемнение списка залипали на любой
+		 * ширине от 1200 до 360. Слушатели теперь висят всегда, а
+		 * эффект (добавление классов, запуск ролика) включён только пока
+		 * query.matches — и сам сбрасывает уже выставленные классы в
+		 * момент, когда наведение выключается.
 		 */
-		if ( ! window.matchMedia( '(hover: hover) and (min-width: 1201px)' ).matches ) {
-			return;
-		}
+		var query = window.matchMedia( '(hover: hover) and (min-width: 1201px)' );
 
 		/*
 		 * В баннере лежит ролик услуги или направления — тот же, что
@@ -2499,11 +2507,32 @@
 			}
 		}
 
+		function reset() {
+			lists.forEach( function ( list ) {
+				list.classList.remove( 'is-hovered' );
+
+				list.querySelectorAll( itemSelector ).forEach( function ( item ) {
+					item.classList.remove( 'is-active' );
+					play( item, false );
+				} );
+			} );
+		}
+
+		query.addEventListener( 'change', function () {
+			if ( ! query.matches ) {
+				reset();
+			}
+		} );
+
 		lists.forEach( function ( list ) {
 			var items = list.querySelectorAll( itemSelector );
 
 			items.forEach( function ( item ) {
 				item.addEventListener( 'mouseenter', function () {
+					if ( ! query.matches ) {
+						return;
+					}
+
 					list.classList.add( 'is-hovered' );
 
 					items.forEach( function ( other ) {
