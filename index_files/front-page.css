@@ -627,6 +627,25 @@
 	object-fit: cover;
 }
 
+/*
+ * Два разных файла — широкий и узкий показ переключаются на 900/901, как
+ * и раскладка самого блока (.home-telegram__content margin-right ниже,
+ * design-700 выше по файлу).
+ */
+.home-telegram__video--mobile {
+	display: none;
+}
+
+@media (max-width: 900px) {
+	.home-telegram__video--desktop {
+		display: none;
+	}
+
+	.home-telegram__video--mobile {
+		display: block;
+	}
+}
+
 .home-telegram__content {
 	position: relative;
 	z-index: 1;

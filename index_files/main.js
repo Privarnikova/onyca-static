@@ -1759,15 +1759,11 @@
 			}
 		}
 
-		/* Столько же, сколько уход в CSS: 0.45s выезд, закрытие вдвое быстрее */
-		var POPUP_HIDE_DELAY = 220;
-		var hideTimer = null;
 		/* Куда вернуть фокус при закрытии — кнопка/ссылка, что открыла поп-ап */
 		var lastTrigger = null;
 
 		function open( name, trigger ) {
 			show( name );
-			window.clearTimeout( hideTimer );
 			popup.hidden = false;
 			lockScroll();
 			popup.scrollTop = 0;
@@ -1802,21 +1798,23 @@
 			}
 
 			/*
-			 * Прячем и возвращаем прокрутку строго вместе, не раньше: поп-ап
-			 * ещё 220мс висит на весь экран (position: fixed, inset: 0) и
-			 * гаснет прозрачностью — если снять блокировку сразу, за это
-			 * окно можно успеть потянуть страницу вверх поверх системной
-			 * полосы, и та полоса берёт цвет прозрачного, ещё не скрытого
-			 * поп-апа вместо белого фона страницы под ним.
+			 * Раньше тут ждали 220мс (время CSS-перехода) перед тем, как
+			 * скрыть поп-ап и снять блокировку скролла — чтобы не утянуть
+			 * страницу вверх, пока подложка ещё гаснет прозрачностью, и не
+			 * подставить системной полосе iOS Safari кадр с прозрачным
+			 * фоном. Даже с этой задержкой баг иногда всё равно ловился.
+			 *
+			 * У шоурила (initShowreelPlayer) той же гонки нет вообще: его
+			 * оверлей переключается через display:none/flex, без перехода,
+			 * и ждать там нечего — закрытие происходит в тот же кадр, что
+			 * и снятие блокировки. Делаем попап так же: прячем и
+			 * возвращаем прокрутку сразу, без задержки. Анимация выезда
+			 * при открытии остаётся (следующим кадром в open()), пропадает
+			 * только затухание при закрытии — ровно как у шоурила.
 			 */
-			window.clearTimeout( hideTimer );
-			hideTimer = window.setTimeout( function () {
-				if ( ! popup.classList.contains( 'is-open' ) ) {
-					popup.hidden = true;
-					unlockScroll();
-					touchThemeColor();
-				}
-			}, POPUP_HIDE_DELAY );
+			popup.hidden = true;
+			unlockScroll();
+			touchThemeColor();
 		}
 
 		/* onyca.digital/order/ (page-order.php) — поп-ап открыт сразу, без клика */
@@ -2902,18 +2900,12 @@
 				video.src = media.currentSrc || media.src;
 				video.poster = media.getAttribute( 'poster' ) || '';
 				video.controls = true;
-				video.autoplay = true;
 				video.playsInline = true;
 				/* Со звуком: это и есть «посмотреть ролик», а не фон */
 				video.muted = false;
 				frame.appendChild( video );
 
 				video.addEventListener( 'loadedmetadata', function () {
-					/* Продолжаем с того же места, где шёл фоновый ролик */
-					if ( media.currentTime ) {
-						video.currentTime = media.currentTime;
-					}
-
 					/* Кадр принимает пропорцию самого ролика */
 					if ( video.videoWidth && video.videoHeight ) {
 						frame.style.setProperty(
@@ -2922,6 +2914,25 @@
 						);
 					}
 				} );
+
+				/*
+				 * Полный просмотр начинается сначала (с 0), а не с того места,
+				 * где шёл фоновый ролик — currentTime у нового video и так 0
+				 * по умолчанию, трогать не нужно.
+				 *
+				 * Запуск — явным play(), а не атрибутом autoplay: autoplay
+				 * ставится как свойство элемента ДО вставки в DOM, и браузер
+				 * не всегда засчитывает это как «внутри жеста пользователя» —
+				 * может потребовать повторного клика или беззвучно замьютить.
+				 * Прямой play() в том же обработчике клика — тот же приём,
+				 * что и у видео в превью списков (initHoverList, play()
+				 * выше по файлу).
+				 */
+				var started = video.play();
+
+				if ( started && started.catch ) {
+					started.catch( function () {} );
+				}
 
 				if ( ! media.paused ) {
 					media.pause();
