@@ -957,13 +957,23 @@
 	 * Сила притяжения: сама кнопка тянется на 25px, текст внутри — на 15,
 	 * из-за разницы кнопка выглядит «тянущейся», а не едущей целиком.
 	 *
-	 * Зона притяжения — ореол ровно в 21px вокруг кнопки, одинаковый у
-	 * всех ЦД-кнопок и одинаковой толщины по всему периметру. Раньше она
-	 * считалась кругом по большей стороне (половина плюс 60px), и у
-	 * широкой кнопки «Отправить» радиус доходил до 360px: она начинала
-	 * тянуться, когда курсор был ещё у поля «Расскажите о проекте».
+	 * Зона притяжения — ореол вокруг кнопки, одинаковой толщины по всему
+	 * периметру. Раньше она считалась кругом по большей стороне (половина
+	 * плюс 60px), и у широкой кнопки «Отправить» радиус доходил до 360px:
+	 * она начинала тянуться, когда курсор был ещё у поля «Расскажите о
+	 * проекте».
+	 *
+	 * 21px — верно на 1920 (ПК), но тот же плоский ореол на ноуте (1600)
+	 * ощущается слишком чувствительным: кнопки в этом диапазоне мельче, а
+	 * зона не сужалась вместе с ними. Правка заказчика — тянем ореол той
+	 * же парой точек, что и остальные десктопные размеры: 21 на 1920, 14
+	 * на 1600, ниже 1600 (до отключения наведения на 1200) держим 14.
 	 */
-	var MAGNET_REACH = 21;
+	function magnetReach() {
+		var raw = 2.1875 * ( window.innerWidth / 100 ) - 21;
+
+		return Math.min( 21, Math.max( 14, raw ) );
+	}
 
 	/*
 	 * Какая часть высоты первого экрана уходит на разворот видео. Ею
@@ -1087,6 +1097,8 @@
 				return;
 			}
 
+			var reach = magnetReach();
+
 			items.forEach( function ( item ) {
 				var rect = item.el.getBoundingClientRect();
 				var halfWidth = rect.width / 2;
@@ -1117,7 +1129,7 @@
 				var outsideX = Math.max( 0, Math.abs( dx ) - halfWidth );
 				var outsideY = Math.max( 0, Math.abs( dy ) - halfHeight );
 
-				if ( outsideX > MAGNET_REACH || outsideY > MAGNET_REACH ) {
+				if ( outsideX > reach || outsideY > reach ) {
 					item.el.style.transform = '';
 					item.text.style.transform = '';
 					return;
@@ -1129,8 +1141,8 @@
 				 * Резкость на границе снимает transition на самой кнопке —
 				 * она возвращается плавно, а не прыжком.
 				 */
-				var shiftX = ( dx / ( halfWidth + MAGNET_REACH ) ) * item.strength;
-				var shiftY = ( dy / ( halfHeight + MAGNET_REACH ) ) * item.strength;
+				var shiftX = ( dx / ( halfWidth + reach ) ) * item.strength;
+				var shiftY = ( dy / ( halfHeight + reach ) ) * item.strength;
 
 				item.el.style.transform = 'translate(' + shiftX + 'px, ' + shiftY + 'px)';
 				item.text.style.transform = 'translate(' +
@@ -1693,47 +1705,19 @@
 		/* С какой формы пришли — чтобы «Попробовать снова» вернул её */
 		var lastFormPane = null;
 
-		/*
-		 * Блокировка прокрутки — через position: fixed у body, а не
-		 * overflow: hidden у html. У overflow: hidden на iOS Safari есть
-		 * побочный эффект: переключение прячет и возвращает адресную
-		 * строку (тело документа резко меняет прокручиваемую высоту), а
-		 * сама анимация строки — ровно то окно, когда фикс-позиционные
-		 * потомки (белая полоса под вырезом, body::before в main.css)
-		 * могут на кадр отрисоваться не там, и системная полоса сверху
-		 * подхватывает чужой цвет. Та же причина, по которой в body уже
-		 * нет overflow-x: clip (см. комментарий у body чуть выше) — там
-		 * ломался не цвет, а клик по фикс-кнопке, но источник тот же.
-		 *
-		 * position: fixed у body с отрицательным top на высоту прокрутки
-		 * держит страницу на месте, не трогая overflow совсем — адресная
-		 * строка не анимируется, и перерисовывать нечего.
-		 */
-		var lockedScrollY = 0;
-
 		function lockScroll() {
 			var scrollbar = window.innerWidth - document.documentElement.clientWidth;
 
-			lockedScrollY = window.scrollY;
-
-			document.body.style.position = 'fixed';
-			document.body.style.top = -lockedScrollY + 'px';
-			document.body.style.left = '0';
-			document.body.style.right = '0';
+			document.documentElement.style.overflow = 'hidden';
 
 			if ( scrollbar > 0 ) {
-				document.body.style.paddingRight = scrollbar + 'px';
+				document.documentElement.style.paddingRight = scrollbar + 'px';
 			}
 		}
 
 		function unlockScroll() {
-			document.body.style.position = '';
-			document.body.style.top = '';
-			document.body.style.left = '';
-			document.body.style.right = '';
-			document.body.style.paddingRight = '';
-
-			window.scrollTo( 0, lockedScrollY );
+			document.documentElement.style.overflow = '';
+			document.documentElement.style.paddingRight = '';
 		}
 
 		/*
@@ -2319,8 +2303,17 @@
 		var GROW_PART = HERO_GROW_PART;
 		/* Отступ под шапкой, на котором держится раскрытое видео */
 		var GAP_UNDER_HEADER = 16;
-		/* Сколько пикселей прокрутки видео едет вместе с окном */
-		var HOLD_LENGTH = 10;
+		/*
+		 * Сколько пикселей прокрутки видео едет вместе с окном, уже
+		 * раскрывшись — та самая «протяжка» вниз. Было 150, затем
+		 * срезано до 10 заодно с правкой шапки (решение не прокомментировано
+		 * отдельно) — на коротких окнах (ноутбук, планшет) 10px расходится
+		 * за один тик прокрутки, и протяжка переставала быть заметной:
+		 * видео раскрывается и тут же пролистывается дальше. Возвращаем
+		 * прежние 150 — правка заказчика, заметная протяжка нужна на
+		 * десктопе, ноуте и планшете.
+		 */
+		var HOLD_LENGTH = 150;
 
 		/*
 		 * Отсчёт идёт от верхней кромки ЭКРАНА: она не двигается, в
@@ -3611,9 +3604,10 @@
 		var offset = 0;
 		var direction = -1;
 		var lastScroll = window.scrollY;
-		/* Пикселей за кадр: базовая скорость и добавка от прокрутки */
+		/* Пикселей за кадр при 60 кадрах/с: базовая скорость и добавка от прокрутки */
 		var speed = 0.6;
 		var boost = 0;
+		var lastTimestamp = null;
 
 		window.addEventListener( 'scroll', function () {
 			var delta = window.scrollY - lastScroll;
@@ -3626,11 +3620,26 @@
 			lastScroll = window.scrollY;
 		}, { passive: true } );
 
-		function frame() {
+		/*
+		 * Шаг считался «на кадр», не «на время»: пока курсор двигался,
+		 * браузер держал стабильные 60 кадров/с и это было незаметно. Как
+		 * только курсор замирает на несколько секунд, часть браузеров сама
+		 * снижает частоту requestAnimationFrame для экономии энергии — кадр
+		 * тот же (скорость та же, в пикселях), а кадров в секунду меньше,
+		 * и лента на глаз дёргается реже и крупнее. Шаг считаем от
+		 * фактически прошедшего времени (аргумент frame), тогда скорость
+		 * на экране одна и та же при любой частоте кадров.
+		 */
+		function frame( timestamp ) {
 			var width = row.offsetWidth;
+			var elapsed = lastTimestamp === null ? 1000 / 60 : timestamp - lastTimestamp;
+			/* На случай когда вкладка была в фоне и elapsed подскочил */
+			var scale = Math.min( elapsed / ( 1000 / 60 ), 4 );
 
-			offset += direction * ( speed + boost );
-			boost *= 0.92;
+			lastTimestamp = timestamp;
+
+			offset += direction * ( speed + boost ) * scale;
+			boost *= Math.pow( 0.92, scale );
 
 			/* Зацикливаем по ширине одной копии — стык не виден */
 			if ( width ) {

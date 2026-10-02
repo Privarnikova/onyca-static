@@ -216,14 +216,34 @@
 	left: calc(4 * (100% - 5 * var(--grid-gap)) / 6 + 4 * var(--grid-gap));
 	z-index: 2;
 	display: block;
+	/* Доля колонки — верно для 1200–1599, где своих чисел нет */
 	width: calc(2 * (100% - 5 * var(--grid-gap)) / 6 + var(--grid-gap));
-	height: 294px;
+	/* Высота от ширины, не плоским числом — см. .service-list__preview */
+	aspect-ratio: 600 / 294;
 	overflow: hidden;
 	background-color: var(--color-surface-alt);
 	opacity: 0;
 	transform: translate(0, -50%) scale(0.98);
 	transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 	pointer-events: none;
+}
+
+/* Наведения ниже 1200 нет — см. .service-list__preview в specialization.css */
+@media (max-width: 1199px) {
+	.price-table__preview {
+		display: none;
+	}
+}
+
+/*
+ * С 1600 — числа заказчика, не доля колонки (та на 1200–1400 у́же, а
+ * 498px плоским полом раздвигали бы страницу вправо) — см.
+ * .service-list__preview в specialization.css за подробностями.
+ */
+@media (min-width: 1600px) {
+	.price-table__preview {
+		width: clamp(498px, calc(31.875vw - 12px), 600px);
+	}
 }
 
 .price-table__preview img,

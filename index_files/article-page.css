@@ -164,10 +164,19 @@
 	}
 }
 
-/* В «Других статьях» карточки скругляются на 35 — как маленькие в блоге */
+/*
+ * В «Других статьях» карточки скругляются как маленькие в блоге — тот
+ * же непрямой clamp по трём точкам, см. комментарий в card-tile.css.
+ */
 @media (hover: hover) and (min-width: 1200px) {
 	.other-articles .card-post__link:hover .card-post__cover {
-		border-radius: 35px;
+		border-radius: clamp(30px, calc(5px + 1.5625vw), 35px);
+	}
+}
+
+@media (hover: hover) and (min-width: 1200px) and (max-width: 1599px) {
+	.other-articles .card-post__link:hover .card-post__cover {
+		border-radius: clamp(30px, calc(50px - 1.25vw), 35px);
 	}
 }
 
