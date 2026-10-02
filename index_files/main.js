@@ -3542,12 +3542,32 @@
 			return;
 		}
 
+		/*
+		 * Стопка — только с 1081 (правка заказчика, было без порога).
+		 * Ниже карточки идут просто друг под другом с зазором (макет
+		 * «Проекты студии. Планшет горизонтальный», 3903:25741 — три
+		 * карточки на ровных местах, без наезда): CSS снимает
+		 * position: sticky этим же порогом (studio-projects.css), а здесь
+		 * сбрасываем --card-scale к 1, чтобы при пересечении границы
+		 * (ресайз) не осталась «сжатая» с прошлого скролла карточка.
+		 */
+		var stackQuery = window.matchMedia( '(min-width: 1081px)' );
+
 		/* На сколько уменьшается карточка, полностью ушедшая под следующую */
 		var MAX_DEPTH = 0.12;
 		var pending = false;
 
 		function update() {
 			pending = false;
+
+			if ( ! stackQuery.matches ) {
+				lists.forEach( function ( list ) {
+					list.querySelectorAll( '.card-project' ).forEach( function ( card ) {
+						card.style.setProperty( '--card-scale', 1 );
+					} );
+				} );
+				return;
+			}
 
 			lists.forEach( function ( list ) {
 				var cards = list.querySelectorAll( '.card-project' );
