@@ -90,6 +90,7 @@
 }
 
 .card-post__cover img,
+.card-post__cover video,
 .card-case__cover img,
 .card-case__cover video {
 	width: 100%;

@@ -30,7 +30,7 @@
 
 .article-quote__mark {
 	flex: none;
-	color: var(--color-black);
+	color: var(--case-mark, var(--color-black));
 }
 
 .article-quote__text {
@@ -780,7 +780,7 @@
 	}
 
 	.article-section > .article-heading--1,
-	.article-page--project .article-section > .article-heading--2 {
+	.article-page--structured .article-section > .article-heading--2 {
 		grid-column: 1;
 		max-width: none;
 	}

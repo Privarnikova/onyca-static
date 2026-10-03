@@ -125,3 +125,28 @@ h1 + .case-media {
 		margin-top: var(--case-media-seam);
 	}
 }
+
+/*
+ * Визуалы под крупным заголовком раздела — отступ 64 на 1920 и выше, 54 на
+ * 1600–701, 48 на 360. Блок в конце файла: та же специфичность, что у
+ * правил отступа выше, порядок решает. Заголовок может быть и h1, и
+ * элементом .article-heading--1 (сетка визуалов у статьи, услуги и кейса).
+ */
+.article-heading--1 + .case-media,
+h1 + .case-media {
+	margin-top: clamp(54px, calc(4px + 3.125vw), 64px);
+}
+
+@media (max-width: 1599px) {
+	.article-heading--1 + .case-media,
+	h1 + .case-media {
+		margin-top: 54px;
+	}
+}
+
+@media (max-width: 700px) {
+	.article-heading--1 + .case-media,
+	h1 + .case-media {
+		margin-top: clamp(48px, calc(41.65px + 1.7647vw), 54px);
+	}
+}

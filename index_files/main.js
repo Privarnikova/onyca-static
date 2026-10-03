@@ -817,56 +817,69 @@
 	 * (запас в пол-окна), и останавливается, когда уходит: это и трафик
 	 * бережёт, и процессор на телефоне.
 	 */
-	function initLazyVideo() {
-		var videos = document.querySelectorAll( 'video[data-autoplay]' );
+	var lazyVideoWatcher = null;
+
+	function startLazyVideo( video ) {
+		if ( 'auto' !== video.preload ) {
+			video.preload = 'auto';
+		}
+
+		var started = video.play();
+
+		/* Браузер вправе отказать в автозапуске — тогда виден постер */
+		if ( started && started.catch ) {
+			started.catch( function () {} );
+		}
+	}
+
+	/*
+	 * Ролики за экраном — в одном наблюдателе. Карточки, догруженные
+	 * кнопкой «Показать ещё» или фильтром, добавляются сюда же, иначе они
+	 * остаются без запуска до перезагрузки страницы.
+	 */
+	function watchLazyVideos( root ) {
+		var videos = root.querySelectorAll( 'video[data-autoplay]' );
 
 		if ( ! videos.length ) {
 			return;
 		}
 
-		function start( video ) {
-			if ( 'auto' !== video.preload ) {
-				video.preload = 'auto';
-			}
-
-			var started = video.play();
-
-			/* Браузер вправе отказать в автозапуске — тогда виден постер */
-			if ( started && started.catch ) {
-				started.catch( function () {} );
-			}
-		}
-
 		/* Без IntersectionObserver просто запускаем всё, как было раньше */
 		if ( ! ( 'IntersectionObserver' in window ) ) {
-			videos.forEach( start );
+			videos.forEach( startLazyVideo );
 			return;
 		}
 
-		var watcher = new IntersectionObserver(
-			function ( entries ) {
-				entries.forEach( function ( entry ) {
-					if ( entry.isIntersecting ) {
-						start( entry.target );
-						return;
-					}
+		if ( ! lazyVideoWatcher ) {
+			lazyVideoWatcher = new IntersectionObserver(
+				function ( entries ) {
+					entries.forEach( function ( entry ) {
+						if ( entry.isIntersecting ) {
+							startLazyVideo( entry.target );
+							return;
+						}
 
-					/*
-					 * Ролик за экраном ставим на паузу, но только если
-					 * его уже запускали: у незагруженного pause() зря
-					 * дёргает сеть.
-					 */
-					if ( ! entry.target.paused ) {
-						entry.target.pause();
-					}
-				} );
-			},
-			{ rootMargin: '50% 0px' }
-		);
+						/*
+						 * Ролик за экраном ставим на паузу, но только если
+						 * его уже запускали: у незагруженного pause() зря
+						 * дёргает сеть.
+						 */
+						if ( ! entry.target.paused ) {
+							entry.target.pause();
+						}
+					} );
+				},
+				{ rootMargin: '50% 0px' }
+			);
+		}
 
 		videos.forEach( function ( video ) {
-			watcher.observe( video );
+			lazyVideoWatcher.observe( video );
 		} );
+	}
+
+	function initLazyVideo() {
+		watchLazyVideos( document );
 	}
 
 
@@ -2745,6 +2758,8 @@
 						grid.appendChild( card );
 					} );
 
+					watchLazyVideos( grid );
+
 					/* Пагинация и сама кнопка приезжают из ответа уже с новыми адресами */
 					var footer = next.querySelector( '[data-load-more-area]' );
 
@@ -3233,6 +3248,8 @@
 								card.setAttribute( 'data-filter-loaded', '' );
 								grid.appendChild( card );
 							} );
+
+							watchLazyVideos( grid );
 
 							var current = document.querySelector( '[data-load-more-area]' );
 							var fresh = page.querySelector( '[data-load-more-area]' );
