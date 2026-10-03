@@ -566,3 +566,18 @@
 		max-width: 560px;
 	}
 }
+
+/*
+ * Заголовок формы: от 1600 и выше перенос после «который» (как на 1600),
+ * ниже — естественный. Блок в конце файла — тот же порядок, что у текста
+ * выше.
+ */
+.contact-form-intro__title-break {
+	display: none;
+}
+
+@media (min-width: 1600px) {
+	.contact-form-intro__title-break {
+		display: inline;
+	}
+}

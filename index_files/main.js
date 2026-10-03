@@ -1655,30 +1655,6 @@
 	}
 
 	/**
-	 * Снять и сразу восстановить content у <meta name="theme-color">:
-	 * «трогаем» officially-поддерживаемый способ задать цвет системной
-	 * полосы iOS Safari, а не пытаемся повлиять на неё тем, что отрисовано
-	 * на странице (белый слой выше, z-index). Ставится рядом с ним как
-	 * вторая, независимая попытка — по отдельности каждая дешева и
-	 * безвредна, если не поможет.
-	 */
-	function touchThemeColor() {
-		var meta = document.querySelector( 'meta[name="theme-color"]' );
-
-		if ( ! meta ) {
-			return;
-		}
-
-		var color = meta.getAttribute( 'content' );
-
-		meta.setAttribute( 'content', '' );
-
-		window.requestAnimationFrame( function () {
-			meta.setAttribute( 'content', color );
-		} );
-	}
-
-	/**
 	 * Поп-апы: «Обсудить проект», «Написать по вакансии» и экран
 	 * результата отправки (макеты 1293:4021, 2271:7900, 1845:3990,
 	 * 2271:8502).
@@ -1814,7 +1790,6 @@
 			 */
 			popup.hidden = true;
 			unlockScroll();
-			touchThemeColor();
 		}
 
 		/* onyca.digital/order/ (page-order.php) — поп-ап открыт сразу, без клика */

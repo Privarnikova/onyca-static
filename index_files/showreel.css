@@ -139,12 +139,24 @@
 	 * у которого тот же отступ от края, что и у кадра, то есть
 	 * свободного места между ними не оставалось вовсе.
 	 */
-	max-width: min(
-		calc((100vh - 2 * clamp(15px, calc(4.12px + 2.24vw), 58px)) * var(--showreel-ratio, 1.7778)),
-		calc(100% - 2 * 72px)
-	);
+	max-width: calc((100vh - 2 * clamp(15px, calc(4.12px + 2.24vw), 58px)) * var(--showreel-ratio, 1.7778));
 	aspect-ratio: var(--showreel-ratio, 1.7778);
 	background-color: var(--color-black);
+}
+
+/*
+ * Широкие и невысокие окна: запас под крестик (32×32 плюс зазор) с
+ * каждой стороны, иначе кадр доходил до крестика вплотную. На телефоне
+ * крестик уже над кадром, и такой запас только сжимал ролик — там
+ * ограничивает одна высота.
+ */
+@media (min-width: 701px) {
+	.showreel-player__frame {
+		max-width: min(
+			calc((100vh - 2 * clamp(15px, calc(4.12px + 2.24vw), 58px)) * var(--showreel-ratio, 1.7778)),
+			calc(100% - 2 * 72px)
+		);
+	}
 }
 
 .showreel-player__frame video,
