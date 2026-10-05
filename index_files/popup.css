@@ -518,3 +518,31 @@ img.popup__logo-icon {
 		color: var(--color-text-muted);
 	}
 }
+
+/*
+ * Системная полоса iPhone внизу: Safari берёт цвет у верхнего элемента
+ * возле кромки. Пока поп-ап открыт, там лежит прозрачная дорожка
+ * плавающей кнопки (float-track, z-index 190) — полоса получается
+ * прозрачной, и сквозь неё видно страницу под поп-апом. Эта полоска
+ * (настоящий элемент, не псевдо — те Safari не учитывает) перекрывает
+ * кромку белым. 10px — меньше уже не срабатывает, проверено на iPhone.
+ * Только на телефоне: выше 700 системной полосы нет, и трогать там
+ * нечего.
+ */
+.popup-edge {
+	display: none;
+}
+
+@media (max-width: 700px) {
+	body:has(.popup:not([hidden])) .popup-edge {
+		display: block;
+		position: fixed;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 10px;
+		z-index: 301;
+		background-color: var(--color-white);
+		pointer-events: none;
+	}
+}
