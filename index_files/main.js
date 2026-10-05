@@ -1697,16 +1697,16 @@
 		function lockScroll() {
 			var scrollbar = window.innerWidth - document.documentElement.clientWidth;
 
-			document.documentElement.style.overflow = 'hidden';
+			document.body.style.overflow = 'hidden';
 
 			if ( scrollbar > 0 ) {
-				document.documentElement.style.paddingRight = scrollbar + 'px';
+				document.body.style.paddingRight = scrollbar + 'px';
 			}
 		}
 
 		function unlockScroll() {
-			document.documentElement.style.overflow = '';
-			document.documentElement.style.paddingRight = '';
+			document.body.style.overflow = '';
+			document.body.style.paddingRight = '';
 		}
 
 		/*
@@ -1768,39 +1768,13 @@
 		function close() {
 			popup.classList.remove( 'is-open' );
 
-			/*
-			 * Фокус с кнопки внутри поп-апа (например, «Закрыть») нужно
-			 * увести ДО того, как она скроется: стандартное поведение
-			 * браузера при исчезновении сфокусированного элемента — сброс
-			 * фокуса на body, но на iOS Safari это не всегда надёжно и
-			 * однажды поймали фокус на .skip-link (z-index: 1000, выше
-			 * поп-апа и даже шоурила) — он невидим до фокуса, но на долю
-			 * кадра мог становиться видимым и, возможно, участвовал в том
-			 * же баге с прозрачной системной полосой. Возвращаем фокус на
-			 * то, что поп-ап открыло — так и положено модалкам, и фокус
-			 * больше никогда не достаётся не пойми чему.
-			 */
+			/* Фокус — обратно на кнопку, которая открыла поп-ап */
 			if ( lastTrigger && document.contains( lastTrigger ) ) {
 				lastTrigger.focus();
 			} else if ( document.activeElement && popup.contains( document.activeElement ) ) {
 				document.activeElement.blur();
 			}
 
-			/*
-			 * Раньше тут ждали 220мс (время CSS-перехода) перед тем, как
-			 * скрыть поп-ап и снять блокировку скролла — чтобы не утянуть
-			 * страницу вверх, пока подложка ещё гаснет прозрачностью, и не
-			 * подставить системной полосе iOS Safari кадр с прозрачным
-			 * фоном. Даже с этой задержкой баг иногда всё равно ловился.
-			 *
-			 * У шоурила (initShowreelPlayer) той же гонки нет вообще: его
-			 * оверлей переключается через display:none/flex, без перехода,
-			 * и ждать там нечего — закрытие происходит в тот же кадр, что
-			 * и снятие блокировки. Делаем попап так же: прячем и
-			 * возвращаем прокрутку сразу, без задержки. Анимация выезда
-			 * при открытии остаётся (следующим кадром в open()), пропадает
-			 * только затухание при закрытии — ровно как у шоурила.
-			 */
 			popup.hidden = true;
 			unlockScroll();
 		}
@@ -2804,16 +2778,16 @@
 		function lockScroll() {
 			var scrollbar = window.innerWidth - document.documentElement.clientWidth;
 
-			document.documentElement.style.overflow = 'hidden';
+			document.body.style.overflow = 'hidden';
 
 			if ( scrollbar > 0 ) {
-				document.documentElement.style.paddingRight = scrollbar + 'px';
+				document.body.style.paddingRight = scrollbar + 'px';
 			}
 		}
 
 		function unlockScroll() {
-			document.documentElement.style.overflow = '';
-			document.documentElement.style.paddingRight = '';
+			document.body.style.overflow = '';
+			document.body.style.paddingRight = '';
 		}
 
 		function close() {
