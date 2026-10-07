@@ -22,21 +22,24 @@
 
 .popup__bar,
 .popup__body,
-.popup__note {
+.popup__note,
+.popup__pane--result {
 	transform: translateY(40px);
 	transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .popup.is-open .popup__bar,
 .popup.is-open .popup__body,
-.popup.is-open .popup__note {
+.popup.is-open .popup__note,
+.popup.is-open .popup__pane--result {
 	transform: translateY(0);
 }
 
 /* Закрытие вдвое быстрее открытия */
 .popup:not(.is-open) .popup__bar,
 .popup:not(.is-open) .popup__body,
-.popup:not(.is-open) .popup__note {
+.popup:not(.is-open) .popup__note,
+.popup:not(.is-open) .popup__pane--result {
 	transition-duration: 0.22s;
 }
 
@@ -44,7 +47,8 @@
 	.popup,
 	.popup__bar,
 	.popup__body,
-	.popup__note {
+	.popup__note,
+	.popup__pane--result {
 		transition: none;
 		transform: none;
 	}
@@ -256,32 +260,29 @@ img.popup__logo-icon {
  * Экран результата: круг с иконкой, заголовок, текст и кнопка — по
  * центру ЭКРАНА на всех адаптивах (проверено на 360, 700, 1200, 1600 —
  * во всех четырёх блок стоит ровно в середине окна, без привязки к
- * высоте полосы). Поэтому не padding-top от верха тела, а абсолютное
- * позиционирование на всю высоту окна.
+ * высоте полосы).
  *
- * inset: 0 здесь НЕ даёт этого: .popup__body — containing block сама
- * по себе (у неё transform для выезда поп-апа, см. выше), а не .popup,
- * хотя тот и position: fixed. Абсолютный потомок встаёт от верха ТЕЛА
- * (под полосой), а не от верха окна — блок съезжал вниз на половину
- * высоты полосы. Поэтому верх — минус высота полосы (та же формула, что
- * у .popup__bar), а высота — явные 100vh.
+ * Раньше панель лежала внутри .popup__body и вставала по центру экрана
+ * через отрицательный верхний отступ (вылезала выше тела, перекрывая
+ * полосу) — единственная из всех панелей поп-апа, что выходит за пределы
+ * обычного потока. У .popup__body есть transform для выезда поп-апа, а
+ * значит он сам становится containing block для position: absolute
+ * потомков — отсюда и вычисление отступа. На iPhone это совпало с
+ * гашением верхней системной полосы после экрана результата (полосы
+ * «Обсудить проект» и бургер-меню, где всё остаётся в потоке, этим не
+ * страдают — см. SHOWREEL-BAR.md про похожий баг у шоурила).
+ *
+ * Теперь панель — не внутри .popup__body, а рядом (popup.php), и её
+ * containing block — сам .popup (position: fixed, без transform).
+ * inset: 0 покрывает весь экран без вычислений, наружу ничего не
+ * вылезает.
  */
 .popup__pane--result {
 	position: absolute;
-	top: calc(-1 * clamp(50px, calc(30px + 1.25vw), 54px));
-	right: 0;
-	left: 0;
-	height: 100vh;
+	inset: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-}
-
-@media (max-width: 1200px) {
-	.popup__pane--result {
-		/* Полоса здесь плоские 58 (.popup__bar выше) */
-		top: -58px;
-	}
 }
 
 .form-result {

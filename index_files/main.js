@@ -604,8 +604,15 @@
 		function checks() {
 			var email = form.querySelector( 'input[type="email"]' );
 
+			/*
+			 * У формы дизайн-поддержки (contact-form.php с tags=false,
+			 * template-parts/specialization/support.php) группы тегов в
+			 * разметке вообще нет — раньше проверка требовала выбранный тег
+			 * в любом случае и форма никогда не проходила валидацию.
+			 * Требуем выбор, только если сама группа есть на странице.
+			 */
 			return {
-				tags: ! isCareer && ! form.querySelector( '.tab-pill.is-selected' ),
+				tags: ! isCareer && !! group( 'tags' ) && ! form.querySelector( '.tab-pill.is-selected' ),
 				// Точный разбор адреса тут не нужен: письмо всё равно
 				// проверяется на сервере, здесь — только форма записи.
 				email: ! /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test( email.value.trim() ),
@@ -630,21 +637,14 @@
 		}
 
 		form.addEventListener( 'submit', function ( event ) {
-			/*
-			 * Отправки на сервер пока нет (этап «Формы и интеграции»),
-			 * поэтому событие останавливаем всегда: прошла проверка —
-			 * показываем экран «Заявка отправлена». Когда появится
-			 * реальная отправка, экран успеха/ошибки будет выбираться по
-			 * ответу сервера — здесь же, в этом обработчике.
-			 */
 			event.preventDefault();
 
-			if ( validate() ) {
-				showFormResult( 'success', form );
+			if ( ! validate() ) {
+				scrollToFirstError( form );
 				return;
 			}
 
-			scrollToFirstError( form );
+			submitContactForm( form, isCareer );
 		} );
 
 		/*
@@ -668,6 +668,90 @@
 				validate();
 			}
 		} );
+	}
+
+	/**
+	 * Отправка формы на сервер (inc/contact-form-handler.php) — одна и
+	 * та же для всех трёх вариантов: «Обсудить проект», дизайн-поддержка
+	 * (contact-form.php, tags=false) и «Карьера» (career-form.php). Имена
+	 * полей у форм разные (contact_ и career_) — сервер понимает оба.
+	 *
+	 * @param {HTMLFormElement} form
+	 * @param {boolean} isCareer
+	 */
+	function submitContactForm( form, isCareer ) {
+		if ( ! window.onycaContactForm ) {
+			return;
+		}
+
+		var submitButton = form.querySelector( '.contact-form__submit' );
+		var submitText   = submitButton ? submitButton.querySelector( '.btn__text' ) : null;
+		var originalText = submitText ? submitText.textContent : '';
+		var controls      = form.querySelectorAll( 'input, textarea, select, button' );
+		var formData      = new FormData( form );
+
+		if ( ! isCareer ) {
+			var selectedTags = Array.prototype.map.call(
+				form.querySelectorAll( '.tab-pill.is-selected' ),
+				function ( pill ) {
+					return pill.textContent.trim();
+				}
+			);
+
+			formData.append( 'contact_tags', selectedTags.join( ', ' ) );
+			/*
+			 * contact_source уже в форме скрытым полем (contact-form.php,
+			 * $onyca_source) — своё значение на каждой странице, а не
+			 * «Обсудить проект» везде подряд.
+			 */
+		} else {
+			formData.append( 'contact_source', 'Отклик на вакансию' );
+		}
+
+		/*
+		 * Все поля, не только кнопка — иначе можно было успеть подправить
+		 * имя/email/файл, пока запрос ещё летит. disabled заодно защищает
+		 * от повторного клика, подпись кнопки — видимый отклик на клик.
+		 */
+		controls.forEach( function ( control ) {
+			control.disabled = true;
+		} );
+
+		if ( submitText ) {
+			submitText.textContent = 'Отправка…';
+		}
+
+		fetch( window.onycaContactForm.endpoint, {
+			method: 'POST',
+			headers: { 'X-WP-Nonce': window.onycaContactForm.nonce },
+			body: formData
+		} )
+			.then( function ( response ) {
+				return response.json().then( function ( data ) {
+					return { ok: response.ok, data: data };
+				} );
+			} )
+			.then( function ( result ) {
+				if ( result.ok && result.data && 'success' === result.data.status ) {
+					form.reset();
+					showFormResult( 'success', form );
+					return;
+				}
+
+				showFormResult( 'error', form );
+			} )
+			.catch( function () {
+				showFormResult( 'error', form );
+			} )
+			.then( function () {
+				controls.forEach( function ( control ) {
+					control.disabled = false;
+				} );
+
+				if ( submitText ) {
+					submitText.textContent = originalText;
+				}
+			} );
 	}
 
 
@@ -1735,6 +1819,16 @@
 			panes.forEach( function ( pane ) {
 				pane.hidden = pane.dataset.popupPane !== name;
 			} );
+
+			/*
+			 * open() всегда сбрасывает прокрутку перед показом (ниже) — у
+			 * show() самого по себе такого не было. Если форма в уже
+			 * открытом поп-апе была прокручена вниз (до кнопки
+			 * «Отправить»), экран результата подставлялся на той же
+			 * прокрутке — единственное отличие от заведомо рабочего пути
+			 * через open().
+			 */
+			popup.scrollTop = 0;
 
 			notify( name );
 
