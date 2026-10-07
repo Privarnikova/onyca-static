@@ -334,7 +334,7 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 															</div>
 			</div>
 
-						<div class="showreel page-contacts__showreel is-playable" data-popup-open="showreel" role="button" tabindex="0" aria-label="Смотреть ролик">
+						<div class="showreel page-contacts__showreel is-playable" data-showreel-watch="" role="button" tabindex="0" aria-label="Смотреть ролик">
 									<video src="./index_files/120302-720505018.mp4" autoplay="" muted="" loop="" playsinline=""></video>
 							</div>
 		</div>
@@ -658,37 +658,31 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 </section>
 		</div>
 
-		<div class="popup__pane" data-popup-pane="showreel" hidden="">
-			<div style="display:flex;align-items:center;justify-content:center;min-height:70vh;padding:20px 0;">
-				<video src="./index_files/120302-720505018.mp4" controls playsinline style="max-width:100%;max-height:70vh;background:#000;"></video>
-			</div>
-		</div>
-	</div>
-
-	<div class="popup__pane popup__pane--result" data-popup-pane="success" hidden="">
-		<div class="form-result">
-			<span class="form-result__icon form-result__icon--success">
-				<svg class="icon icon--check" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+				<div class="popup__pane popup__pane--result" data-popup-pane="success" hidden="">
+			<div class="form-result">
+				<span class="form-result__icon form-result__icon--success">
+					<svg class="icon icon--check" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
   <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-linejoin="round"></path>
 </svg>
-			</span>
-			<h2 class="form-result__title">Заявка отправлена</h2>
-			<p class="form-result__text">Спасибо! Мы получили вашу заявку<br>и свяжемся с вами в ближайшее время.</p>
-			<button type="button" class="btn btn--cta form-result__action" data-popup-close=""><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Готово</span></button>
+				</span>
+				<h2 class="form-result__title">Заявка отправлена</h2>
+				<p class="form-result__text">Спасибо! Мы получили вашу заявку<br>и свяжемся с вами в ближайшее время.</p>
+				<button type="button" class="btn btn--cta form-result__action" data-popup-close=""><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Готово</span></button>
+			</div>
 		</div>
-	</div>
 
-	<div class="popup__pane popup__pane--result" data-popup-pane="error" hidden="">
-		<div class="form-result">
-			<span class="form-result__icon form-result__icon--error">
-				<svg class="icon icon--x" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+		<div class="popup__pane popup__pane--result" data-popup-pane="error" hidden="">
+			<div class="form-result">
+				<span class="form-result__icon form-result__icon--error">
+					<svg class="icon icon--x" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
   <path d="M18 6L6 18" stroke="currentColor" stroke-linejoin="round"></path>
   <path d="M6 6L18 18" stroke="currentColor" stroke-linejoin="round"></path>
 </svg>
-			</span>
-			<h2 class="form-result__title">Что-то пошло не так</h2>
-			<p class="form-result__text">Не удалось отправить заявку.<br>Попробуйте еще раз или обновите страницу.</p>
-			<button type="button" class="btn btn--cta form-result__action" data-popup-retry=""><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Попробовать снова</span></button>
+				</span>
+				<h2 class="form-result__title">Что-то пошло не так</h2>
+				<p class="form-result__text">Не удалось отправить заявку.<br>Попробуйте еще раз или обновите страницу.</p>
+				<button type="button" class="btn btn--cta form-result__action" data-popup-retry=""><span class="btn__fill" aria-hidden="true"></span><span class="btn__text">Попробовать снова</span></button>
+			</div>
 		</div>
 	</div>
 
